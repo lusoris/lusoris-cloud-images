@@ -34,13 +34,13 @@ install_k3s_binaries() {
 
   if [ "${K3S_ROLE}" = "server" ]; then
     INSTALL_K3S_SKIP_START=true \
-    INSTALL_K3S_VERSION="${K3S_VERSION}" \
-    sh "${install_script}"
+      INSTALL_K3S_VERSION="${K3S_VERSION}" \
+      sh "${install_script}"
   else
     INSTALL_K3S_SKIP_START=true \
-    INSTALL_K3S_VERSION="${K3S_VERSION}" \
-    INSTALL_K3S_EXEC="agent" \
-    sh "${install_script}"
+      INSTALL_K3S_VERSION="${K3S_VERSION}" \
+      INSTALL_K3S_EXEC="agent" \
+      sh "${install_script}"
   fi
 
   rm -f "${install_script}"
@@ -79,4 +79,3 @@ main() {
 }
 
 main "$@"
-
