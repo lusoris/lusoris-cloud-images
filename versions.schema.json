@@ -1,0 +1,118 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Lusoris Cloud Images Version Manifest Schema",
+  "description": "Validates the structure and semantic invariants of versions.json Single Source of Truth",
+  "type": "object",
+  "required": ["distro", "kubernetes", "drivers", "runtimes", "time"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "distro": {
+      "type": "object",
+      "required": ["name", "release", "version", "iso_url", "iso_checksum"],
+      "properties": {
+        "name": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
+        "release": { "type": "string", "pattern": "^[a-z0-9_-]+$" },
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+(\\.[0-9]+)?$" },
+        "iso_url": { "type": "string", "format": "uri" },
+        "iso_checksum": { "type": "string" }
+      }
+    },
+    "kubernetes": {
+      "type": "object",
+      "required": ["version", "major_minor", "images"],
+      "properties": {
+        "version": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+\\.[0-9]+.*$" },
+        "major_minor": { "type": "string", "pattern": "^[0-9]+\\.[0-9]+$" },
+        "images": {
+          "type": "object",
+          "required": [
+            "pause",
+            "coredns",
+            "cilium",
+            "cilium_operator",
+            "kube_vip",
+            "node_exporter",
+            "calico_cni",
+            "calico_node",
+            "calico_controllers",
+            "flannel",
+            "flannel_cni"
+          ],
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "drivers": {
+      "type": "object",
+      "required": ["intel", "amd", "nvidia"],
+      "properties": {
+        "intel": {
+          "type": "object",
+          "required": ["k8s_plugin"],
+          "properties": {
+            "k8s_plugin": { "type": "string" }
+          }
+        },
+        "amd": {
+          "type": "object",
+          "required": ["rocm_legacy_version", "rocm_bleeding_version", "k8s_plugin"],
+          "properties": {
+            "rocm_legacy_version": { "type": "string" },
+            "rocm_bleeding_version": { "type": "string" },
+            "k8s_plugin": { "type": "string" }
+          }
+        },
+        "nvidia": {
+          "type": "object",
+          "required": [
+            "legacy_driver",
+            "mainstream_driver",
+            "modern_driver",
+            "bleeding_driver",
+            "datacenter_driver",
+            "cuda_legacy",
+            "cuda_mainstream",
+            "cuda_modern",
+            "cuda_bleeding",
+            "container_toolkit",
+            "k8s_plugin"
+          ],
+          "properties": {
+            "legacy_driver": { "type": "string" },
+            "mainstream_driver": { "type": "string" },
+            "modern_driver": { "type": "string" },
+            "bleeding_driver": { "type": "string" },
+            "datacenter_driver": { "type": "string" },
+            "cuda_legacy": { "type": "string" },
+            "cuda_mainstream": { "type": "string" },
+            "cuda_modern": { "type": "string" },
+            "cuda_bleeding": { "type": "string" },
+            "container_toolkit": { "type": "string" },
+            "k8s_plugin": { "type": "string" }
+          }
+        }
+      }
+    },
+    "runtimes": {
+      "type": "object",
+      "required": ["containerd", "docker_ce"],
+      "properties": {
+        "containerd": { "type": "string" },
+        "docker_ce": { "type": "string" }
+      }
+    },
+    "time": {
+      "type": "object",
+      "required": ["anycast_nts", "stratum1_nts", "fallback_pool"],
+      "properties": {
+        "anycast_nts": { "type": "string" },
+        "stratum1_nts": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "fallback_pool": { "type": "string" }
+      }
+    }
+  }
+}

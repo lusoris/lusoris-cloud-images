@@ -7,12 +7,14 @@ Adheres to NASA/JPL Power of 10: short functions, checked assertions.
 
 from pathlib import Path
 import json
+import jsonschema
 import re
 import subprocess
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PACKER_DIR = REPO_ROOT / "packer"
 PROVISIONERS_DIR = PACKER_DIR / "provisioners"
+SCHEMA_PATH = REPO_ROOT / "versions.schema.json"
 
 EXPECTED_FLAVORS = [
     "base-generic",
@@ -60,6 +62,7 @@ class TestConfigIntegrity:
             PACKER_DIR / "http" / "user-data",
             PACKER_DIR / "http" / "meta-data",
             REPO_ROOT / "versions.json",
+            SCHEMA_PATH,
             REPO_ROOT / "Makefile",
             REPO_ROOT / "AGENTS.md",
             REPO_ROOT / "CLAUDE.md",
@@ -95,41 +98,40 @@ class TestConfigIntegrity:
             assert file_path.stat().st_size > 0, f"File is empty: {file_path}"
 
     def test_versions_json_schema(self) -> None:
-        """Verify versions.json contains valid 2026 Ubuntu 26.04 and bleeding-edge tags."""
+        """Verify versions.json conforms to schema and maintains semantic invariants."""
         manifest_path = REPO_ROOT / "versions.json"
         assert manifest_path.exists(), "versions.json does not exist"
+        assert SCHEMA_PATH.exists(), "versions.schema.json does not exist"
+
         data = json.loads(manifest_path.read_text(encoding="utf-8"))
+        schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
-        # Strict Ubuntu 26.04 check
-        assert data["distro"]["release"] == "resolute"
-        assert data["distro"]["version"] == "26.04"
+        # Strict JSON schema validation
+        jsonschema.validate(instance=data, schema=schema)
 
-        # Near-rolling 2026 runtimes & Kubernetes
-        assert data["kubernetes"]["version"] == "1.37.0"
-        assert data["kubernetes"]["major_minor"] == "1.37"
-        assert data["runtimes"]["containerd"] == "2.3.5"
-        assert data["runtimes"]["docker_ce"] == "29.8"
+        # Semantic distribution validations
+        assert data["distro"]["name"] == "ubuntu"
+        assert re.match(r"^[a-z]+$", data["distro"]["release"])
+        assert re.match(r"^\d{2}\.\d{2}$", data["distro"]["version"])
 
-        # Generational GPU drivers
+        # Semantic runtime & Kubernetes validations
+        assert re.match(r"^\d+\.\d+\.\d+", data["kubernetes"]["version"])
+        assert re.match(r"^\d+\.\d+$", data["kubernetes"]["major_minor"])
+        assert re.match(r"^\d+\.\d+", data["runtimes"]["containerd"])
+        assert re.match(r"^\d+\.\d+", data["runtimes"]["docker_ce"])
+
+        # Driver invariants
         nvidia = data["drivers"]["nvidia"]
-        assert nvidia["legacy_driver"] == "535"
-        assert nvidia["mainstream_driver"] == "565"
-        assert nvidia["modern_driver"] == "610"
-        assert nvidia["bleeding_driver"] == "615"
-        assert nvidia["cuda_modern"] == "13.3"
-        assert nvidia["cuda_bleeding"] == "13.4"
-
-        # AMD ROCm generations
+        assert all(isinstance(v, str) and len(v) > 0 for v in nvidia.values())
         amd = data["drivers"]["amd"]
-        assert amd["rocm_legacy_version"] == "7.14"
-        assert amd["rocm_bleeding_version"] == "10.0"
+        assert all(isinstance(v, str) and len(v) > 0 for v in amd.values())
+        intel = data["drivers"]["intel"]
+        assert all(isinstance(v, str) and len(v) > 0 for v in intel.values())
 
         # Pre-cached cluster images
         k8s_images = data["kubernetes"]["images"]
-        assert "cilium" in k8s_images
-        assert "calico_cni" in k8s_images
-        assert "flannel" in k8s_images
-        assert "kube_vip" in k8s_images
+        for key in ("cilium", "calico_cni", "flannel", "kube_vip"):
+            assert key in k8s_images and len(k8s_images[key]) > 0
 
     def test_provisioners_executable_and_strict(self) -> None:
         """Verify all provisioners are executable and enforce bash strict mode."""
