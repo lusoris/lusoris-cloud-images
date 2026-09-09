@@ -15,15 +15,30 @@ on:
           - base-generic
           - base-intel
           - base-amd
+          - base-nvidia-legacy
+          - base-nvidia-mainstream
+          - base-nvidia-bleeding
+          - base-nvidia-datacenter
           - docker-generic
           - docker-intel
           - docker-amd
           - docker-nvidia
+          - docker-nvidia-bleeding
+          - podman-generic
           - k8s-node-generic
+          - k8s-node-cilium
+          - k8s-node-calico
+          - k8s-node-flannel
           - k8s-node-intel
           - k8s-node-amd
           - k8s-node-nvidia
+          - k8s-node-nvidia-bleeding
+          - ai-infer-generic
+          - ai-infer-intel
+          - ai-infer-amd
           - ai-infer-nvidia
+          - ai-infer-nvidia-bleeding
+
 
 permissions:
   contents: write

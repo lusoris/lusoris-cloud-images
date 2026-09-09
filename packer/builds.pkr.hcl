@@ -479,7 +479,69 @@ build {
   }
 }
 
-# 22. AI Infer NVIDIA Mainstream: NVIDIA 565 + THP always + vLLM/Ollama
+# 22. AI Infer Generic: CPU High-Throughput Inference (AMX, AVX-512, NUMA, vLLM/Ollama CPU)
+build {
+  name    = "ai-infer-generic"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=ai-infer-generic", "BM_GEN=generic", "KERNEL_PROFILE=ai-infer"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/40-docker-runtime.sh",
+      "${path.root}/provisioners/60-ai-infer-runtime.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 23. AI Infer Intel: Intel Arc/Battlemage Xe2 + OpenVINO / IPEX-LLM + Level Zero CDI
+build {
+  name    = "ai-infer-intel"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=ai-infer-intel", "BM_GEN=intel", "KERNEL_PROFILE=ai-infer"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/30-gpu-intel.sh",
+      "${path.root}/provisioners/40-docker-runtime.sh",
+      "${path.root}/provisioners/60-ai-infer-runtime.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 24. AI Infer AMD: AMD ROCm 10 + RDNA3/4 & Instinct MI300 + /dev/kfd CDI
+build {
+  name    = "ai-infer-amd"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=ai-infer-amd", "BM_GEN=amd", "KERNEL_PROFILE=ai-infer"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/32-gpu-amd-rocm.sh",
+      "${path.root}/provisioners/40-docker-runtime.sh",
+      "${path.root}/provisioners/60-ai-infer-runtime.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 25. AI Infer NVIDIA Mainstream: NVIDIA 565 + THP always + vLLM/Ollama
 build {
   name    = "ai-infer-nvidia"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
@@ -493,13 +555,14 @@ build {
       "${path.root}/provisioners/20-kernel-sysctl.sh",
       "${path.root}/provisioners/25-baremetal-tuning.sh",
       "${path.root}/provisioners/34-gpu-nvidia-mainstream.sh",
+      "${path.root}/provisioners/40-docker-runtime.sh",
       "${path.root}/provisioners/60-ai-infer-runtime.sh",
       "${path.root}/provisioners/99-cleanup.sh"
     ]
   }
 }
 
-# 23. AI Infer NVIDIA Bleeding: NVIDIA R615 / CUDA 13.4 + lowlatency kernel + THP
+# 26. AI Infer NVIDIA Bleeding: NVIDIA R615 / CUDA 13.4 + Blackwell RTX 5090 / B200 + THP
 build {
   name    = "ai-infer-nvidia-bleeding"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
@@ -513,8 +576,10 @@ build {
       "${path.root}/provisioners/20-kernel-sysctl.sh",
       "${path.root}/provisioners/25-baremetal-tuning.sh",
       "${path.root}/provisioners/36-gpu-nvidia-bleeding.sh",
+      "${path.root}/provisioners/40-docker-runtime.sh",
       "${path.root}/provisioners/60-ai-infer-runtime.sh",
       "${path.root}/provisioners/99-cleanup.sh"
     ]
   }
 }
+

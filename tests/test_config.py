@@ -36,9 +36,13 @@ EXPECTED_FLAVORS = [
     "k8s-node-amd",
     "k8s-node-nvidia",
     "k8s-node-nvidia-bleeding",
+    "ai-infer-generic",
+    "ai-infer-intel",
+    "ai-infer-amd",
     "ai-infer-nvidia",
     "ai-infer-nvidia-bleeding",
 ]
+
 
 
 class TestConfigIntegrity:

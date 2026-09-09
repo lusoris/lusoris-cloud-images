@@ -5,8 +5,10 @@
         build-podman-generic \
         build-k8s-generic build-k8s-cilium build-k8s-calico build-k8s-flannel \
         build-k8s-intel build-k8s-amd build-k8s-nvidia build-k8s-nvidia-bleeding \
+        build-ai-infer-generic build-ai-infer-intel build-ai-infer-amd \
         build-ai-infer-nvidia build-ai-infer-nvidia-bleeding \
         build-generic build-intel build-amd build-nvidia
+
 
 SHELL := /usr/bin/env bash
 PACKER := packer
@@ -115,11 +117,21 @@ build-k8s-nvidia-bleeding: init ## Build k8s-node-nvidia-bleeding image (NVIDIA 
 	@cd packer && $(PACKER) build -only="k8s-node-nvidia-bleeding.qemu.image" .
 
 # AI Inference Appliances
+build-ai-infer-generic: init ## Build ai-infer-generic host (CPU High-Throughput / AMX / AVX-512)
+	@cd packer && $(PACKER) build -only="ai-infer-generic.qemu.image" .
+
+build-ai-infer-intel: init ## Build ai-infer-intel host (Intel Arc/Xe2 / OpenVINO / Level Zero)
+	@cd packer && $(PACKER) build -only="ai-infer-intel.qemu.image" .
+
+build-ai-infer-amd: init ## Build ai-infer-amd host (AMD ROCm 10 / RDNA 3/4 & Instinct)
+	@cd packer && $(PACKER) build -only="ai-infer-amd.qemu.image" .
+
 build-ai-infer-nvidia: init ## Build ai-infer-nvidia host (NVIDIA 565 / Hugepages / vLLM)
 	@cd packer && $(PACKER) build -only="ai-infer-nvidia.qemu.image" .
 
 build-ai-infer-nvidia-bleeding: init ## Build ai-infer-nvidia-bleeding host (NVIDIA 615 / Blackwell / vLLM)
 	@cd packer && $(PACKER) build -only="ai-infer-nvidia-bleeding.qemu.image" .
+
 
 # Backwards compatibility aliases
 build-generic: build-base-generic

@@ -4,7 +4,7 @@
 
 ---
 
-## Comprehensive 23-Flavor Matrix
+## Comprehensive 26-Flavor Matrix
 
 | Flavor Name | Workload Tier | Hardware Stack | Kernel Profile | Preheat Profile | Key Components & Target Platforms |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -29,8 +29,11 @@
 | **`k8s-node-amd`** | K8s Worker | AMD ROCm 10 | `k8s` | `cilium` | containerd 2.3.5 + AMD ROCm 10 + AMD K8s Plugin v1.37.0 |
 | **`k8s-node-nvidia`** | K8s Worker | NVIDIA Mainstream | `k8s` | `cilium` | containerd 2.3.5 + NVIDIA 565 + NVIDIA K8s Plugin v0.20.0 |
 | **`k8s-node-nvidia-bleeding`** | K8s Worker | NVIDIA Bleeding | `k8s` | `cilium` | containerd 2.3.5 + NVIDIA 615 + NVIDIA K8s Plugin v0.20.0 |
-| **`ai-infer-nvidia`** | AI Inference | NVIDIA Mainstream | `ai-infer` | None | NVIDIA 565, Transparent Hugepages, NUMA, vLLM / Ollama |
-| **`ai-infer-nvidia-bleeding`**| AI Inference | NVIDIA Bleeding | `ai-infer` | None | NVIDIA 615, Blackwell RTX 5090 / B200, vLLM / Ollama |
+| **`ai-infer-generic`** | AI Inference | CPU High-Throughput | `ai-infer` | None | AMX, AVX-512, NUMA, vLLM / Ollama CPU, Docker CE |
+| **`ai-infer-intel`** | AI Inference | Intel Xe/Arc/Xe2 | `ai-infer` | None | Intel Level Zero, OpenVINO, IPEX-LLM, CDI, Docker CE |
+| **`ai-infer-amd`** | AI Inference | AMD ROCm 10 | `ai-infer` | None | AMD ROCm 10, /dev/kfd, RDNA 3/4 & Instinct, CDI, Docker CE |
+| **`ai-infer-nvidia`** | AI Inference | NVIDIA Mainstream | `ai-infer` | None | NVIDIA 565, Transparent Hugepages, NUMA, vLLM, Docker CE |
+| **`ai-infer-nvidia-bleeding`**| AI Inference | NVIDIA Bleeding | `ai-infer` | None | NVIDIA 615, Blackwell RTX 5090 / B200, vLLM, Docker CE |
 
 ---
 
@@ -66,8 +69,11 @@ make build-k8s-amd            # AMD ROCm 10 GPU
 make build-k8s-nvidia         # NVIDIA 565 Mainstream
 make build-k8s-nvidia-bleeding # NVIDIA 615 Bleeding (RTX 5090)
 
-# AI Inference Appliances
-make build-ai-infer-nvidia
-make build-ai-infer-nvidia-bleeding
+# AI Inference Appliances (All Vendors)
+make build-ai-infer-generic   # CPU High-Throughput / AMX / AVX-512
+make build-ai-infer-intel     # Intel Arc / Battlemage Xe2
+make build-ai-infer-amd       # AMD ROCm 10 / RDNA 3/4 & Instinct
+make build-ai-infer-nvidia    # NVIDIA 565 Mainstream
+make build-ai-infer-nvidia-bleeding # NVIDIA 615 Bleeding (RTX 5090)
 ```
 

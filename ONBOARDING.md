@@ -288,7 +288,7 @@ sudo shutdown -h now
 
 ---
 
-## 7. The 23-Flavor Selection Guide
+## 7. The 26-Flavor Selection Guide
 
 Choose the flavor that matches your workload and hardware stack:
 
@@ -308,8 +308,11 @@ Choose the flavor that matches your workload and hardware stack:
                                                                │
                                                                ▼
                                                         [AI Inference]
-                                                       ai-infer-nvidia
-                                                       ai-infer-nvidia-bleeding
+                                                       ai-infer-generic (CPU)
+                                                       ai-infer-intel (Arc/Xe2)
+                                                       ai-infer-amd (ROCm 10)
+                                                       ai-infer-nvidia (565)
+                                                       ai-infer-nvidia-bleeding(615)
 ```
 
 ### Build Commands Reference
@@ -337,8 +340,12 @@ Choose the flavor that matches your workload and hardware stack:
 | **Kubernetes** | `k8s-node-amd` | `make build-k8s-amd` | AMD ROCm 10 + AMD K8s Plugin v1.37.0 |
 | **Kubernetes** | `k8s-node-nvidia` | `make build-k8s-nvidia` | NVIDIA 565 + NVIDIA K8s Plugin v0.20.0 |
 | **Kubernetes** | `k8s-node-nvidia-bleeding`| `make build-k8s-nvidia-bleeding` | NVIDIA 615 + NVIDIA K8s Plugin v0.20.0 |
+| **AI Inference**| `ai-infer-generic` | `make build-ai-infer-generic` | AMX, AVX-512, NUMA, vLLM / Ollama CPU |
+| **AI Inference**| `ai-infer-intel` | `make build-ai-infer-intel` | Intel Level Zero, OpenVINO, IPEX-LLM, CDI |
+| **AI Inference**| `ai-infer-amd` | `make build-ai-infer-amd` | AMD ROCm 10, /dev/kfd, RDNA 3/4 & Instinct |
 | **AI Inference**| `ai-infer-nvidia` | `make build-ai-infer-nvidia` | NVIDIA 565, Hugepages, vLLM / Ollama |
 | **AI Inference**| `ai-infer-nvidia-bleeding`| `make build-ai-infer-nvidia-bleeding` | NVIDIA 615, Blackwell RTX 5090 / B200, vLLM |
+
 
 ---
 

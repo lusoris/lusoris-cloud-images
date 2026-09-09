@@ -57,7 +57,7 @@ Key capabilities:
 
 ---
 
-## 3. The 4-Dimensional Flavor Matrix (23 Flavors)
+## 3. The 4-Dimensional Flavor Matrix (26 Flavors)
 
 | Workload Tier | Hardware Stack | Flavor Target | Key Components |
 | :--- | :--- | :--- | :--- |
@@ -82,6 +82,9 @@ Key capabilities:
 | **Kubernetes**| AMD GPU | `k8s-node-amd` | containerd 2.3.5 + AMD ROCm 10 + AMD K8s Device Plugin |
 | **Kubernetes**| NVIDIA Mainstream | `k8s-node-nvidia` | containerd 2.3.5 + NVIDIA 565 + NVIDIA K8s Device Plugin |
 | **Kubernetes**| NVIDIA Bleeding | `k8s-node-nvidia-bleeding`| containerd 2.3.5 + NVIDIA 615 + NVIDIA K8s Device Plugin |
+| **AI Infer** | Generic (CPU) | `ai-infer-generic` | AMX, AVX-512, NUMA, vLLM/Ollama CPU, Docker CE |
+| **AI Infer** | Intel GPU | `ai-infer-intel` | Intel Level Zero, OpenVINO, IPEX-LLM, CDI, Docker CE |
+| **AI Infer** | AMD GPU | `ai-infer-amd` | AMD ROCm 10, /dev/kfd, RDNA 3/4 & Instinct, CDI, Docker CE |
 | **AI Infer** | NVIDIA Mainstream | `ai-infer-nvidia` | Transparent hugepages, numactl, vLLM/Ollama (NVIDIA 565) |
 | **AI Infer** | NVIDIA Bleeding | `ai-infer-nvidia-bleeding`| Transparent hugepages, Blackwell RTX 5090 / B200 (NVIDIA 615) |
 
@@ -98,5 +101,9 @@ make build-base-generic # Build base-generic image via local QEMU/KVM
 make build-docker-generic # Build docker-generic image
 make build-k8s-generic  # Build k8s-node-generic image (lean)
 make build-k8s-cilium   # Build k8s-node-cilium image (preheated)
+make build-ai-infer-generic # Build CPU inference image
+make build-ai-infer-intel   # Build Intel Arc inference image
+make build-ai-infer-amd     # Build AMD ROCm inference image
+make build-ai-infer-nvidia  # Build NVIDIA 565 inference image
 make build-ai-infer-nvidia-bleeding # Build ai-infer-nvidia-bleeding image
 ```
