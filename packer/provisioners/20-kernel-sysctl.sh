@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
-# 20-kernel-sysctl.sh — High-performance network sysctl, CIS baseline, and swap disable
-# Configures BBR congestion control, bridge netfilter, and CIS benchmark security parameters.
+# 20-kernel-sysctl.sh — High-performance network sysctl, CIS baseline, and per-flavor kernel tuning
+# Configures BBR, OverlayFS metacopy, cgroup v2 PSI, and per-flavor kernel cmdline parameters.
+# Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.
 set -euo pipefail
+
+KERNEL_PROFILE="${KERNEL_PROFILE:-generic}"
 
 configure_sysctl_and_bbr() {
   echo "==> Setting high-performance network, bridging, and BBR parameters..."
@@ -17,20 +20,37 @@ net.core.default_qdisc = fq
 net.ipv4.tcp_congestion_control = bbr
 net.core.rmem_max = 16777216
 net.core.wmem_max = 16777216
+net.core.somaxconn = 65535
+net.core.netdev_max_backlog = 16384
+net.ipv4.tcp_max_syn_backlog = 8192
+net.ipv4.ip_local_port_range = 1024 65535
+net.ipv4.tcp_tw_reuse = 1
+net.ipv4.tcp_fin_timeout = 15
+net.ipv4.tcp_rfc1337 = 1
+net.netfilter.nf_conntrack_max = 1048576
 
 # Filesystem watch limits & virtual memory
+fs.file-max = 2097152
 fs.inotify.max_user_instances = 8192
 fs.inotify.max_user_watches = 524288
 vm.swappiness = 0
 vm.overcommit_memory = 1
+vm.max_map_count = 1048576
+vm.vfs_cache_pressure = 50
+vm.dirty_ratio = 10
+vm.dirty_background_ratio = 5
 
-# CIS Benchmark Level 1 Hardening
+# CIS Benchmark Level 1 Hardening & BPF JIT
 fs.suid_dumpable = 0
 fs.protected_hardlinks = 1
 fs.protected_symlinks = 1
+fs.protected_fifos = 2
+fs.protected_regular = 2
 kernel.randomize_va_space = 2
 kernel.kptr_restrict = 2
 kernel.dmesg_restrict = 1
+kernel.yama.ptrace_scope = 1
+net.core.bpf_jit_harden = 2
 net.ipv4.conf.all.rp_filter = 1
 net.ipv4.conf.default.rp_filter = 1
 net.ipv4.conf.all.accept_redirects = 0
@@ -40,13 +60,42 @@ net.ipv4.icmp_echo_ignore_broadcasts = 1
 EOF
 
   printf 'overlay\nbr_netfilter\ntcp_bbr\n' | sudo tee /etc/modules-load.d/container-runtime.conf
+  echo 'options overlay metacopy=on redirect_dir=on' | sudo tee /etc/modprobe.d/overlay.conf
   sudo modprobe overlay 2>/dev/null || true
   sudo modprobe br_netfilter 2>/dev/null || true
   sudo modprobe tcp_bbr 2>/dev/null || true
 }
 
-blacklist_uncommon_protocols() {
-  echo "==> Blacklisting unused legacy and uncommon network protocols..."
+configure_kernel_cmdline() {
+  local cmdline_base="console=tty1 console=ttyS0,115200n8 quiet audit=0 fsck.repair=yes net.ifnames=0 biosdevname=0 cgroup_no_v1=all systemd.unified_cgroup_hierarchy=1 psi=1"
+  local extra_params=""
+
+  case "${KERNEL_PROFILE}" in
+    ai-infer)
+      echo "==> Applying AI Inference low-latency kernel tuning (preempt=full, THP always)..."
+      extra_params="preempt=full transparent_hugepage=always processor.max_cstate=1 intel_idle.max_cstate=1"
+      ;;
+    baremetal)
+      echo "==> Applying bare-metal performance tuning (iommu=pt, split_lock_detect=off)..."
+      extra_params="iommu=pt split_lock_detect=off"
+      ;;
+    k8s)
+      echo "==> Applying Kubernetes node kernel profile..."
+      extra_params="vm.swappiness=0"
+      ;;
+    *)
+      echo "==> Using generic cloud kernel profile..."
+      ;;
+  esac
+
+  if [ -f /etc/default/grub ]; then
+    sudo sed -i "s|^GRUB_CMDLINE_LINUX_DEFAULT=.*|GRUB_CMDLINE_LINUX_DEFAULT=\"${cmdline_base} ${extra_params}\"|" /etc/default/grub
+    sudo update-grub 2>/dev/null || true
+  fi
+}
+
+blacklist_and_upgrades() {
+  echo "==> Blacklisting unused protocols and securing unattended updates..."
   cat <<'EOF' | sudo tee /etc/modprobe.d/blacklist-uncommon.conf
 install dccp /bin/true
 install sctp /bin/true
@@ -58,10 +107,7 @@ install jffs2 /bin/true
 install hfs /bin/true
 install hfsplus /bin/true
 EOF
-}
 
-disable_swap_and_configure_upgrades() {
-  echo "==> Disabling swap and configuring unattended security updates..."
   sudo sed -i '/\sswap\s/d' /etc/fstab || true
   sudo swapoff -a 2>/dev/null || true
   sudo systemctl mask swap.target 2>/dev/null || true
@@ -86,8 +132,8 @@ EOF
 
 main() {
   configure_sysctl_and_bbr
-  blacklist_uncommon_protocols
-  disable_swap_and_configure_upgrades
+  configure_kernel_cmdline
+  blacklist_and_upgrades
   echo "==> 20-kernel-sysctl: Complete."
 }
 

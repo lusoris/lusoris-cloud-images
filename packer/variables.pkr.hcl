@@ -10,6 +10,18 @@ variable "flavor" {
   description = "Target image flavor across the 4D matrix"
 }
 
+variable "preheat_profile" {
+  type        = string
+  default     = "lean"
+  description = "Kubernetes image preheat profile: lean (pause only), cilium, calico, flannel"
+}
+
+variable "kernel_profile" {
+  type        = string
+  default     = "generic"
+  description = "Hand-optimized kernel tuning profile: generic, baremetal, k8s, ai-infer"
+}
+
 variable "distro_version" {
   type        = string
   default     = "26.04"

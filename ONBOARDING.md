@@ -77,11 +77,14 @@ make build-docker-nvidia
 
 ### Kubernetes Node Images
 ```bash
-# Kubernetes worker node with pre-cached Cilium and kube-vip
+# Kubernetes worker node with lean footprint (zero-preheat)
 make build-k8s-generic
 
-# Kubernetes worker node with Intel GPU Device Plugin
-make build-k8s-intel
+# Kubernetes worker node with preheated Cilium and kube-vip
+make build-k8s-cilium
+
+# Kubernetes worker node with Blackwell GPU (RTX 5090 / B200)
+make build-k8s-nvidia-bleeding
 ```
 
 ---

@@ -4,27 +4,48 @@
 locals {
   manifest = jsondecode(file("${path.root}/../versions.json"))
 
+  distro_release           = local.manifest.distro.release
   k8s_major_minor          = local.manifest.kubernetes.major_minor
   k8s_version              = local.manifest.kubernetes.version
   img_pause                = local.manifest.kubernetes.images.pause
   img_coredns              = local.manifest.kubernetes.images.coredns
   img_cilium               = local.manifest.kubernetes.images.cilium
+  img_cilium_operator      = local.manifest.kubernetes.images.cilium_operator
   img_kube_vip             = local.manifest.kubernetes.images.kube_vip
   img_node_exporter        = local.manifest.kubernetes.images.node_exporter
+  img_calico_cni           = local.manifest.kubernetes.images.calico_cni
+  img_calico_node          = local.manifest.kubernetes.images.calico_node
+  img_calico_ctrl          = local.manifest.kubernetes.images.calico_controllers
+  img_flannel              = local.manifest.kubernetes.images.flannel
+  img_flannel_cni          = local.manifest.kubernetes.images.flannel_cni
   img_intel_plugin         = local.manifest.drivers.intel.k8s_plugin
   img_amd_plugin           = local.manifest.drivers.amd.k8s_plugin
   img_nvidia_plugin        = local.manifest.drivers.nvidia.k8s_plugin
   nvidia_legacy_driver     = local.manifest.drivers.nvidia.legacy_driver
   nvidia_mainstream_driver = local.manifest.drivers.nvidia.mainstream_driver
+  nvidia_modern_driver     = local.manifest.drivers.nvidia.modern_driver
+  nvidia_bleeding_driver   = local.manifest.drivers.nvidia.bleeding_driver
   nvidia_datacenter_driver = local.manifest.drivers.nvidia.datacenter_driver
-  rocm_version             = local.manifest.drivers.amd.rocm_version
+  cuda_legacy              = local.manifest.drivers.nvidia.cuda_legacy
+  cuda_mainstream          = local.manifest.drivers.nvidia.cuda_mainstream
+  cuda_modern              = local.manifest.drivers.nvidia.cuda_modern
+  cuda_bleeding            = local.manifest.drivers.nvidia.cuda_bleeding
+  rocm_legacy_version      = local.manifest.drivers.amd.rocm_legacy_version
+  rocm_bleeding_version    = local.manifest.drivers.amd.rocm_bleeding_version
 
   common_env = [
+    "DISTRO_RELEASE=${local.distro_release}",
     "K8S_MAJOR_MINOR=${local.k8s_major_minor}",
     "K8S_VERSION=${local.k8s_version}",
     "IMG_PAUSE=${local.img_pause}",
     "IMG_COREDNS=${local.img_coredns}",
     "IMG_CILIUM=${local.img_cilium}",
+    "IMG_CILIUM_OPERATOR=${local.img_cilium_operator}",
+    "IMG_CALICO_CNI=${local.img_calico_cni}",
+    "IMG_CALICO_NODE=${local.img_calico_node}",
+    "IMG_CALICO_CTRL=${local.img_calico_ctrl}",
+    "IMG_FLANNEL=${local.img_flannel}",
+    "IMG_FLANNEL_CNI=${local.img_flannel_cni}",
     "IMG_KUBE_VIP=${local.img_kube_vip}",
     "IMG_NODE_EXPORTER=${local.img_node_exporter}",
     "IMG_INTEL_PLUGIN=${local.img_intel_plugin}",
@@ -32,8 +53,15 @@ locals {
     "IMG_NVIDIA_PLUGIN=${local.img_nvidia_plugin}",
     "NVIDIA_LEGACY_DRIVER=${local.nvidia_legacy_driver}",
     "NVIDIA_MAINSTREAM_DRIVER=${local.nvidia_mainstream_driver}",
+    "NVIDIA_MODERN_DRIVER=${local.nvidia_modern_driver}",
+    "NVIDIA_BLEEDING_DRIVER=${local.nvidia_bleeding_driver}",
     "NVIDIA_DATACENTER_BRANCH=${local.nvidia_datacenter_driver}",
-    "ROCM_VERSION=${local.rocm_version}"
+    "CUDA_LEGACY=${local.cuda_legacy}",
+    "CUDA_MAINSTREAM=${local.cuda_mainstream}",
+    "CUDA_MODERN=${local.cuda_modern}",
+    "CUDA_BLEEDING=${local.cuda_bleeding}",
+    "ROCM_VERSION=${local.rocm_bleeding_version}",
+    "ROCM_LEGACY_VERSION=${local.rocm_legacy_version}"
   ]
 }
 
@@ -43,7 +71,7 @@ build {
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=base-generic", "BM_GEN=generic"], local.common_env)
+    environment_vars = concat(["FLAVOR=base-generic", "BM_GEN=generic", "KERNEL_PROFILE=generic"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -55,13 +83,13 @@ build {
   }
 }
 
-# 2. Base Intel: Hardened cloud image with Intel Xe/i915 GPU acceleration
+# 2. Base Intel: Hardened cloud image with Intel Xe/Arc GPU acceleration
 build {
   name    = "base-intel"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=base-intel", "BM_GEN=intel"], local.common_env)
+    environment_vars = concat(["FLAVOR=base-intel", "BM_GEN=intel", "KERNEL_PROFILE=generic"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -74,13 +102,13 @@ build {
   }
 }
 
-# 3. Base AMD: Hardened cloud image with AMD Radeon / APU acceleration
+# 3. Base AMD: AMD Mesa VA-API and RADV Vulkan runtime
 build {
   name    = "base-amd"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=base-amd", "BM_GEN=amd"], local.common_env)
+    environment_vars = concat(["FLAVOR=base-amd", "BM_GEN=amd", "KERNEL_PROFILE=generic"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -93,13 +121,13 @@ build {
   }
 }
 
-# 4. Base NVIDIA Legacy: Pascal & Volta (CUDA 12.2 / Driver 535)
+# 4. Base NVIDIA Legacy: NVIDIA 535 LTSB for Pascal and Volta
 build {
   name    = "base-nvidia-legacy"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=base-nvidia-legacy", "BM_GEN=generic"], local.common_env)
+    environment_vars = concat(["FLAVOR=base-nvidia-legacy", "BM_GEN=generic", "KERNEL_PROFILE=generic"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -112,13 +140,13 @@ build {
   }
 }
 
-# 5. Base NVIDIA Mainstream: Turing, Ampere, Ada (CUDA 12.8 / Driver 565)
+# 5. Base NVIDIA Mainstream: NVIDIA 565 for Turing, Ampere, and Ada
 build {
   name    = "base-nvidia-mainstream"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=base-nvidia-mainstream", "BM_GEN=generic"], local.common_env)
+    environment_vars = concat(["FLAVOR=base-nvidia-mainstream", "BM_GEN=generic", "KERNEL_PROFILE=generic"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -131,13 +159,32 @@ build {
   }
 }
 
-# 6. Base NVIDIA Datacenter: Hopper & Blackwell (Open Modules + Fabric Manager)
+# 6. Base NVIDIA Bleeding: NVIDIA R615 / CUDA 13.4 for Blackwell RTX 5090 & B200
+build {
+  name    = "base-nvidia-bleeding"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=base-nvidia-bleeding", "BM_GEN=generic", "KERNEL_PROFILE=generic"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/36-gpu-nvidia-bleeding.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 7. Base NVIDIA Datacenter: NVIDIA 615 Open Kernel Modules + Fabric Manager
 build {
   name    = "base-nvidia-datacenter"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=base-nvidia-datacenter", "BM_GEN=generic"], local.common_env)
+    environment_vars = concat(["FLAVOR=base-nvidia-datacenter", "BM_GEN=generic", "KERNEL_PROFILE=generic"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -150,13 +197,13 @@ build {
   }
 }
 
-# 7. Docker Generic: Hardened Docker CE + Compose appliance
+# 8. Docker Generic: Docker CE 29.8 + Compose v2
 build {
   name    = "docker-generic"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=docker-generic", "BM_GEN=generic"], local.common_env)
+    environment_vars = concat(["FLAVOR=docker-generic", "BM_GEN=generic", "KERNEL_PROFILE=generic"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -169,13 +216,13 @@ build {
   }
 }
 
-# 8. Docker Intel: Docker CE with Intel QuickSync & Level Zero
+# 9. Docker Intel: Docker CE + Intel QuickSync & Level Zero
 build {
   name    = "docker-intel"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=docker-intel", "BM_GEN=intel"], local.common_env)
+    environment_vars = concat(["FLAVOR=docker-intel", "BM_GEN=intel", "KERNEL_PROFILE=generic"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -189,13 +236,13 @@ build {
   }
 }
 
-# 9. Docker AMD: Docker CE with AMD ROCm 6.x compute runtime
+# 10. Docker AMD: Docker CE + AMD ROCm 10 Compute Stack
 build {
   name    = "docker-amd"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=docker-amd", "BM_GEN=amd"], local.common_env)
+    environment_vars = concat(["FLAVOR=docker-amd", "BM_GEN=amd", "KERNEL_PROFILE=generic"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -209,13 +256,13 @@ build {
   }
 }
 
-# 10. Docker NVIDIA: Docker CE with NVIDIA Container Toolkit & CDI
+# 11. Docker NVIDIA Mainstream: Docker CE + NVIDIA Container Toolkit
 build {
   name    = "docker-nvidia"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=docker-nvidia", "BM_GEN=generic"], local.common_env)
+    environment_vars = concat(["FLAVOR=docker-nvidia", "BM_GEN=generic", "KERNEL_PROFILE=generic"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -229,13 +276,33 @@ build {
   }
 }
 
-# 11. Podman Generic: Rootless Podman 5.x with Quadlet systemd support
+# 12. Docker NVIDIA Bleeding: Docker CE + NVIDIA R615 / CUDA 13.4
+build {
+  name    = "docker-nvidia-bleeding"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=docker-nvidia-bleeding", "BM_GEN=generic", "KERNEL_PROFILE=generic"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/36-gpu-nvidia-bleeding.sh",
+      "${path.root}/provisioners/40-docker-runtime.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 13. Podman Generic: Rootless Podman 5.x + Netavark + Quadlet
 build {
   name    = "podman-generic"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=podman-generic", "BM_GEN=generic"], local.common_env)
+    environment_vars = concat(["FLAVOR=podman-generic", "BM_GEN=generic", "KERNEL_PROFILE=generic"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -248,13 +315,13 @@ build {
   }
 }
 
-# 12. Kubernetes Node Generic: Worker node with pre-cached Cilium and kube-vip
+# 14. K8s Node Generic (Lean): containerd 2.3.5, kubelet, zero preheat (~1.2GB)
 build {
   name    = "k8s-node-generic"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=k8s-node-generic", "BM_GEN=generic"], local.common_env)
+    environment_vars = concat(["FLAVOR=k8s-node-generic", "PREHEAT_PROFILE=lean", "KERNEL_PROFILE=k8s"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -268,13 +335,73 @@ build {
   }
 }
 
-# 13. Kubernetes Node Intel: Worker node with Intel GPU drivers & Device Plugin
+# 15. K8s Node Cilium: Preheated Cilium 1.20 + kube-vip 1.2.3
+build {
+  name    = "k8s-node-cilium"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=k8s-node-cilium", "PREHEAT_PROFILE=cilium", "KERNEL_PROFILE=k8s"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/50-k8s-runtime.sh",
+      "${path.root}/provisioners/55-k8s-precache.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 16. K8s Node Calico: Preheated Calico 3.32 + kube-vip 1.2.3
+build {
+  name    = "k8s-node-calico"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=k8s-node-calico", "PREHEAT_PROFILE=calico", "KERNEL_PROFILE=k8s"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/50-k8s-runtime.sh",
+      "${path.root}/provisioners/55-k8s-precache.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 17. K8s Node Flannel: Preheated Flannel 0.28 + kube-vip 1.2.3
+build {
+  name    = "k8s-node-flannel"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=k8s-node-flannel", "PREHEAT_PROFILE=flannel", "KERNEL_PROFILE=k8s"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/50-k8s-runtime.sh",
+      "${path.root}/provisioners/55-k8s-precache.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 18. K8s Node Intel: Intel GPU drivers + Intel Device Plugin v0.36
 build {
   name    = "k8s-node-intel"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=k8s-node-intel", "BM_GEN=intel"], local.common_env)
+    environment_vars = concat(["FLAVOR=k8s-node-intel", "BM_GEN=intel", "PREHEAT_PROFILE=lean", "KERNEL_PROFILE=k8s"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -289,13 +416,13 @@ build {
   }
 }
 
-# 14. Kubernetes Node AMD: Worker node with AMD ROCm & AMD Device Plugin
+# 19. K8s Node AMD: AMD ROCm 10 + AMD Device Plugin v1.37
 build {
   name    = "k8s-node-amd"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=k8s-node-amd", "BM_GEN=amd"], local.common_env)
+    environment_vars = concat(["FLAVOR=k8s-node-amd", "BM_GEN=amd", "PREHEAT_PROFILE=lean", "KERNEL_PROFILE=k8s"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -310,13 +437,13 @@ build {
   }
 }
 
-# 15. Kubernetes Node NVIDIA: Worker node with NVIDIA toolkit & NVIDIA Device Plugin
+# 20. K8s Node NVIDIA Mainstream: NVIDIA 565/595 + Device Plugin v0.20
 build {
   name    = "k8s-node-nvidia"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=k8s-node-nvidia", "BM_GEN=generic"], local.common_env)
+    environment_vars = concat(["FLAVOR=k8s-node-nvidia", "BM_GEN=generic", "PREHEAT_PROFILE=lean", "KERNEL_PROFILE=k8s"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -331,13 +458,34 @@ build {
   }
 }
 
-# 16. AI Inference NVIDIA: Tuned vLLM / Ollama node with hugepages and CUDA
+# 21. K8s Node NVIDIA Bleeding: NVIDIA R615 / CUDA 13.4 + Device Plugin v0.20
+build {
+  name    = "k8s-node-nvidia-bleeding"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=k8s-node-nvidia-bleeding", "BM_GEN=generic", "PREHEAT_PROFILE=lean", "KERNEL_PROFILE=k8s"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/36-gpu-nvidia-bleeding.sh",
+      "${path.root}/provisioners/50-k8s-runtime.sh",
+      "${path.root}/provisioners/55-k8s-precache.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 22. AI Infer NVIDIA Mainstream: NVIDIA 565 + THP always + vLLM/Ollama
 build {
   name    = "ai-infer-nvidia"
   sources = ["source.qemu.image", "source.proxmox-clone.template"]
 
   provisioner "shell" {
-    environment_vars = concat(["FLAVOR=ai-infer-nvidia", "BM_GEN=generic"], local.common_env)
+    environment_vars = concat(["FLAVOR=ai-infer-nvidia", "BM_GEN=generic", "KERNEL_PROFILE=ai-infer"], local.common_env)
     scripts = [
       "${path.root}/provisioners/00-base-strip.sh",
       "${path.root}/provisioners/05-hypervisor-agents.sh",
@@ -345,7 +493,26 @@ build {
       "${path.root}/provisioners/20-kernel-sysctl.sh",
       "${path.root}/provisioners/25-baremetal-tuning.sh",
       "${path.root}/provisioners/34-gpu-nvidia-mainstream.sh",
-      "${path.root}/provisioners/40-docker-runtime.sh",
+      "${path.root}/provisioners/60-ai-infer-runtime.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 23. AI Infer NVIDIA Bleeding: NVIDIA R615 / CUDA 13.4 + lowlatency kernel + THP
+build {
+  name    = "ai-infer-nvidia-bleeding"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=ai-infer-nvidia-bleeding", "BM_GEN=generic", "KERNEL_PROFILE=ai-infer"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/36-gpu-nvidia-bleeding.sh",
       "${path.root}/provisioners/60-ai-infer-runtime.sh",
       "${path.root}/provisioners/99-cleanup.sh"
     ]

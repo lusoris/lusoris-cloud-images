@@ -48,32 +48,42 @@ Key capabilities:
    Functions <= 60 lines, bounded loops, checked return codes, and zero linter warnings.
 5. **NVIDIA Generational Segmentation**:
    - `nvidia-legacy`: NVIDIA 535 (Pascal / Volta).
-   - `nvidia-mainstream`: NVIDIA 565+ (Turing / Ampere / Ada).
+   - `nvidia-mainstream`: NVIDIA 565 (Turing / Ampere).
+   - `nvidia-modern`: NVIDIA 610 (Ada Lovelace RTX 4090 / Hopper).
+   - `nvidia-bleeding`: NVIDIA 615 (Blackwell RTX 5090 / B200).
    - `nvidia-datacenter`: NVIDIA Open Kernel Modules + Fabric Manager (Hopper / Blackwell).
 6. **Pre-cached Container Runtime**:
-   Kubernetes node flavors pre-pull essential cluster images directly into containerd's `k8s.io` namespace using tags injected from `versions.json`.
+   Kubernetes node flavors support modular preheat profiles (`lean`, `cilium`, `calico`, `flannel`) injecting DaemonSets directly into containerd's `k8s.io` namespace.
 
 ---
 
-## 3. The 4-Dimensional Flavor Matrix
+## 3. The 4-Dimensional Flavor Matrix (23 Flavors)
 
 | Workload Tier | Hardware Stack | Flavor Target | Key Components |
 | :--- | :--- | :--- | :--- |
 | **Base** | Generic (VirtIO) | `base-generic` | Minimal hardened OS, Anycast NTS, QEMU+VMware agents |
-| **Base** | Intel GPU | `base-intel` | Intel Media Driver (`iHD`), Level Zero, vainfo, clinfo |
+| **Base** | Intel GPU | `base-intel` | Intel Media Driver (`iHD`), Level Zero, vainfo, Battlemage Xe2 |
 | **Base** | AMD GPU | `base-amd` | AMD Mesa VA-API (`radeonsi`), RADV Vulkan, AMDGPU DRM |
 | **Base** | NVIDIA Legacy | `base-nvidia-legacy` | NVIDIA 535 driver branch, CUDA 12.2 (Pascal/Volta) |
-| **Base** | NVIDIA Mainstream | `base-nvidia-mainstream`| NVIDIA 565 driver branch, CUDA 12.8 (RTX/Ampere/Ada) |
+| **Base** | NVIDIA Mainstream | `base-nvidia-mainstream`| NVIDIA 565 driver branch, CUDA 12.8 (RTX/Ampere) |
+| **Base** | NVIDIA Bleeding | `base-nvidia-bleeding` | NVIDIA 615 driver branch, CUDA 13.4 (Blackwell RTX 5090) |
 | **Base** | NVIDIA Datacenter | `base-nvidia-datacenter`| NVIDIA Open Kernel Modules, Fabric Manager (Hopper/Blackwell) |
-| **Docker** | Generic (VirtIO) | `docker-generic` | Docker CE, Docker Compose v2, containerd, log rotation |
+| **Docker** | Generic (VirtIO) | `docker-generic` | Docker CE 29.8, Docker Compose v2, containerd, log rotation |
 | **Docker** | Intel GPU | `docker-intel` | Docker CE + Intel Media/Compute + QuickSync passthrough |
-| **Docker** | AMD GPU | `docker-amd` | Docker CE + AMD ROCm 6.x compute runtime |
+| **Docker** | AMD GPU | `docker-amd` | Docker CE + AMD ROCm 10 compute runtime |
 | **Docker** | NVIDIA Mainstream | `docker-nvidia` | Docker CE + NVIDIA Container Toolkit + CDI specifications |
-| **Kubernetes**| Generic (VirtIO) | `k8s-node-generic` | containerd 2.x, kubelet/kubeadm, pre-cached Cilium/kube-vip |
-| **Kubernetes**| Intel GPU | `k8s-node-intel` | containerd 2.x + Intel drivers + Intel K8s Device Plugin |
-| **Kubernetes**| AMD GPU | `k8s-node-amd` | containerd 2.x + AMD ROCm + AMD K8s Device Plugin |
-| **Kubernetes**| NVIDIA Mainstream | `k8s-node-nvidia` | containerd 2.x + NVIDIA toolkit + NVIDIA K8s Device Plugin |
-| **AI Infer** | NVIDIA Mainstream | `ai-infer-nvidia` | Transparent hugepages, numactl, vLLM/Ollama execution hooks |
+| **Docker** | NVIDIA Bleeding | `docker-nvidia-bleeding`| Docker CE + NVIDIA 615 + NVIDIA Container Toolkit CDI |
+| **Podman** | Generic (VirtIO) | `podman-generic` | Podman 5.x, Buildah, Skopeo, Quadlet, Netavark CNI |
+| **Kubernetes**| Generic (VirtIO) | `k8s-node-generic` | containerd 2.3.5, kubelet/kubeadm 1.37.0, lean zero-preheat |
+| **Kubernetes**| Generic (VirtIO) | `k8s-node-cilium` | containerd 2.3.5, preheated Cilium 1.20.1 & kube-vip 1.2.3 |
+| **Kubernetes**| Generic (VirtIO) | `k8s-node-calico` | containerd 2.3.5, preheated Calico 3.32.2 & kube-vip 1.2.3 |
+| **Kubernetes**| Generic (VirtIO) | `k8s-node-flannel` | containerd 2.3.5, preheated Flannel 0.28.9 & kube-vip 1.2.3 |
+| **Kubernetes**| Intel GPU | `k8s-node-intel` | containerd 2.3.5 + Intel drivers + Intel K8s Device Plugin |
+| **Kubernetes**| AMD GPU | `k8s-node-amd` | containerd 2.3.5 + AMD ROCm 10 + AMD K8s Device Plugin |
+| **Kubernetes**| NVIDIA Mainstream | `k8s-node-nvidia` | containerd 2.3.5 + NVIDIA 565 + NVIDIA K8s Device Plugin |
+| **Kubernetes**| NVIDIA Bleeding | `k8s-node-nvidia-bleeding`| containerd 2.3.5 + NVIDIA 615 + NVIDIA K8s Device Plugin |
+| **AI Infer** | NVIDIA Mainstream | `ai-infer-nvidia` | Transparent hugepages, numactl, vLLM/Ollama (NVIDIA 565) |
+| **AI Infer** | NVIDIA Bleeding | `ai-infer-nvidia-bleeding`| Transparent hugepages, Blackwell RTX 5090 / B200 (NVIDIA 615) |
 
 ---
 
@@ -86,5 +96,7 @@ make test               # Run automated pytest verification suite
 make fmt                # Format Packer HCL configurations
 make build-base-generic # Build base-generic image via local QEMU/KVM
 make build-docker-generic # Build docker-generic image
-make build-k8s-generic  # Build k8s-node-generic image
+make build-k8s-generic  # Build k8s-node-generic image (lean)
+make build-k8s-cilium   # Build k8s-node-cilium image (preheated)
+make build-ai-infer-nvidia-bleeding # Build ai-infer-nvidia-bleeding image
 ```

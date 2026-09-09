@@ -1,10 +1,12 @@
 # Container Appliance Flavors
 
-`lusoris-cloud-images` provides pre-configured, production-grade container host appliances supporting both **Docker CE** and **Rootless Podman 5.x**.
+`lusoris-cloud-images` provides pre-configured, production-grade container host appliances supporting both **Docker CE 29.8** and **Rootless Podman 5.x**.
+
+---
 
 ## Docker Appliances (`docker-*`)
 
-Pre-baked with official Docker CE, `containerd.io`, and Docker Compose v2 plugin.
+Pre-baked with official Docker CE 29.8, `containerd.io` 2.3.5, and Docker Compose v2 plugin.
 
 ### Daemon Tuning (`/etc/docker/daemon.json`)
 ```json
@@ -15,15 +17,20 @@ Pre-baked with official Docker CE, `containerd.io`, and Docker Compose v2 plugin
     "max-size": "50m",
     "max-file": "3"
   },
-  "live-restore": true
+  "live-restore": true,
+  "userland-proxy": false,
+  "features": {
+    "cdi": true
+  }
 }
 ```
 
 ### Flavors
 - **`docker-generic`**: Standard CPU container host for Docker Compose stacks.
-- **`docker-intel`**: Pre-configured Intel QuickSync and Level Zero access for Jellyfin, Plex, and Intel OpenVINO containers.
-- **`docker-amd`**: Pre-configured AMD ROCm 6.x runtime and `/dev/kfd` access for PyTorch and ROCm containers.
-- **`docker-nvidia`**: Pre-configured NVIDIA Container Toolkit and CDI v0.6+ specifications for GPU-accelerated Docker containers.
+- **`docker-intel`**: Pre-configured Intel QuickSync, Level Zero access, and CDI specification (`/etc/cdi/intel.yaml`) for Jellyfin, Plex, and Intel OpenVINO containers.
+- **`docker-amd`**: Pre-configured AMD ROCm 10 compute runtime, `/dev/kfd` access, and CDI specification (`/etc/cdi/amd.yaml`) for PyTorch and ROCm containers.
+- **`docker-nvidia`**: Pre-configured NVIDIA 565 driver, NVIDIA Container Toolkit, and CDI specification (`/etc/cdi/nvidia.yaml`) for Turing/Ampere GPUs.
+- **`docker-nvidia-bleeding`**: Pre-configured NVIDIA 615 driver, NVIDIA Container Toolkit, and CDI specification for Blackwell GPUs (RTX 5090, B200).
 
 ---
 
@@ -34,4 +41,5 @@ Daemonless and rootless container host designed for security-conscious environme
 ### Features
 - Rootless subordinate UID/GID mappings pre-configured (`/etc/subuid` and `/etc/subgid`).
 - Quadlet generator directories initialized at `/etc/containers/systemd/` and `~/.config/containers/systemd/`.
+- Netavark modern CNI network stack and crun OCI runtime.
 - Includes `podman`, `buildah`, `skopeo`, and `crun`.

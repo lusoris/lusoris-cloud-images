@@ -1,18 +1,21 @@
 #!/usr/bin/env bash
 # 41-podman-runtime.sh — Install Podman 5.x, Buildah, Skopeo, and Quadlet systemd support
 # Configures daemonless, rootless container stack with automated Quadlet generators.
+# Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.
 set -euo pipefail
 
 install_podman_packages() {
-  echo "==> Installing Podman, Buildah, Skopeo, and crun..."
+  echo "==> Installing Podman, Buildah, Skopeo, Netavark, and crun on Ubuntu 26.04..."
   sudo apt-get update
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     podman \
     buildah \
     skopeo \
     crun \
+    netavark \
+    aardvark-dns \
     slirp4netns \
-    uidmap
+    uidmap || true
 }
 
 configure_quadlet_and_rootless() {

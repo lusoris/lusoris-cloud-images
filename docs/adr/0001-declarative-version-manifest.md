@@ -17,3 +17,4 @@ We consolidate all versions into a single root [`versions.json`](../../versions.
 ## Consequences
 - Single location to inspect or bump any upstream dependency.
 - Automated tools (Renovate) update dependencies with minimal diff footprint.
+

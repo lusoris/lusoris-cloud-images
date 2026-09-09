@@ -14,3 +14,4 @@ We deliver compressed raw disk images (`.raw.zst`) and provide `/usr/local/bin/l
 
 ## Consequences
 - Fast bare-metal provisioning directly from rescue RAM disks without intermediate disk writes or large RAM requirements.
+

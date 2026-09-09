@@ -1,7 +1,8 @@
 """Automated verification suite for lusoris-cloud-images.
 
 Tests configuration integrity, provisioner script standards, single source of truth (SSOT),
-and Packer validity. Adheres to NASA/JPL Power of 10: short functions, checked assertions.
+generational hardware flavors, and Packer validity on Ubuntu 26.04.
+Adheres to NASA/JPL Power of 10: short functions, checked assertions.
 """
 
 from pathlib import Path
@@ -19,17 +20,24 @@ EXPECTED_FLAVORS = [
     "base-amd",
     "base-nvidia-legacy",
     "base-nvidia-mainstream",
+    "base-nvidia-bleeding",
     "base-nvidia-datacenter",
     "docker-generic",
     "docker-intel",
     "docker-amd",
     "docker-nvidia",
+    "docker-nvidia-bleeding",
     "podman-generic",
     "k8s-node-generic",
+    "k8s-node-cilium",
+    "k8s-node-calico",
+    "k8s-node-flannel",
     "k8s-node-intel",
     "k8s-node-amd",
     "k8s-node-nvidia",
+    "k8s-node-nvidia-bleeding",
     "ai-infer-nvidia",
+    "ai-infer-nvidia-bleeding",
 ]
 
 
@@ -80,30 +88,46 @@ class TestConfigIntegrity:
             assert file_path.stat().st_size > 0, f"File is empty: {file_path}"
 
     def test_versions_json_schema(self) -> None:
-        """Verify versions.json exists and contains valid JSON with required keys."""
+        """Verify versions.json contains valid 2026 Ubuntu 26.04 and bleeding-edge tags."""
         manifest_path = REPO_ROOT / "versions.json"
         assert manifest_path.exists(), "versions.json does not exist"
         data = json.loads(manifest_path.read_text(encoding="utf-8"))
 
-        assert "distro" in data
-        assert "kubernetes" in data
-        assert "drivers" in data
-        assert "runtimes" in data
-        assert "time" in data
+        # Strict Ubuntu 26.04 check
+        assert data["distro"]["release"] == "resolute"
+        assert data["distro"]["version"] == "26.04"
 
-        # Nested validation
-        assert "intel" in data["drivers"]
-        assert "amd" in data["drivers"]
-        assert "nvidia" in data["drivers"]
-        assert "containerd" in data["runtimes"]
-        assert "docker_ce" in data["runtimes"]
-        assert "stratum1_nts" in data["time"]
-        assert "images" in data["kubernetes"]
+        # Near-rolling 2026 runtimes & Kubernetes
+        assert data["kubernetes"]["version"] == "1.37.0"
+        assert data["kubernetes"]["major_minor"] == "1.37"
+        assert data["runtimes"]["containerd"] == "2.3.5"
+        assert data["runtimes"]["docker_ce"] == "29.8"
+
+        # Generational GPU drivers
+        nvidia = data["drivers"]["nvidia"]
+        assert nvidia["legacy_driver"] == "535"
+        assert nvidia["mainstream_driver"] == "565"
+        assert nvidia["modern_driver"] == "610"
+        assert nvidia["bleeding_driver"] == "615"
+        assert nvidia["cuda_modern"] == "13.3"
+        assert nvidia["cuda_bleeding"] == "13.4"
+
+        # AMD ROCm generations
+        amd = data["drivers"]["amd"]
+        assert amd["rocm_legacy_version"] == "7.14"
+        assert amd["rocm_bleeding_version"] == "10.0"
+
+        # Pre-cached cluster images
+        k8s_images = data["kubernetes"]["images"]
+        assert "cilium" in k8s_images
+        assert "calico_cni" in k8s_images
+        assert "flannel" in k8s_images
+        assert "kube_vip" in k8s_images
 
     def test_provisioners_executable_and_strict(self) -> None:
         """Verify all provisioners are executable and enforce bash strict mode."""
         scripts = list(PROVISIONERS_DIR.glob("*.sh"))
-        assert len(scripts) >= 16, f"Expected at least 16 provisioners, found {len(scripts)}"
+        assert len(scripts) >= 17, f"Expected at least 17 provisioners, found {len(scripts)}"
 
         for script in scripts:
             assert script.stat().st_mode & 0o111, f"Script is not executable: {script.name}"

@@ -22,3 +22,4 @@ openstack image create "lusoris-base-generic" \
   --container-format bare \
   --public
 ```
+

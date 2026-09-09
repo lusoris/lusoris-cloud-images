@@ -11,3 +11,4 @@ We install both `qemu-guest-agent` and `open-vm-tools` in all base images via `0
 
 ## Consequences
 - A single `.qcow2` or `.vmdk` image boots with full telemetry and clean ACPI shutdowns on Proxmox, Unraid, and VMware ESXi without manual agent installation.
+

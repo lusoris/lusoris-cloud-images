@@ -37,3 +37,4 @@ kernel https://releases.lusoris.org/netboot/vmlinuz ip=dhcp root=/dev/ram0 ds=no
 initrd https://releases.lusoris.org/netboot/initrd.img
 boot
 ```
+

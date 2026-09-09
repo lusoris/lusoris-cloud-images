@@ -15,3 +15,4 @@ Once an ADR reaches status **Accepted**, its text is immutable. If architectural
 | [0003](0003-nvidia-generational-segmentation.md) | NVIDIA Multi-Generational CUDA & Driver Segmentation | Accepted | 2026-09-10 |
 | [0004](0004-hypervisor-agent-coexistence.md) | Hypervisor Guest Agent Coexistence (QEMU + VMware) | Accepted | 2026-09-10 |
 | [0005](0005-baremetal-streaming-install.md) | Bare-Metal Compressed Block Streaming Installation | Accepted | 2026-09-10 |
+

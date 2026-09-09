@@ -66,26 +66,33 @@ graph TD
 
 ---
 
-## The 4-Dimensional Flavor Matrix
+## The 4-Dimensional Flavor Matrix (23 Flavors)
 
-| Flavor | Workload | Hardware Stack | Included Components | Primary Target Platforms |
+| Flavor | Workload | Hardware Stack | Kernel Profile | Key Components |
 | :--- | :--- | :--- | :--- | :--- |
-| **`base-generic`** | Minimal OS | VirtIO / CPU | Zero bloat, Anycast NTS, QEMU+VMware agents | Proxmox, Unraid, VMware, KVM, Cloud |
-| **`base-intel`** | Minimal OS | Intel GPU | Intel Media Driver (`iHD`), Level Zero, vainfo, clinfo | Proxmox PCIe passthrough, Bare-Metal |
-| **`base-amd`** | Minimal OS | AMD GPU | Mesa Gallium `radeonsi`, RADV Vulkan, AMDGPU DRM | Proxmox PCIe passthrough, Bare-Metal |
-| **`base-nvidia-legacy`** | Minimal OS | NVIDIA Pascal/Volta | NVIDIA 535 driver, CUDA 12.2, CDI toolkit | GTX 1080, P4, P40, P100, V100 |
-| **`base-nvidia-mainstream`**| Minimal OS | NVIDIA RTX/Ampere/Ada | NVIDIA 565+ driver, CUDA 12.8+, modern CDI | RTX 30/40, A100, L4, L40S |
-| **`base-nvidia-datacenter`**| Minimal OS | NVIDIA Hopper/Blackwell | NVIDIA Open Modules, Fabric Manager, NVLink | H100, H200, B100, B200, GB200 |
-| **`docker-generic`** | Docker Appliance| VirtIO / CPU | Docker CE, Docker Compose v2, log rotation | Standalone microservices, Homelab |
-| **`docker-intel`** | Docker Appliance| Intel GPU | Docker CE + Intel QuickSync passthrough | Jellyfin, Plex, Intel OpenVINO |
-| **`docker-amd`** | Docker Appliance| AMD GPU | Docker CE + AMD ROCm 6.x compute | PyTorch, ROCm ML containers |
-| **`docker-nvidia`** | Docker Appliance| NVIDIA Mainstream | Docker CE + NVIDIA Container Toolkit | GPU containers, Ollama, CUDA dev |
-| **`podman-generic`** | Rootless OCI | VirtIO / CPU | Podman 5.x, Buildah, Skopeo, Quadlet | Daemonless rootless microservices |
-| **`k8s-node-generic`**| K8s Worker | VirtIO / CPU | containerd 2.x, kubelet, Cilium/kube-vip cached | Production K8s cluster node |
-| **`k8s-node-intel`** | K8s Worker | Intel GPU | containerd 2.x + Intel K8s Device Plugin | K8s GPU worker (Intel Arc/Flex) |
-| **`k8s-node-amd`** | K8s Worker | AMD GPU | containerd 2.x + AMD K8s Device Plugin | K8s GPU worker (AMD Radeon/ROCm) |
-| **`k8s-node-nvidia`**| K8s Worker | NVIDIA Mainstream | containerd 2.x + NVIDIA K8s Device Plugin | K8s GPU worker (NVIDIA RTX/A100) |
-| **`ai-infer-nvidia`**| AI Inference | NVIDIA Mainstream | Hugepages, numactl, vLLM & Ollama hooks | Dedicated LLM inference appliance |
+| **`base-generic`** | Minimal OS | VirtIO / CPU | `generic` | Zero bloat, Anycast NTS, QEMU+VMware agents |
+| **`base-intel`** | Minimal OS | Intel Xe/Arc/Xe2 | `generic` | Intel Media Driver (`iHD`), Level Zero, vainfo, Battlemage Xe2 |
+| **`base-amd`** | Minimal OS | AMD GPU | `generic` | Mesa Gallium `radeonsi`, RADV Vulkan, AMDGPU DRM |
+| **`base-nvidia-legacy`** | Minimal OS | NVIDIA Pascal/Volta | `generic` | NVIDIA 535 driver, CUDA 12.2, GTX 1080, P4, P40, P100, V100 |
+| **`base-nvidia-mainstream`**| Minimal OS | NVIDIA Turing/Ampere | `generic` | NVIDIA 565 driver, CUDA 12.8, RTX 20/30/40, A100, L4 |
+| **`base-nvidia-bleeding`** | Minimal OS | NVIDIA Blackwell | `generic` | NVIDIA 615 driver, CUDA 13.4, RTX 5090, B200 |
+| **`base-nvidia-datacenter`**| Minimal OS | NVIDIA Hopper/Blackwell | `baremetal` | NVIDIA 615 Open Modules, Fabric Manager, NVLink mesh |
+| **`docker-generic`** | Docker Host | VirtIO / CPU | `generic` | Docker CE 29.8, Docker Compose v2, log rotation |
+| **`docker-intel`** | Docker Host | Intel GPU | `generic` | Docker CE + Intel QuickSync passthrough + CDI spec |
+| **`docker-amd`** | Docker Host | AMD GPU | `generic` | Docker CE + AMD ROCm 10 compute runtime + CDI spec |
+| **`docker-nvidia`** | Docker Host | NVIDIA Mainstream | `generic` | Docker CE + NVIDIA 565 + NVIDIA Container Toolkit CDI |
+| **`docker-nvidia-bleeding`** | Docker Host | NVIDIA Bleeding | `generic` | Docker CE + NVIDIA 615 + NVIDIA Container Toolkit CDI |
+| **`podman-generic`** | Rootless OCI | VirtIO / CPU | `generic` | Podman 5.x, Buildah, Skopeo, Quadlet, Netavark CNI |
+| **`k8s-node-generic`** | K8s Worker | VirtIO / CPU | `k8s` | containerd 2.3.5, kubelet 1.37.0, lean zero-preheat |
+| **`k8s-node-cilium`** | K8s Worker | VirtIO / CPU | `k8s` | containerd 2.3.5, preheated Cilium 1.20.1 & kube-vip 1.2.3 |
+| **`k8s-node-calico`** | K8s Worker | VirtIO / CPU | `k8s` | containerd 2.3.5, preheated Calico 3.32.2 & kube-vip 1.2.3 |
+| **`k8s-node-flannel`** | K8s Worker | VirtIO / CPU | `k8s` | containerd 2.3.5, preheated Flannel 0.28.9 & kube-vip 1.2.3 |
+| **`k8s-node-intel`** | K8s Worker | Intel Arc/Xe2 | `k8s` | containerd 2.3.5 + Intel drivers + Intel K8s Plugin v0.36.0 |
+| **`k8s-node-amd`** | K8s Worker | AMD GPU | `k8s` | containerd 2.3.5 + AMD ROCm 10 + AMD K8s Plugin v1.37.0 |
+| **`k8s-node-nvidia`** | K8s Worker | NVIDIA Mainstream | `k8s` | containerd 2.3.5 + NVIDIA 565 + NVIDIA K8s Plugin v0.20.0 |
+| **`k8s-node-nvidia-bleeding`** | K8s Worker | NVIDIA Bleeding | `k8s` | containerd 2.3.5 + NVIDIA 615 + NVIDIA K8s Plugin v0.20.0 |
+| **`ai-infer-nvidia`** | AI Inference | NVIDIA Mainstream | `ai-infer` | NVIDIA 565, Transparent Hugepages, NUMA, vLLM / Ollama |
+| **`ai-infer-nvidia-bleeding`**| AI Inference | NVIDIA Bleeding | `ai-infer` | NVIDIA 615, Blackwell RTX 5090 / B200, vLLM / Ollama |
 
 ---
 
@@ -113,8 +120,10 @@ make test
 make build-base-generic
 make build-docker-generic
 make build-docker-nvidia
-make build-k8s-generic
+make build-k8s-generic        # Lean zero-preheat
+make build-k8s-cilium         # Preheated Cilium
 make build-ai-infer-nvidia
+make build-ai-infer-nvidia-bleeding
 ```
 
 ---
@@ -135,7 +144,7 @@ make build-ai-infer-nvidia
 │   ├── versions.pkr.hcl       # Required Packer plugins
 │   ├── variables.pkr.hcl      # Universal build variables
 │   ├── sources.pkr.hcl        # QEMU and Proxmox builder sources
-│   ├── builds.pkr.hcl         # Modular 16-flavor pipeline definitions
+│   ├── builds.pkr.hcl         # Modular 23-flavor pipeline definitions
 │   ├── http/                  # Headless cloud-init seed data
 │   └── provisioners/          # Modular shell scripts (NASA/JPL Power of 10 compliant)
 ├── tests/                     # Automated pytest verification suite

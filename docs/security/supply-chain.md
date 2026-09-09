@@ -23,3 +23,4 @@ Every release provides a complete catalog of installed deb packages, container l
 ## 3. Automated Vulnerability Scanning
 
 Images and repository code are continuously scanned via **Trivy** and **Semgrep** in CI, halting releases if unpatched `CRITICAL` CVEs are detected.
+

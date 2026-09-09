@@ -15,3 +15,4 @@ We implement a 3-tier time synchronization architecture in `10-network-time.sh`:
 ## Consequences
 - Single-digit millisecond latency globally with cryptographically verified time.
 - Graceful degradation in airgapped or firewalled environments without failing boot.
+
