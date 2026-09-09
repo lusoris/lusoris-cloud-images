@@ -50,7 +50,7 @@ Autonomous agents should utilize specialized project skills under `.agents/skill
 
 ---
 
-## 3. The 4-Dimensional Flavor Matrix (26 Flavors)
+## 3. The 4-Dimensional Flavor Matrix (30 Flavors)
 
 | Workload Tier | Hardware Stack | Flavor Target | Key Components |
 | :--- | :--- | :--- | :--- |
@@ -59,12 +59,14 @@ Autonomous agents should utilize specialized project skills under `.agents/skill
 | **Base** | AMD GPU | `base-amd` | AMD Mesa VA-API (`radeonsi`), RADV Vulkan, AMDGPU DRM |
 | **Base** | NVIDIA Legacy | `base-nvidia-legacy` | NVIDIA 535 driver branch, CUDA 12.2 (Pascal/Volta) |
 | **Base** | NVIDIA Mainstream | `base-nvidia-mainstream`| NVIDIA 565 driver branch, CUDA 12.8 (RTX/Ampere) |
+| **Base** | NVIDIA Modern | `base-nvidia-modern` | NVIDIA 610 driver branch, CUDA 13.3 (Ada/Hopper) |
 | **Base** | NVIDIA Bleeding | `base-nvidia-bleeding` | NVIDIA 615 driver branch, CUDA 13.4 (Blackwell RTX 5090) |
 | **Base** | NVIDIA Datacenter | `base-nvidia-datacenter`| NVIDIA Open Kernel Modules, Fabric Manager (Hopper/Blackwell) |
 | **Docker** | Generic (VirtIO) | `docker-generic` | Docker CE 29.8, Docker Compose v2, containerd, log rotation |
 | **Docker** | Intel GPU | `docker-intel` | Docker CE + Intel Media/Compute + QuickSync passthrough |
 | **Docker** | AMD GPU | `docker-amd` | Docker CE + AMD ROCm 10 compute runtime |
 | **Docker** | NVIDIA Mainstream | `docker-nvidia` | Docker CE + NVIDIA Container Toolkit + CDI specifications |
+| **Docker** | NVIDIA Modern | `docker-nvidia-modern` | Docker CE + NVIDIA 610 + NVIDIA Container Toolkit CDI |
 | **Docker** | NVIDIA Bleeding | `docker-nvidia-bleeding`| Docker CE + NVIDIA 615 + NVIDIA Container Toolkit CDI |
 | **Podman** | Generic (VirtIO) | `podman-generic` | Podman 5.x, Buildah, Skopeo, Quadlet, Netavark CNI |
 | **Kubernetes**| Generic (VirtIO) | `k8s-node-generic` | containerd 2.3.5, kubelet/kubeadm 1.37.0, lean zero-preheat |
@@ -74,11 +76,13 @@ Autonomous agents should utilize specialized project skills under `.agents/skill
 | **Kubernetes**| Intel GPU | `k8s-node-intel` | containerd 2.3.5 + Intel drivers + Intel K8s Device Plugin |
 | **Kubernetes**| AMD GPU | `k8s-node-amd` | containerd 2.3.5 + AMD ROCm 10 + AMD K8s Device Plugin |
 | **Kubernetes**| NVIDIA Mainstream | `k8s-node-nvidia` | containerd 2.3.5 + NVIDIA 565 + NVIDIA K8s Device Plugin |
+| **Kubernetes**| NVIDIA Modern | `k8s-node-nvidia-modern` | containerd 2.3.5 + NVIDIA 610 + NVIDIA K8s Device Plugin |
 | **Kubernetes**| NVIDIA Bleeding | `k8s-node-nvidia-bleeding`| containerd 2.3.5 + NVIDIA 615 + NVIDIA K8s Device Plugin |
 | **AI Infer** | Generic (CPU) | `ai-infer-generic` | AMX, AVX-512, NUMA, vLLM/Ollama CPU, Docker CE |
 | **AI Infer** | Intel GPU | `ai-infer-intel` | Intel Level Zero, OpenVINO, IPEX-LLM, CDI, Docker CE |
 | **AI Infer** | AMD GPU | `ai-infer-amd` | AMD ROCm 10, /dev/kfd, RDNA 3/4 & Instinct, CDI, Docker CE |
 | **AI Infer** | NVIDIA Mainstream | `ai-infer-nvidia` | Transparent hugepages, numactl, vLLM/Ollama (NVIDIA 565) |
+| **AI Infer** | NVIDIA Modern | `ai-infer-nvidia-modern` | Transparent hugepages, numactl, vLLM/Ollama (NVIDIA 610) |
 | **AI Infer** | NVIDIA Bleeding | `ai-infer-nvidia-bleeding`| Transparent hugepages, Blackwell RTX 5090 / B200 (NVIDIA 615) |
 
 ---
