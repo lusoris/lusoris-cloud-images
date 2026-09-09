@@ -23,9 +23,36 @@
       "customType": "regex",
       "fileMatch": ["^versions\\.json$"],
       "matchStrings": [
-        "\"(?<depName>[^\"]+)\": \"(?<currentValue>[^\"]+)\""
+        "\"(?<depName>(?:registry\\.k8s\\.io|docker\\.io|quay\\.io|ghcr\\.io|prom|nvcr\\.io|intel|rocm)[^:\"]+):(?<currentValue>[^\"]+)\""
       ],
       "datasourceTemplate": "docker"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^versions\\.json$"],
+      "matchStrings": [
+        "\"version\": \"(?<currentValue>1\\.\\d+\\.\\d+)\""
+      ],
+      "depNameTemplate": "kubernetes/kubernetes",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^versions\\.json$"],
+      "matchStrings": [
+        "\"containerd\": \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "depNameTemplate": "containerd/containerd",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^versions\\.json$"],
+      "matchStrings": [
+        "\"container_toolkit\": \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "depNameTemplate": "NVIDIA/nvidia-container-toolkit",
+      "datasourceTemplate": "github-releases"
     }
   ]
 }
