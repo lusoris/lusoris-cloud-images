@@ -26,7 +26,7 @@ jobs:
           python-version: "3.12"
       - name: Install MkDocs Material
         run: |
-          pip install mkdocs-material pymdownx-superfences
+          pip install mkdocs-material pymdown-extensions
       - name: Build MkDocs Site
         run: mkdocs build --strict
       - uses: actions/upload-pages-artifact@56afc609e74202658d3ffba0e8f6dda462b719fa # v3.0.1
