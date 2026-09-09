@@ -66,7 +66,7 @@ graph TD
 
 ---
 
-## The 4-Dimensional Flavor Matrix (26 Flavors)
+## The 4-Dimensional Flavor Matrix (30 Flavors)
 
 | Flavor | Workload | Hardware Stack | Kernel Profile | Key Components |
 | :--- | :--- | :--- | :--- | :--- |
@@ -75,12 +75,14 @@ graph TD
 | **`base-amd`** | Minimal OS | AMD GPU | `generic` | Mesa Gallium `radeonsi`, RADV Vulkan, AMDGPU DRM |
 | **`base-nvidia-legacy`** | Minimal OS | NVIDIA Pascal/Volta | `generic` | NVIDIA 535 driver, CUDA 12.2, GTX 1080, P4, P40, P100, V100 |
 | **`base-nvidia-mainstream`**| Minimal OS | NVIDIA Turing/Ampere | `generic` | NVIDIA 565 driver, CUDA 12.8, RTX 20/30/40, A100, L4 |
+| **`base-nvidia-modern`**    | Minimal OS | NVIDIA Ada/Hopper | `generic` | NVIDIA 610 driver, CUDA 13.3, RTX 4080/4090, L40S, H100 |
 | **`base-nvidia-bleeding`** | Minimal OS | NVIDIA Blackwell | `generic` | NVIDIA 615 driver, CUDA 13.4, RTX 5090, B200 |
 | **`base-nvidia-datacenter`**| Minimal OS | NVIDIA Hopper/Blackwell | `baremetal` | NVIDIA 615 Open Modules, Fabric Manager, NVLink mesh |
 | **`docker-generic`** | Docker Host | VirtIO / CPU | `generic` | Docker CE 29.8, Docker Compose v2, log rotation |
 | **`docker-intel`** | Docker Host | Intel GPU | `generic` | Docker CE + Intel QuickSync passthrough + CDI spec |
 | **`docker-amd`** | Docker Host | AMD GPU | `generic` | Docker CE + AMD ROCm 10 compute runtime + CDI spec |
 | **`docker-nvidia`** | Docker Host | NVIDIA Mainstream | `generic` | Docker CE + NVIDIA 565 + NVIDIA Container Toolkit CDI |
+| **`docker-nvidia-modern`** | Docker Host | NVIDIA Modern | `generic` | Docker CE + NVIDIA 610 + NVIDIA Container Toolkit CDI |
 | **`docker-nvidia-bleeding`** | Docker Host | NVIDIA Bleeding | `generic` | Docker CE + NVIDIA 615 + NVIDIA Container Toolkit CDI |
 | **`podman-generic`** | Rootless OCI | VirtIO / CPU | `generic` | Podman 5.x, Buildah, Skopeo, Quadlet, Netavark CNI |
 | **`k8s-node-generic`** | K8s Worker | VirtIO / CPU | `k8s` | containerd 2.3.5, kubelet 1.37.0, lean zero-preheat |
@@ -90,11 +92,13 @@ graph TD
 | **`k8s-node-intel`** | K8s Worker | Intel Arc/Xe2 | `k8s` | containerd 2.3.5 + Intel drivers + Intel K8s Plugin v0.36.0 |
 | **`k8s-node-amd`** | K8s Worker | AMD GPU | `k8s` | containerd 2.3.5 + AMD ROCm 10 + AMD K8s Plugin v1.37.0 |
 | **`k8s-node-nvidia`** | K8s Worker | NVIDIA Mainstream | `k8s` | containerd 2.3.5 + NVIDIA 565 + NVIDIA K8s Plugin v0.20.0 |
+| **`k8s-node-nvidia-modern`** | K8s Worker | NVIDIA Modern | `k8s` | containerd 2.3.5 + NVIDIA 610 + NVIDIA K8s Plugin v0.20.0 |
 | **`k8s-node-nvidia-bleeding`** | K8s Worker | NVIDIA Bleeding | `k8s` | containerd 2.3.5 + NVIDIA 615 + NVIDIA K8s Plugin v0.20.0 |
 | **`ai-infer-generic`** | AI Inference | CPU High-Throughput | `ai-infer` | AMX, AVX-512, NUMA, vLLM / Ollama CPU, Docker CE |
 | **`ai-infer-intel`** | AI Inference | Intel Xe/Arc/Xe2 | `ai-infer` | Intel Level Zero, OpenVINO, IPEX-LLM, CDI, Docker CE |
 | **`ai-infer-amd`** | AI Inference | AMD ROCm 10 | `ai-infer` | AMD ROCm 10, /dev/kfd, RDNA 3/4 & Instinct, CDI, Docker CE |
 | **`ai-infer-nvidia`** | AI Inference | NVIDIA Mainstream | `ai-infer` | NVIDIA 565, Transparent Hugepages, NUMA, vLLM, Docker CE |
+| **`ai-infer-nvidia-modern`** | AI Inference | NVIDIA Modern | `ai-infer` | NVIDIA 610, Transparent Hugepages, NUMA, vLLM, Docker CE |
 | **`ai-infer-nvidia-bleeding`**| AI Inference | NVIDIA Bleeding | `ai-infer` | NVIDIA 615, Blackwell RTX 5090 / B200, vLLM, Docker CE |
 
 ---

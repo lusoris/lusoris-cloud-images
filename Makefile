@@ -1,12 +1,12 @@
 .PHONY: help init fmt fmt-check lint test clean compress docs-serve docs-build \
         build-base-generic build-base-intel build-base-amd \
-        build-base-nvidia-legacy build-base-nvidia-mainstream build-base-nvidia-bleeding build-base-nvidia-datacenter \
-        build-docker-generic build-docker-intel build-docker-amd build-docker-nvidia build-docker-nvidia-bleeding \
+        build-base-nvidia-legacy build-base-nvidia-mainstream build-base-nvidia-modern build-base-nvidia-bleeding build-base-nvidia-datacenter \
+        build-docker-generic build-docker-intel build-docker-amd build-docker-nvidia build-docker-nvidia-modern build-docker-nvidia-bleeding \
         build-podman-generic \
         build-k8s-generic build-k8s-cilium build-k8s-calico build-k8s-flannel \
-        build-k8s-intel build-k8s-amd build-k8s-nvidia build-k8s-nvidia-bleeding \
+        build-k8s-intel build-k8s-amd build-k8s-nvidia build-k8s-nvidia-modern build-k8s-nvidia-bleeding \
         build-ai-infer-generic build-ai-infer-intel build-ai-infer-amd \
-        build-ai-infer-nvidia build-ai-infer-nvidia-bleeding \
+        build-ai-infer-nvidia build-ai-infer-nvidia-modern build-ai-infer-nvidia-bleeding \
         build-generic build-intel build-amd build-nvidia
 
 
@@ -74,6 +74,9 @@ build-base-nvidia-legacy: init ## Build base-nvidia-legacy image (NVIDIA 535 / C
 build-base-nvidia-mainstream: init ## Build base-nvidia-mainstream image (NVIDIA 565 / CUDA 12.8)
 	@cd packer && $(PACKER) build -only="base-nvidia-mainstream.qemu.image" .
 
+build-base-nvidia-modern: init ## Build base-nvidia-modern image (NVIDIA 610 / CUDA 13.3)
+	@cd packer && $(PACKER) build -only="base-nvidia-modern.qemu.image" .
+
 build-base-nvidia-bleeding: init ## Build base-nvidia-bleeding image (NVIDIA 615 / CUDA 13.4)
 	@cd packer && $(PACKER) build -only="base-nvidia-bleeding.qemu.image" .
 
@@ -92,6 +95,9 @@ build-docker-amd: init ## Build docker-amd appliance (ROCm 10 / CDI)
 
 build-docker-nvidia: init ## Build docker-nvidia appliance (NVIDIA 565 / CDI)
 	@cd packer && $(PACKER) build -only="docker-nvidia.qemu.image" .
+
+build-docker-nvidia-modern: init ## Build docker-nvidia-modern appliance (NVIDIA 610 / CDI)
+	@cd packer && $(PACKER) build -only="docker-nvidia-modern.qemu.image" .
 
 build-docker-nvidia-bleeding: init ## Build docker-nvidia-bleeding appliance (NVIDIA 615 / CDI)
 	@cd packer && $(PACKER) build -only="docker-nvidia-bleeding.qemu.image" .
@@ -121,6 +127,9 @@ build-k8s-amd: init ## Build k8s-node-amd image (AMD ROCm K8s Plugin)
 build-k8s-nvidia: init ## Build k8s-node-nvidia image (NVIDIA 565 K8s Plugin)
 	@cd packer && $(PACKER) build -only="k8s-node-nvidia.qemu.image" .
 
+build-k8s-nvidia-modern: init ## Build k8s-node-nvidia-modern image (NVIDIA 610 K8s Plugin)
+	@cd packer && $(PACKER) build -only="k8s-node-nvidia-modern.qemu.image" .
+
 build-k8s-nvidia-bleeding: init ## Build k8s-node-nvidia-bleeding image (NVIDIA 615 K8s Plugin)
 	@cd packer && $(PACKER) build -only="k8s-node-nvidia-bleeding.qemu.image" .
 
@@ -136,6 +145,9 @@ build-ai-infer-amd: init ## Build ai-infer-amd host (AMD ROCm 10 / RDNA 3/4 & In
 
 build-ai-infer-nvidia: init ## Build ai-infer-nvidia host (NVIDIA 565 / Hugepages / vLLM)
 	@cd packer && $(PACKER) build -only="ai-infer-nvidia.qemu.image" .
+
+build-ai-infer-nvidia-modern: init ## Build ai-infer-nvidia-modern host (NVIDIA 610 / Hugepages / vLLM)
+	@cd packer && $(PACKER) build -only="ai-infer-nvidia-modern.qemu.image" .
 
 build-ai-infer-nvidia-bleeding: init ## Build ai-infer-nvidia-bleeding host (NVIDIA 615 / Blackwell / vLLM)
 	@cd packer && $(PACKER) build -only="ai-infer-nvidia-bleeding.qemu.image" .

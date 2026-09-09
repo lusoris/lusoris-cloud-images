@@ -24,11 +24,12 @@ All modern and bleeding flavors generate native Container Device Interface (CDI)
 
 ---
 
-## 3. NVIDIA Modern (`nvidia_modern`)
+## 3. NVIDIA Modern (`*-nvidia-modern`)
 
 - **Microarchitectures**: Ada Lovelace (`sm_89`) and Hopper (`sm_90`).
 - **Target GPUs**: RTX 4080/4090, RTX 6000 Ada, L40, L40S, H100 PCIe.
 - **Driver & CUDA**: NVIDIA 610 branch (`610.57.04`) with CUDA 13.3.1.
+- **Container Device Interface**: Native CDI specifications generated at `/etc/cdi/nvidia.yaml`.
 - **Features**: Ada FP8 Tensor Cores, modern Transformer Engine support, optical flow acceleration.
 
 ---
