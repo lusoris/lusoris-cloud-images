@@ -50,15 +50,23 @@ docs-serve: ## Serve documentation portal locally via mkdocs
 docs-build: ## Build documentation portal strictly
 	@mkdocs build --strict
 
+build: init ## Build any flavor dynamically (e.g. make build FLAVOR=base-generic)
+	@if [ -z "$(FLAVOR)" ]; then \
+		echo "Error: FLAVOR is required. Example: make build FLAVOR=base-generic"; \
+		exit 1; \
+	fi
+	@echo "==> Building flavor: $(FLAVOR)..."
+	@cd packer && $(PACKER) build -only="$(FLAVOR).qemu.image" .
+
 # Base Flavors
 build-base-generic: init ## Build base-generic minimal cloud image
-	@cd packer && $(PACKER) build -only="base-generic.qemu.image" .
+	@$(MAKE) build FLAVOR=base-generic
 
 build-base-intel: init ## Build base-intel image (Xe/Arc Media/Compute)
-	@cd packer && $(PACKER) build -only="base-intel.qemu.image" .
+	@$(MAKE) build FLAVOR=base-intel
 
 build-base-amd: init ## Build base-amd image (Mesa/RADV Vulkan)
-	@cd packer && $(PACKER) build -only="base-amd.qemu.image" .
+	@$(MAKE) build FLAVOR=base-amd
 
 build-base-nvidia-legacy: init ## Build base-nvidia-legacy image (NVIDIA 535 / CUDA 12.2)
 	@cd packer && $(PACKER) build -only="base-nvidia-legacy.qemu.image" .

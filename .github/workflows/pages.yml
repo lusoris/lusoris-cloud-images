@@ -2,6 +2,15 @@ name: pages
 on:
   push:
     branches: [main]
+    paths:
+      - "docs/**"
+      - "mkdocs.yml"
+      - "README.md"
+      - "SECURITY.md"
+      - "CONTRIBUTING.md"
+      - "CODE_OF_CONDUCT.md"
+      - "GOVERNANCE.md"
+      - ".github/workflows/pages.yml"
   workflow_dispatch:
 
 permissions:

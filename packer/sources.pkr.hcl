@@ -10,8 +10,8 @@ source "qemu" "image" {
   disk_interface         = "virtio"
   format                 = "qcow2"
   net_device             = "virtio-net"
-  iso_url                = var.iso_url
-  iso_checksum           = var.iso_checksum
+  iso_url                = var.iso_url != "" ? var.iso_url : local.manifest.distro.iso_url
+  iso_checksum           = var.iso_checksum != "" ? var.iso_checksum : local.manifest.distro.iso_checksum
   output_directory       = "${var.output_dir}/${var.flavor}"
   vm_name                = "${var.image_name}-${var.flavor}.qcow2"
   cd_files               = ["${path.root}/http/meta-data", "${path.root}/http/user-data"]

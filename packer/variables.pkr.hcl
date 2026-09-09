@@ -30,14 +30,14 @@ variable "distro_version" {
 
 variable "iso_url" {
   type        = string
-  default     = "https://cloud-images.ubuntu.com/daily/server/resolute/current/resolute-server-cloudimg-amd64.img"
-  description = "URL to upstream cloud image (QCOW2 or raw disk)"
+  default     = ""
+  description = "Optional override for upstream cloud image (defaults to versions.json distro.iso_url)"
 }
 
 variable "iso_checksum" {
   type        = string
-  default     = "file:https://cloud-images.ubuntu.com/daily/server/resolute/current/SHA256SUMS"
-  description = "Checksum verification file URL"
+  default     = ""
+  description = "Optional override for upstream checksum (defaults to versions.json distro.iso_checksum)"
 }
 
 variable "disk_size" {
