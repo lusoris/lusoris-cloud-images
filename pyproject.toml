@@ -7,3 +7,7 @@ minversion = "7.0"
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 addopts = "-v --strict-markers"
+
+[tool.codespell]
+skip = ".git,output-images,packer_cache,*.qcow2,*.img,*.lock,.pytest_cache,*.zst,*.iso"
+ignore-words-list = "nts,ptb,vainfo,clinfo,amdgpu,radeonsi,cgroup,cgroups,cgroupfs,containerd,virtio,virtiofs,unraid,resolute,nd,renderd,te"

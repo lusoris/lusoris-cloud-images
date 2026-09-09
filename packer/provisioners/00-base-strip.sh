@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# 00-base-strip.sh — Strip distro bloat and install minimal base packages
-# Complies with NASA/JPL Power of 10: short functions, checked returns.
+# 00-base-strip.sh — Strip distro bloat, optimize fast boot, and install minimal base packages
+# Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.
 set -euo pipefail
 
 strip_documentation_paths() {
@@ -29,12 +29,42 @@ purge_distro_bloat() {
   sudo rm -rf /var/cache/snapd /root/snap /home/ubuntu/snap
   sudo apt-mark hold snapd lxd-installer 2>/dev/null || true
 
-  # Disable marketing & telemetry timers
   sudo systemctl disable --now apt-news.service esm-cache.service motd-news.timer 2>/dev/null || true
 }
 
+configure_fast_boot_and_systemd() {
+  echo "==> Configuring cloud-init datasource and systemd fast-boot limits..."
+  sudo mkdir -p /etc/cloud/cloud.cfg.d
+  echo "datasource_list: [ NoCloud, ConfigDrive, OpenStack, None ]" | sudo tee /etc/cloud/cloud.cfg.d/90_dpkg.cfg
+
+  sudo mkdir -p /etc/systemd/system/systemd-networkd-wait-online.service.d
+  cat <<'EOF' | sudo tee /etc/systemd/system/systemd-networkd-wait-online.service.d/override.conf
+[Service]
+ExecStart=
+ExecStart=/lib/systemd/systemd-networkd-wait-online --any --timeout=10
+EOF
+
+  sudo mkdir -p /etc/systemd/journald.conf.d
+  cat <<'EOF' | sudo tee /etc/systemd/journald.conf.d/00-limits.conf
+[Journal]
+SystemMaxUse=100M
+RuntimeMaxUse=50M
+Storage=persistent
+EOF
+
+  sudo mkdir -p /etc/systemd/coredump.conf.d
+  echo -e "[Coredump]\nStorage=none\nProcessSizeMax=0" | sudo tee /etc/systemd/coredump.conf.d/00-disable.conf
+
+  if [ -f /etc/default/grub ]; then
+    echo "==> Configuring instant GRUB boot timeout and serial console..."
+    sudo sed -i 's/^GRUB_TIMEOUT=.*/GRUB_TIMEOUT=0/' /etc/default/grub
+    echo 'GRUB_RECORDFAIL_TIMEOUT=0' | sudo tee -a /etc/default/grub
+    sudo update-grub 2>/dev/null || true
+  fi
+}
+
 install_base_essentials() {
-  echo "==> Updating package repository and installing essentials..."
+  echo "==> Updating package repository and installing essentials on Ubuntu 26.04..."
   sudo apt-get update
   sudo DEBIAN_FRONTEND=noninteractive apt-get -o Dpkg::Options::='--force-confold' upgrade -y
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
@@ -52,6 +82,7 @@ install_base_essentials() {
 main() {
   strip_documentation_paths
   purge_distro_bloat
+  configure_fast_boot_and_systemd
   install_base_essentials
   echo "==> 00-base-strip: Complete."
 }

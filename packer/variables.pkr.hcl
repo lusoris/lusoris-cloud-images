@@ -7,7 +7,19 @@ variable "image_name" {
 variable "flavor" {
   type        = string
   default     = "base-generic"
-  description = "Image flavor (base-generic, base-intel, base-amd, base-nvidia, k8s-node-generic, k8s-node-intel, k8s-node-amd, k8s-node-nvidia, k8s-cp)"
+  description = "Target image flavor across the 4D matrix"
+}
+
+variable "preheat_profile" {
+  type        = string
+  default     = "lean"
+  description = "Kubernetes image preheat profile: lean (pause only), cilium, calico, flannel"
+}
+
+variable "kernel_profile" {
+  type        = string
+  default     = "generic"
+  description = "Hand-optimized kernel tuning profile: generic, baremetal, k8s, ai-infer"
 }
 
 variable "distro_version" {
@@ -19,13 +31,13 @@ variable "distro_version" {
 variable "iso_url" {
   type        = string
   default     = "https://cloud-images.ubuntu.com/daily/server/resolute/current/resolute-server-cloudimg-amd64.img"
-  description = "URL to the upstream cloud image (QCOW2 or raw disk image)"
+  description = "URL to upstream cloud image (QCOW2 or raw disk)"
 }
 
 variable "iso_checksum" {
   type        = string
   default     = "file:https://cloud-images.ubuntu.com/daily/server/resolute/current/SHA256SUMS"
-  description = "Checksum or checksum verification file URL"
+  description = "Checksum verification file URL"
 }
 
 variable "disk_size" {
