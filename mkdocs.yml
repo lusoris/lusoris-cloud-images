@@ -87,7 +87,7 @@ nav:
       - Repository Crosswalk: repository-rule-crosswalk.md
   - Community:
       - Contributing Guide: community/contributing.md
-      - Security Policy: community/security.md
+      - Security Policy & Audits: community/security.md
       - Code of Conduct: community/code-of-conduct.md
       - Governance: community/governance.md
 
