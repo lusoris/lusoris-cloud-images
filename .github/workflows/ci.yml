@@ -1,0 +1,79 @@
+name: ci
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint:
+    name: Lint & Static Gates
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-packer@v3
+        with:
+          version: "1.11.2"
+      - name: Install Linters
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck yamllint shfmt
+          pip install codespell tomli
+      - name: Initialize Packer
+        run: |
+          cd packer
+          packer init .
+      - name: Check Packer Formatting
+        run: |
+          cd packer
+          packer fmt -check .
+      - name: Validate Packer Configuration
+        run: |
+          cd packer
+          packer validate .
+      - name: ShellCheck Provisioners
+        run: shellcheck packer/provisioners/*.sh
+      - name: Check Shell Formatting (shfmt)
+        run: shfmt -d -i 2 -ci packer/provisioners/*.sh
+      - name: Codespell Check
+        run: codespell
+      - name: Yamllint Check
+        run: yamllint -c .yamllint.yml .github/ packer/http/
+
+  test:
+    name: Pytest Verification Suite
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: hashicorp/setup-packer@v3
+        with:
+          version: "1.11.2"
+      - name: Install Test Dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck
+          cd packer && packer init . && cd ..
+          pip install pytest jsonschema
+      - name: Run Test Suite
+        run: pytest tests/ -v
+
+  gitleaks:
+    name: Secret & Privacy Leak Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

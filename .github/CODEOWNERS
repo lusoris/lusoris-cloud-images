@@ -1,0 +1,14 @@
+# Global repository owners
+* @lusoris
+
+# Core build templates & version manifest
+/packer/ @lusoris
+/versions.json @lusoris
+
+# CI/CD Workflows & security
+/.github/ @lusoris
+
+# Documentation
+/docs/ @lusoris
+/README.md @lusoris
+/ONBOARDING.md @lusoris

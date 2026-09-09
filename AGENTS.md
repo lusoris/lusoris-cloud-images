@@ -6,59 +6,74 @@
 
 ## 🌟 TOP-PRIORITY GLOBAL RULES
 
-1. **Declarative Source of Truth**:
-   All image definitions, provisioners, and CI pipelines live declaratively in this repository. Never assume or hand-mutate external state.
-2. **Preserve Architectural Invariants**:
+1. **Single Source of Truth (`versions.json`)**:
+   Never hardcode distribution URLs, Kubernetes versions, container tags, or driver branches in Packer templates or shell provisioners. All versions must originate from [`versions.json`](versions.json) and be injected via Packer environment variables.
+2. **Trunk-Based PR Merge Flow**:
+   Direct commits to `main` are strictly prohibited. Always create a short-lived branch (`feat/*`, `fix/*`, `chore/*`), run all local quality gates, push, and open a PR with `gh pr create`. Merges require passing the `required-checks` aggregator.
+3. **Preserve Architectural Invariants**:
    Every invariant defined in Section 2 must be maintained across all modifications. If an edit risks violating an invariant, stop, verify, and resolve the invariant first.
-3. **Docs & Code Synchrony**:
-   Every user-discoverable change (new flavor, configuration variable, or provisioner step) must be reflected in the documentation ([README.md](README.md) and [ONBOARDING.md](ONBOARDING.md)) in the **exact same commit**.
-4. **All Documentation in English**:
+4. **Docs & Code Synchrony**:
+   Every user-discoverable change (new flavor, configuration variable, or provisioner step) must be reflected in documentation ([README.md](README.md), [ONBOARDING.md](ONBOARDING.md), and [`docs/`](docs/)) in the **exact same commit**.
+5. **NASA/JPL Power of 10 Compliance**:
+   All shell provisioner functions must be <= 60 lines, enforce `set -euo pipefail`, check return codes, and pass ShellCheck with zero warnings.
+6. **Privacy & Zero-Leak Invariant**:
+   Never commit private RFC 1918 IP addresses (`10.x`, `192.168.x`, `172.16-31.x`) or local workstation home paths. Use standard documentation placeholders (`pve.example.com`, `192.0.2.x`).
+7. **All Documentation in English**:
    All commit messages, code comments, documentation, and agent reports must be written in a neutral, professional English register.
 
 ---
 
 ## 1. Mission & Purpose
 
-`lusoris-cloud-images` produces clean, hardened, production-ready cloud and bare-metal OS images optimized for virtualization (Proxmox, KVM, QEMU), cloud-init, and Kubernetes clusters.
+`lusoris-cloud-images` produces clean, hardened, production-ready cloud and bare-metal OS images optimized for virtualization (Proxmox VE, Unraid, VMware ESXi, QEMU/KVM, Public Clouds) and bare-metal servers.
 
 Key capabilities:
 - **Zero Base Bloat**: Purges `snapd`, `lxd`, Ubuntu Pro telemetry, motd news, and unneeded documentation/locales.
-- **Hardware Acceleration Flavors**: Dedicated flavors for Intel, AMD, and NVIDIA eliminate competing driver bloat.
-- **Instant Kubernetes Boot**: Pinned containerd 2.x, kubelet, and core DaemonSets (`cilium`, `kube-vip`, device plugins) are pre-baked into the image to eliminate first-boot network pulling delays.
-- **Authoritative Time**: Hostname-based PTB NTS policy (`ptbtime1.ptb.de` - `ptbtime4.ptb.de`) baked in via chrony.
+- **Hardware Acceleration Flavors**: Dedicated flavors for Intel Arc/Xe, AMD Mesa/ROCm, and NVIDIA generational CUDA (Pascal 535, Ampere/Ada 565, Hopper/Blackwell Open + Fabric Manager).
+- **Multi-Hypervisor Portability**: Coexistence of `qemu-guest-agent`, `open-vm-tools`, Unraid `virtiofs`/`9p` host sharing, and ACPI clean power shutdown.
+- **Bare-Metal Performance Engine**: NVMe I/O scheduling (`kyber`), BBR congestion control, automatic first-boot root expansion (`growpart`), and direct disk streaming (`lusoris-install-to-disk`).
+- **Resilient Global Time**: Cryptographically authenticated Network Time Security (NTS) combining Cloudflare Anycast NTS and European Stratum-1 national laboratories (PTB, Netnod, SIDN, 3eck) with graceful fallback.
 
 ---
 
 ## 2. Architectural Invariants
 
 1. **Self-Contained & Reproducible Builds**:
-   - The Packer templates must build cleanly via standalone QEMU/KVM locally or in CI without requiring an external hypervisor API.
-2. **Modular Provisioners**:
-   - Provisioner shell scripts must live under `packer/provisioners/` with prefix numbering (`00-`, `10-`, etc.).
-   - Scripts must enforce `set -euo pipefail` and pass ShellCheck with zero warnings.
-3. **NASA/JPL Power of 10 Compliance**:
-   - Short functions (<= 60 lines), bounded loops, checked return codes, and zero linter warnings.
-4. **Lean GPU Stacks**:
-   - `:intel` installs Intel Media Driver (`iHD`), Level Zero (`libze`), and oneAPI runtime.
-   - `:amd` installs Mesa Gallium RADV and AMDGPU DRM.
-   - `:nvidia` installs NVIDIA Container Toolkit and headless driver hooks.
-5. **Pre-cached Container Runtime**:
-   - `:k8s-*` node flavors must pre-pull essential cluster images directly into containerd's `k8s.io` namespace.
+   The Packer templates must build cleanly via standalone QEMU/KVM locally or in CI without requiring an external hypervisor API.
+2. **Declarative Version Manifest**:
+   All upstream versions live in [`versions.json`](versions.json) and are ingested into Packer via `jsondecode()`.
+3. **Modular Provisioners**:
+   Provisioner shell scripts live under `packer/provisioners/` with prefix numbering (`00-`, `10-`, etc.). Scripts must enforce `set -euo pipefail` and pass ShellCheck with zero warnings.
+4. **NASA/JPL Power of 10 Compliance**:
+   Functions <= 60 lines, bounded loops, checked return codes, and zero linter warnings.
+5. **NVIDIA Generational Segmentation**:
+   - `nvidia-legacy`: NVIDIA 535 (Pascal / Volta).
+   - `nvidia-mainstream`: NVIDIA 565+ (Turing / Ampere / Ada).
+   - `nvidia-datacenter`: NVIDIA Open Kernel Modules + Fabric Manager (Hopper / Blackwell).
+6. **Pre-cached Container Runtime**:
+   Kubernetes node flavors pre-pull essential cluster images directly into containerd's `k8s.io` namespace using tags injected from `versions.json`.
 
 ---
 
-## 3. Image Flavor Matrix
+## 3. The 4-Dimensional Flavor Matrix
 
-| Flavor | Target Platform / Hardware | Acceleration Stack | Included Components |
+| Workload Tier | Hardware Stack | Flavor Target | Key Components |
 | :--- | :--- | :--- | :--- |
-| **`base-generic`** | General purpose VMs & Cloud instances | VirtIO / Headless | Minimal hardened OS, PTB NTS, qemu-guest-agent |
-| **`base-intel`** | Intel Core Gen 8–14+, Arc Alchemist/Battlemage | Intel Media Driver (`iHD`), Level Zero, oneAPI | Intel compute/media drivers, vainfo, clinfo |
-| **`base-amd`** | AMD Radeon RX series, Ryzen APUs | Mesa Gallium (`radeonsi`), RADV Vulkan | AMDGPU DRM, Mesa VA-API/Vulkan, vainfo |
-| **`base-nvidia`** | NVIDIA Pascal through Blackwell | NVIDIA Container Toolkit | nvidia-container-toolkit, CDI hooks |
-| **`k8s-node-generic`**| Kubernetes Worker / Control-Plane | VirtIO / CPU | containerd 2.x, kubelet/kubeadm, pre-cached Cilium/kube-vip |
-| **`k8s-node-intel`**  | Kubernetes Worker with Intel GPU | Intel Arc/iGPU + containerd | Intel drivers + Intel K8s Device Plugin pre-cached |
-| **`k8s-node-amd`**    | Kubernetes Worker with AMD GPU | AMD Radeon + containerd | AMD drivers + AMD K8s Device Plugin pre-cached |
-| **`k8s-node-nvidia`** | Kubernetes Worker with NVIDIA GPU | NVIDIA GPU + containerd | NVIDIA toolkit + NVIDIA K8s Device Plugin pre-cached |
+| **Base** | Generic (VirtIO) | `base-generic` | Minimal hardened OS, Anycast NTS, QEMU+VMware agents |
+| **Base** | Intel GPU | `base-intel` | Intel Media Driver (`iHD`), Level Zero, vainfo, clinfo |
+| **Base** | AMD GPU | `base-amd` | AMD Mesa VA-API (`radeonsi`), RADV Vulkan, AMDGPU DRM |
+| **Base** | NVIDIA Legacy | `base-nvidia-legacy` | NVIDIA 535 driver branch, CUDA 12.2 (Pascal/Volta) |
+| **Base** | NVIDIA Mainstream | `base-nvidia-mainstream`| NVIDIA 565 driver branch, CUDA 12.8 (RTX/Ampere/Ada) |
+| **Base** | NVIDIA Datacenter | `base-nvidia-datacenter`| NVIDIA Open Kernel Modules, Fabric Manager (Hopper/Blackwell) |
+| **Docker** | Generic (VirtIO) | `docker-generic` | Docker CE, Docker Compose v2, containerd, log rotation |
+| **Docker** | Intel GPU | `docker-intel` | Docker CE + Intel Media/Compute + QuickSync passthrough |
+| **Docker** | AMD GPU | `docker-amd` | Docker CE + AMD ROCm 6.x compute runtime |
+| **Docker** | NVIDIA Mainstream | `docker-nvidia` | Docker CE + NVIDIA Container Toolkit + CDI specifications |
+| **Kubernetes**| Generic (VirtIO) | `k8s-node-generic` | containerd 2.x, kubelet/kubeadm, pre-cached Cilium/kube-vip |
+| **Kubernetes**| Intel GPU | `k8s-node-intel` | containerd 2.x + Intel drivers + Intel K8s Device Plugin |
+| **Kubernetes**| AMD GPU | `k8s-node-amd` | containerd 2.x + AMD ROCm + AMD K8s Device Plugin |
+| **Kubernetes**| NVIDIA Mainstream | `k8s-node-nvidia` | containerd 2.x + NVIDIA toolkit + NVIDIA K8s Device Plugin |
+| **AI Infer** | NVIDIA Mainstream | `ai-infer-nvidia` | Transparent hugepages, numactl, vLLM/Ollama execution hooks |
 
 ---
 
@@ -67,9 +82,9 @@ Key capabilities:
 ```bash
 make help               # Display all available targets
 make lint               # Run packer validate, shellcheck, and yamllint
-make test               # Run automated pytest verification
+make test               # Run automated pytest verification suite
 make fmt                # Format Packer HCL configurations
-make build-generic      # Build base-generic image via local QEMU/KVM
-make build-intel        # Build base-intel image via local QEMU/KVM
-make build-k8s-intel    # Build k8s-node-intel image via local QEMU/KVM
+make build-base-generic # Build base-generic image via local QEMU/KVM
+make build-docker-generic # Build docker-generic image
+make build-k8s-generic  # Build k8s-node-generic image
 ```

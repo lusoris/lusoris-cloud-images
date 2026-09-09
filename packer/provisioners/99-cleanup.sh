@@ -1,13 +1,14 @@
 #!/usr/bin/env bash
-# 99-cleanup.sh — Template sanitization, log truncation, and thin-provision trimming
-# Ensures clean first boot, regenerated machine-id, and minimal disk footprint.
+# 99-cleanup.sh — Template sanitization, security cleanup, and thin-provision trimming
+# Ensures clean first boot, password lock, regenerated machine-id, and minimal disk footprint.
 set -euo pipefail
 
-clean_cloud_init() {
-  echo "==> Sanitizing cloud-init state..."
+clean_cloud_init_and_auth() {
+  echo "==> Sanitizing cloud-init state and locking temporary build password..."
   sudo cloud-init clean --logs --seed || true
-  # Drop cloud-init datasources not needed on bare-metal or local hypervisors
-  echo 'datasource_list: [ NoCloud, ConfigDrive, None ]' | sudo tee /etc/cloud/cloud.cfg.d/99_datasource.cfg
+  # Lock build password so users must inject credentials via cloud-init / SSH key
+  sudo passwd -l ubuntu || true
+  sudo rm -f /etc/sudoers.d/90-cloud-init-users || true
 }
 
 clean_apt_cache() {
@@ -23,7 +24,7 @@ clean_machine_identities() {
   sudo rm -f /var/lib/dbus/machine-id
   sudo ln -sf /etc/machine-id /var/lib/dbus/machine-id
 
-  echo "==> Removing host SSH keys for unique regeneration..."
+  echo "==> Removing host SSH keys for unique regeneration on first boot..."
   sudo rm -f /etc/ssh/ssh_host_*
 }
 
@@ -44,7 +45,7 @@ zero_free_space() {
 }
 
 main() {
-  clean_cloud_init
+  clean_cloud_init_and_auth
   clean_apt_cache
   clean_machine_identities
   clean_logs_and_histories

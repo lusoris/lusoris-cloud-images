@@ -1,10 +1,12 @@
 """Automated verification suite for lusoris-cloud-images.
 
-Tests configuration integrity, provisioner script standards, and Packer validity.
-Adheres to NASA/JPL Power of 10: short functions, checked assertions.
+Tests configuration integrity, provisioner script standards, single source of truth (SSOT),
+and Packer validity. Adheres to NASA/JPL Power of 10: short functions, checked assertions.
 """
 
 from pathlib import Path
+import json
+import re
 import subprocess
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -15,17 +17,25 @@ EXPECTED_FLAVORS = [
     "base-generic",
     "base-intel",
     "base-amd",
-    "base-nvidia",
+    "base-nvidia-legacy",
+    "base-nvidia-mainstream",
+    "base-nvidia-datacenter",
+    "docker-generic",
+    "docker-intel",
+    "docker-amd",
+    "docker-nvidia",
+    "podman-generic",
     "k8s-node-generic",
     "k8s-node-intel",
     "k8s-node-amd",
     "k8s-node-nvidia",
+    "ai-infer-nvidia",
 ]
 
 
 class TestConfigIntegrity:
     def test_core_files_exist(self) -> None:
-        """Verify all core configuration files exist in the repository."""
+        """Verify all core configuration, governance, and manifest files exist."""
         required_files = [
             PACKER_DIR / "versions.pkr.hcl",
             PACKER_DIR / "variables.pkr.hcl",
@@ -33,20 +43,67 @@ class TestConfigIntegrity:
             PACKER_DIR / "builds.pkr.hcl",
             PACKER_DIR / "http" / "user-data",
             PACKER_DIR / "http" / "meta-data",
+            REPO_ROOT / "versions.json",
             REPO_ROOT / "Makefile",
             REPO_ROOT / "AGENTS.md",
+            REPO_ROOT / "CLAUDE.md",
             REPO_ROOT / "README.md",
             REPO_ROOT / "ONBOARDING.md",
             REPO_ROOT / "VERSION",
+            REPO_ROOT / "SECURITY.md",
+            REPO_ROOT / "CONTRIBUTING.md",
+            REPO_ROOT / "CODE_OF_CONDUCT.md",
+            REPO_ROOT / "GOVERNANCE.md",
+            REPO_ROOT / "SUPPORT.md",
+            REPO_ROOT / "MAINTAINERS.md",
+            REPO_ROOT / "CHANGELOG.md",
+            REPO_ROOT / "mkdocs.yml",
+            REPO_ROOT / ".pre-commit-config.yaml",
+            REPO_ROOT / ".yamllint.yml",
+            REPO_ROOT / ".gitleaks.toml",
+            REPO_ROOT / ".markdownlint.json",
+            REPO_ROOT / ".codespellrc",
+            REPO_ROOT / "release-please-config.json",
+            REPO_ROOT / ".release-please-manifest.json",
+            REPO_ROOT / "renovate.json",
+            REPO_ROOT / ".github" / "workflows" / "ci.yml",
+            REPO_ROOT / ".github" / "workflows" / "required-aggregator.yml",
+            REPO_ROOT / ".github" / "workflows" / "pages.yml",
+            REPO_ROOT / ".github" / "workflows" / "release-matrix.yml",
+            REPO_ROOT / ".github" / "workflows" / "release-please.yml",
+            REPO_ROOT / ".github" / "workflows" / "scorecard.yml",
+            REPO_ROOT / ".github" / "workflows" / "security-scans.yml",
+            REPO_ROOT / ".github" / "workflows" / "supply-chain.yml",
         ]
         for file_path in required_files:
             assert file_path.exists(), f"Missing required file: {file_path}"
             assert file_path.stat().st_size > 0, f"File is empty: {file_path}"
 
+    def test_versions_json_schema(self) -> None:
+        """Verify versions.json exists and contains valid JSON with required keys."""
+        manifest_path = REPO_ROOT / "versions.json"
+        assert manifest_path.exists(), "versions.json does not exist"
+        data = json.loads(manifest_path.read_text(encoding="utf-8"))
+
+        assert "distro" in data
+        assert "kubernetes" in data
+        assert "drivers" in data
+        assert "runtimes" in data
+        assert "time" in data
+
+        # Nested validation
+        assert "intel" in data["drivers"]
+        assert "amd" in data["drivers"]
+        assert "nvidia" in data["drivers"]
+        assert "containerd" in data["runtimes"]
+        assert "docker_ce" in data["runtimes"]
+        assert "stratum1_nts" in data["time"]
+        assert "images" in data["kubernetes"]
+
     def test_provisioners_executable_and_strict(self) -> None:
         """Verify all provisioners are executable and enforce bash strict mode."""
         scripts = list(PROVISIONERS_DIR.glob("*.sh"))
-        assert len(scripts) >= 8, f"Expected at least 8 provisioners, found {len(scripts)}"
+        assert len(scripts) >= 16, f"Expected at least 16 provisioners, found {len(scripts)}"
 
         for script in scripts:
             assert script.stat().st_mode & 0o111, f"Script is not executable: {script.name}"
@@ -57,6 +114,30 @@ class TestConfigIntegrity:
             assert "set -euo pipefail" in content, (
                 f"Missing strict mode 'set -euo pipefail' in {script.name}"
             )
+
+    def test_provisioners_power_of_ten_function_length(self) -> None:
+        """Verify all functions in shell scripts adhere to NASA/JPL rule: <= 60 lines."""
+        scripts = list(PROVISIONERS_DIR.glob("*.sh"))
+        func_start_pattern = re.compile(r"^[a-zA-Z0-9_-]+\(\)\s*\{")
+
+        for script in scripts:
+            lines = script.read_text(encoding="utf-8").splitlines()
+            current_func = None
+            func_line_count = 0
+
+            for line in lines:
+                if current_func is None:
+                    if func_start_pattern.match(line):
+                        current_func = line.split("(")[0].strip()
+                        func_line_count = 1
+                else:
+                    func_line_count += 1
+                    if line.strip() == "}":
+                        assert func_line_count <= 60, (
+                            f"Function '{current_func}' in {script.name} exceeds 60 lines "
+                            f"({func_line_count} lines). Violates NASA/JPL Power of 10."
+                        )
+                        current_func = None
 
     def test_all_flavors_defined_in_builds(self) -> None:
         """Verify all architectural flavors are defined in builds.pkr.hcl."""
@@ -87,3 +168,22 @@ class TestConfigIntegrity:
             check=False,
         )
         assert result.returncode == 0, f"ShellCheck detected issues: {result.stdout}"
+
+    def test_no_private_ips_or_user_paths(self) -> None:
+        """Verify no private RFC 1918 IPs or developer home paths leak into configs."""
+        prohibited_patterns = [
+            re.compile(r"10\.1\.10\.10"),
+            re.compile(r"/home/kilian"),
+        ]
+        ignored_paths = {".git", ".pytest_cache", "__pycache__", "tests"}
+
+        for path in REPO_ROOT.rglob("*"):
+            if path.is_file() and not any(part in ignored_paths for part in path.parts):
+                try:
+                    content = path.read_text(encoding="utf-8", errors="ignore")
+                except Exception:
+                    continue
+                for pattern in prohibited_patterns:
+                    assert not pattern.search(content), (
+                        f"Found prohibited pattern '{pattern.pattern}' in {path.relative_to(REPO_ROOT)}"
+                    )

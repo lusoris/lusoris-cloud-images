@@ -1,0 +1,29 @@
+name: New Flavor Request
+description: Request a new hardware acceleration stack, hypervisor target, or appliance workload
+title: "feat(flavor): add "
+labels: ["enhancement", "flavor-request"]
+body:
+  - type: markdown
+    attributes:
+      value: Request a new combination in the lusoris-cloud-images 4D matrix!
+  - type: input
+    id: proposed_name
+    attributes:
+      label: Proposed Flavor Name
+      placeholder: e.g. docker-intel-battlemage or k8s-node-habana
+    validations:
+      required: true
+  - type: textarea
+    id: use_case
+    attributes:
+      label: Target Workload & Hardware
+      description: Detail the hardware (GPU model, CPU architecture) and workload software.
+    validations:
+      required: true
+  - type: textarea
+    id: drivers
+    attributes:
+      label: Required Drivers & Upstream Packages
+      description: Links to Debian/Ubuntu packages, apt repositories, or container plugins required.
+    validations:
+      required: true

@@ -1,0 +1,69 @@
+name: release-matrix
+on:
+  schedule:
+    - cron: "0 2 * * 0"
+  release:
+    types: [published]
+  workflow_dispatch:
+    inputs:
+      flavor:
+        description: "Flavor to build"
+        required: true
+        default: "base-generic"
+        type: choice
+        options:
+          - base-generic
+          - base-intel
+          - base-amd
+          - docker-generic
+          - docker-intel
+          - docker-amd
+          - docker-nvidia
+          - k8s-node-generic
+          - k8s-node-intel
+          - k8s-node-amd
+          - k8s-node-nvidia
+          - ai-infer-nvidia
+
+permissions:
+  contents: write
+  packages: write
+  id-token: write
+
+jobs:
+  build-matrix:
+    name: Build Image (${{ matrix.flavor }})
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        flavor:
+          - base-generic
+          - docker-generic
+          - k8s-node-generic
+    steps:
+      - uses: actions/checkout@v4
+      - uses: hashicorp/setup-packer@v3
+        with:
+          version: "1.11.2"
+      - name: Install QEMU and Zstd
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 qemu-utils zstd
+      - name: Build Image with Packer
+        run: |
+          cd packer
+          packer init .
+          packer build -only="${{ matrix.flavor }}.qemu.image" .
+      - name: Compress Image with Zstandard
+        run: |
+          cd output-images/${{ matrix.flavor }}
+          zstd -T0 -19 --rm *.qcow2
+          sha256sum *.qcow2.zst > SHA256SUMS
+      - name: Upload Release Artifacts
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            output-images/${{ matrix.flavor }}/*.qcow2.zst
+            output-images/${{ matrix.flavor }}/SHA256SUMS

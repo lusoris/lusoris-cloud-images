@@ -1,0 +1,68 @@
+name: Bug Report
+description: Report an issue with an image flavor, build failure, or provisioner script
+title: "fix: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: Thank you for reporting a bug. Please fill in the details below.
+  - type: dropdown
+    id: flavor
+    attributes:
+      label: Image Flavor
+      description: Which image flavor experienced the issue?
+      options:
+        - base-generic
+        - base-intel
+        - base-amd
+        - base-nvidia-mainstream
+        - base-nvidia-legacy
+        - base-nvidia-datacenter
+        - docker-generic
+        - docker-intel
+        - docker-amd
+        - docker-nvidia
+        - k8s-node-generic
+        - k8s-node-intel
+        - k8s-node-amd
+        - k8s-node-nvidia
+        - ai-infer-nvidia
+        - other
+    validations:
+      required: true
+  - type: dropdown
+    id: platform
+    attributes:
+      label: Target Hypervisor / Platform
+      options:
+        - QEMU / KVM Standalone
+        - Proxmox VE
+        - Unraid
+        - VMware ESXi / vSphere
+        - Bare-Metal
+        - Public Cloud (AWS/GCP/OpenStack)
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: What steps did you take to encounter the bug?
+      placeholder: |
+        1. Run `make build-docker-generic`
+        2. Boot generated .qcow2 in QEMU
+        3. Observe failure...
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: What did you expect to happen?
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant Logs / Output
+      render: shell

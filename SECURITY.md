@@ -1,0 +1,37 @@
+# Security Policy
+
+`lusoris-cloud-images` produces hardened, production-grade cloud and bare-metal OS images. Security is paramount across our image forge, provisioners, and supply chain.
+
+## Supported Versions
+
+Only the current rolling branch and the latest two minor tags receive security patches:
+
+| Version | Supported |
+| :--- | :--- |
+| `main` (rolling weekly) | :white_check_mark: |
+| Latest minor release (v0.x) | :white_check_mark: |
+| Older releases | :x: |
+
+## Reporting a Vulnerability
+
+Please **do not report security vulnerabilities through public GitHub issues**.
+
+Instead, please report vulnerabilities by opening a private GitHub Security Advisory:
+- Navigate to the **Security** tab of this repository.
+- Click **Report a vulnerability**.
+- Provide a detailed description of the vulnerability, affected flavors, and steps to reproduce.
+
+Alternatively, contact security coordinators via email:
+- `security@lusoris.org` (or encrypted via standard channels)
+
+### Response Timeline
+- **Initial Acknowledgement**: Within 24 hours.
+- **Triage & Reproduction**: Within 72 hours.
+- **Fix & Disclosure**: Patches will be developed in private and released alongside a coordinated GitHub Security Advisory (GHSA) and CVE identifier if warranted.
+
+## Supply Chain Integrity
+
+All official release artifacts (`.qcow2.zst`, `.raw.zst`, `.vmdk.zst`) are:
+1. Cryptographically signed using **Cosign** (keyless OIDC with GitHub Actions).
+2. Accompanied by **CycloneDX** and **SPDX** Software Bill of Materials (SBOM) generated via **Syft**.
+3. Scanned for CVE vulnerabilities in CI via **Trivy**.

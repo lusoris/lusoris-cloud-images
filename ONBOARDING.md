@@ -1,23 +1,20 @@
 # Onboarding Guide: lusoris-cloud-images
 
-> Welcome to `lusoris-cloud-images`! This guide walks you through switching your editor workspace root, validating your local environment, and building your first flavored cloud image.
+> Welcome to `lusoris-cloud-images`! This guide walks you through setting up your environment, validating quality gates, and building flavored cloud images across our 4D matrix.
 
 ---
 
-## 1. Switching Project Roots
+## 1. Quickstart Workspace Setup
 
-To open and work on this repository directly:
+Clone and open the repository:
 
-### VS Code / Cursor / Windsurf
 ```bash
 git clone https://github.com/lusoris/lusoris-cloud-images.git
 cd lusoris-cloud-images
 code .
 ```
-Or open the cloned folder via **File -> Open Folder...**.
 
-### Antigravity / Agent CLI
-Launch Antigravity or any autonomous agent directly in the project directory:
+Or launch Antigravity directly in the directory:
 ```bash
 cd lusoris-cloud-images
 agy
@@ -27,11 +24,10 @@ agy
 
 ## 2. Local Environment Check
 
-The builder requires `packer`, `qemu-system-x86_64` (with KVM acceleration), and development linters.
+The builder requires `packer`, `qemu-system-x86_64` (with KVM acceleration), `shellcheck`, and `pytest`.
 
 Run the pre-flight check:
 ```bash
-# Check CLI versions
 packer version
 qemu-system-x86_64 --version
 shellcheck --version
@@ -45,7 +41,7 @@ pytest --version
 
 ## 3. Verify Quality Gates
 
-Before running image builds, execute the verification suite:
+Before running image builds, execute our verification suite:
 
 ```bash
 # Initialize Packer plugins (installs QEMU and Proxmox plugins)
@@ -58,59 +54,41 @@ make lint
 make test
 ```
 
-Expected output:
-```text
-==> Validating Packer configuration...
-The configuration is valid.
-==> Running ShellCheck on provisioner scripts...
-==> All lint checks passed successfully.
-====== 5 passed in 0.25s ======
-```
-
 ---
 
 ## 4. Build Your First Image
 
-### Standalone QEMU Build (Base Generic)
-To build a lean base cloud image (`.qcow2`) locally:
+All builds read upstream versions declaratively from [`versions.json`](versions.json).
 
+### Base Cloud Image (Generic)
 ```bash
-make build-generic
+make build-base-generic
+```
+Builds a minimal hardened `.qcow2` image to `output-images/base-generic/`.
+
+### Docker & Container Appliances
+```bash
+# Standalone Docker CE + Compose host
+make build-docker-generic
+
+# Docker CE with NVIDIA Container Toolkit & CDI
+make build-docker-nvidia
 ```
 
-This will:
-1. Download the official Ubuntu 26.04 Resolute LTS cloud image.
-2. Launch a headless QEMU VM with cloud-init seed data.
-3. Execute `00-base-strip.sh`, `10-network-ptb.sh`, and `20-kernel-sysctl.sh`.
-4. Run `99-cleanup.sh` and trim free space.
-5. Save the output to `output-images/base-generic/lusoris-cloud-base-generic.qcow2`.
-
-### Building GPU-Accelerated Flavors
+### Kubernetes Node Images
 ```bash
-# Intel Arc / Flex / iGPU
-make build-intel
-
-# AMD Radeon / APU
-make build-amd
-
-# NVIDIA Container Toolkit
-make build-nvidia
-```
-
-### Building Kubernetes Node Images
-```bash
-# Kubernetes worker with pre-cached Cilium, kube-vip, and containerd
+# Kubernetes worker node with pre-cached Cilium and kube-vip
 make build-k8s-generic
 
-# Kubernetes worker with Intel GPU pass-through & Intel Device Plugin
+# Kubernetes worker node with Intel GPU Device Plugin
 make build-k8s-intel
 ```
 
 ---
 
-## 5. Testing the Built Image Locally
+## 5. Testing the Built Image Locally in QEMU
 
-You can launch the generated `.qcow2` image directly in QEMU for instant smoke testing:
+Smoke-test your generated `.qcow2` image directly with headless QEMU:
 
 ```bash
 qemu-system-x86_64 \
@@ -123,36 +101,33 @@ qemu-system-x86_64 \
   -nographic
 ```
 
-Then SSH into the running instance in another terminal:
+---
+
+## 6. Hypervisor Deployment Paths
+
+### Proxmox VE
+Deploy templates directly via the Proxmox builder:
 ```bash
-ssh -p 2222 ubuntu@localhost
+cd packer
+packer build -var-file=../proxmox.pkrvars.hcl -only="base-generic.proxmox-clone.template" .
+```
+
+### Unraid
+Copy the generated `.qcow2` to `/mnt/user/domains/<vm-name>/vdisk1.qcow2` and select VirtIO disk/net. Guest agent IP reporting and Unraid `virtiofs` host share passthrough are enabled out of the box.
+
+### Bare-Metal Direct Flash
+Flash compressed `.raw.zst` directly to NVMe/SATA storage:
+```bash
+curl -fsSL https://releases.lusoris.org/lusoris-base-generic.raw.zst | \
+  zstdcat | sudo dd of=/dev/nvme0n1 bs=4M status=progress conv=fsync
 ```
 
 ---
 
-## 6. Proxmox VE Deployment (Optional)
+## 7. Documentation Portal
 
-To deploy templates directly to your Proxmox cluster:
-
-1. Create a `proxmox.pkrvars.hcl` file (git-ignored):
-   ```hcl
-   proxmox_url          = "https://pve.example.com:8006/api2/json"
-   proxmox_token_id     = "terraform@pve!terraform"
-   proxmox_token_secret = "YOUR_TOKEN_SECRET"
-   proxmox_node         = "pve01"
-   storage_pool         = "local-lvm"
-   vm_id                = 9000
-   ```
-2. Run Packer with the Proxmox target:
-   ```bash
-   cd packer
-   packer build -var-file=../proxmox.pkrvars.hcl -only="base-intel.proxmox-clone.template" .
-   ```
-
----
-
-## 7. Next Steps & Roadmap
-
-- [ ] Add Bare-Metal (BM) ISO and raw disk builder for network PXE/iPXE installs.
-- [ ] Connect GitHub Actions matrix builds to automate monthly `.qcow2` releases.
-- [ ] Integrate with `lusoris/k8s` cluster GitOps for automated node provisioning.
+Run the full documentation portal locally:
+```bash
+make docs-serve
+```
+And view the docs in your browser at `http://127.0.0.1:8000`.

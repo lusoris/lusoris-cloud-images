@@ -1,0 +1,89 @@
+site_name: lusoris-cloud-images
+site_description: Enterprise-grade, hardened, hardware-accelerated cloud and bare-metal OS image forge
+site_url: https://lusoris.github.io/lusoris-cloud-images
+repo_url: https://github.com/lusoris/lusoris-cloud-images
+repo_name: lusoris/lusoris-cloud-images
+edit_uri: edit/main/docs/
+copyright: "Copyright &copy; 2026 The Lusoris Authors — Apache 2.0 License"
+
+theme:
+  name: material
+  language: en
+  palette:
+    - scheme: slate
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+    - scheme: default
+      primary: teal
+      accent: cyan
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.tabs
+    - navigation.sections
+    - navigation.top
+    - search.suggest
+    - search.highlight
+    - content.code.copy
+    - content.code.annotate
+
+markdown_extensions:
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences:
+      custom_fences:
+        - name: mermaid
+          class: mermaid
+          format: !!python/name:pymdownx.superfences.fence_code_format
+  - pymdownx.highlight:
+      anchor_linenums: true
+      line_spans: __span
+      pygments_lang_class: true
+  - pymdownx.inlinehilite
+  - pymdownx.tabbed:
+      alternate_style: true
+  - tables
+  - attr_list
+  - toc:
+      permalink: true
+
+nav:
+  - Home: index.md
+  - Flavor Matrix:
+      - Overview & Explorer: flavors/matrix.md
+      - Base Flavors: flavors/base.md
+      - Docker & Podman: flavors/containers.md
+      - Kubernetes Nodes: flavors/kubernetes.md
+      - AI & LLM Inference: flavors/ai-infer.md
+  - Hypervisors & Platforms:
+      - Proxmox VE: platforms/proxmox.md
+      - Unraid: platforms/unraid.md
+      - VMware ESXi: platforms/vmware.md
+      - Bare-Metal & iPXE: platforms/baremetal.md
+      - Cloud Generic: platforms/cloud.md
+  - Hardware Acceleration:
+      - Intel Arc / Xe / Flex: hardware/intel.md
+      - AMD Radeon & ROCm: hardware/amd.md
+      - NVIDIA Generational CUDA: hardware/nvidia.md
+  - Security & Time:
+      - CIS Benchmark Baseline: security/cis-baseline.md
+      - Global Anycast NTS Time: security/time-nts.md
+      - Supply Chain & Attestation: security/supply-chain.md
+  - Architecture Decisions (ADRs):
+      - ADR Index: adr/README.md
+      - "0001: Declarative Version Manifest": adr/0001-declarative-version-manifest.md
+      - "0002: Global Anycast NTS Time": adr/0002-global-anycast-nts-time.md
+      - "0003: NVIDIA Generational Segmentation": adr/0003-nvidia-generational-segmentation.md
+      - "0004: Hypervisor Agent Coexistence": adr/0004-hypervisor-agent-coexistence.md
+      - "0005: Bare-Metal Streaming Install": adr/0005-baremetal-streaming-install.md
+  - Community:
+      - Contributing Guide: community/contributing.md
+      - Security Policy: community/security.md
+      - Code of Conduct: community/code-of-conduct.md
+      - Governance: community/governance.md
