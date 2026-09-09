@@ -28,7 +28,7 @@ Key capabilities:
 - **Zero Base Bloat**: Purges `snapd`, `lxd`, Ubuntu Pro telemetry, motd news, and unneeded documentation/locales.
 - **Hardware Acceleration Flavors**: Dedicated flavors for Intel Arc/Xe, AMD Mesa/ROCm, and NVIDIA generational CUDA (Pascal 535, Ampere/Ada 565, Hopper/Blackwell Open + Fabric Manager).
 - **Multi-Hypervisor Portability**: Coexistence of `qemu-guest-agent`, `open-vm-tools`, Unraid `virtiofs`/`9p` host sharing, and ACPI clean power shutdown.
-- **Bare-Metal Performance Engine**: NVMe I/O scheduling (`kyber`), BBR congestion control, automatic first-boot root expansion (`growpart`), and direct disk streaming (`lusoris-install-to-disk`).
+- **Bare-Metal & Hypervisor Performance Engine**: NVMe/VirtIO `mq-deadline` I/O scheduling, automated weekly `fstrim.timer`, ZRAM in-memory swap guard, fast-boot `NoCloud` cloud-init discovery, BBR congestion control, and direct disk streaming (`lusoris-install-to-disk`).
 - **Resilient Global Time**: Cryptographically authenticated Network Time Security (NTS) combining Cloudflare Anycast NTS and European Stratum-1 national laboratories (PTB, Netnod, SIDN, 3eck) with graceful fallback.
 
 ---
