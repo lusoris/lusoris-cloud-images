@@ -45,6 +45,9 @@ permissions:
   packages: write
   id-token: write
 
+env:
+  PACKER_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   build-matrix:
     name: Build Image (${{ matrix.flavor }})
