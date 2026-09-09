@@ -198,10 +198,10 @@ class TestConfigIntegrity:
 
     def test_no_private_ips_or_user_paths(self) -> None:
         """Verify no private RFC 1918 IPs or developer home paths leak into configs."""
-        prohibited_patterns = [
-            re.compile(r"10\.1\.10\.10"),
-            re.compile(r"/home/kilian"),
-        ]
+        prohibited_user_paths = re.compile(r"/home/(?!(ubuntu|username)\b)[\w-]+")
+        prohibited_ip_patterns = re.compile(
+            r"\b(10\.\d{1,3}\.\d{1,3}\.\d{1,3}|192\.168\.\d{1,3}\.\d{1,3}|172\.(1[6-9]|2\d|3[01])\.\d{1,3}\.\d{1,3})\b"
+        )
         ignored_paths = {".git", ".pytest_cache", "__pycache__", "tests"}
 
         for path in REPO_ROOT.rglob("*"):
@@ -210,7 +210,15 @@ class TestConfigIntegrity:
                     content = path.read_text(encoding="utf-8", errors="ignore")
                 except Exception:
                     continue
-                for pattern in prohibited_patterns:
-                    assert not pattern.search(content), (
-                        f"Found prohibited pattern '{pattern.pattern}' in {path.relative_to(REPO_ROOT)}"
+
+                # Check developer home paths across all files
+                assert not prohibited_user_paths.search(content), (
+                    f"Found prohibited user home path in {path.relative_to(REPO_ROOT)}"
+                )
+
+                # Check RFC 1918 IPs in non-documentation files
+                if not (path.suffix == ".md" or "docs" in path.parts):
+                    assert not prohibited_ip_patterns.search(content), (
+                        f"Found prohibited private RFC 1918 IP in {path.relative_to(REPO_ROOT)}"
                     )
+

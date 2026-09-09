@@ -29,9 +29,12 @@ Alternatively, contact security coordinators via email:
 - **Triage & Reproduction**: Within 72 hours.
 - **Fix & Disclosure**: Patches will be developed in private and released alongside a coordinated GitHub Security Advisory (GHSA) and CVE identifier if warranted.
 
-## Supply Chain Integrity
+## Supply Chain Integrity & Continuous Auditing
 
 All official release artifacts (`.qcow2.zst`, `.raw.zst`, `.vmdk.zst`) are:
 1. Cryptographically signed using **Cosign** (keyless OIDC with GitHub Actions).
 2. Accompanied by **CycloneDX** and **SPDX** Software Bill of Materials (SBOM) generated via **Syft**.
-3. Scanned for CVE vulnerabilities in CI via **Trivy**.
+3. Scanned for CVE vulnerabilities in CI via **Trivy**, static analysis via **Semgrep**, and supply-chain health via **OpenSSF Scorecard**.
+
+For comprehensive audit reports, automated gate metrics, and zero-leak verification details, consult the [Security Policy & Audit Ledger](https://github.com/lusoris/lusoris-cloud-images/blob/main/docs/community/security.md).
+
