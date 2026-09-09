@@ -7,7 +7,7 @@ Accepted
 Originally, component versions (Kubernetes binaries, container image tags, driver branches) were hardcoded in multiple provisioner scripts and Packer variable files. Version bumps required searching and updating dozens of files, risking version drift and breaking automated updates.
 
 ## Decision
-We consolidate all versions into a single root [`versions.json`](../../versions.json) file:
+We consolidate all versions into a single root [`versions.json`](https://github.com/lusoris/lusoris-cloud-images/blob/main/versions.json) file:
 1. Packer decodes the file natively using `jsondecode(file("${path.root}/../versions.json"))`.
 2. Packer injects versions dynamically into shell provisioners via `environment_vars`.
 3. Provisioners never hardcode version strings or tags.
