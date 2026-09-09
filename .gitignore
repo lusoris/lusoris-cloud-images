@@ -33,3 +33,10 @@ htmlcov/
 # Logs & temp files
 *.log
 /tmp/
+
+# Fleet Agent & Worktree directories (fleet convention)
+.workingdir/
+.workingdir2/
+.agyfleet/
+.claude/
+
