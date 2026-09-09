@@ -47,8 +47,7 @@ This project follows **Trunk-Based Development** with protected `main` branch. D
 ## Documentation Synchrony
 
 Any user-discoverable addition (new flavor, Packer variable, or provisioner step) **must be reflected in documentation** in the exact same commit:
-- Update [`README.md`](README.md) and [`ONBOARDING.md`](ONBOARDING.md).
-- Update relevant guides in [`docs/`](docs/).
+- Update [`README.md`](README.md) and relevant guides in [`docs/`](docs/).
 
 ## Developer Certificate of Origin (DCO)
 

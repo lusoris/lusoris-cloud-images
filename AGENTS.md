@@ -13,7 +13,7 @@
 3. **Preserve Architectural Invariants**:
    Every invariant defined in Section 2 must be maintained across all modifications. If an edit risks violating an invariant, stop, verify, and resolve the invariant first.
 4. **Docs & Code Synchrony**:
-   Every user-discoverable change (new flavor, configuration variable, or provisioner step) must be reflected in documentation ([README.md](README.md), [ONBOARDING.md](ONBOARDING.md), and [`docs/`](docs/)) in the **exact same commit**.
+   Every user-discoverable change (new flavor, configuration variable, or provisioner step) must be reflected in documentation ([README.md](README.md) and [`docs/`](docs/)) in the **exact same commit**.
 5. **NASA/JPL Power of 10 Compliance**:
    All shell provisioner functions must be <= 60 lines, enforce `set -euo pipefail`, check return codes, and pass ShellCheck with zero warnings.
 6. **Privacy & Zero-Leak Invariant**:

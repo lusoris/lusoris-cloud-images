@@ -60,7 +60,6 @@ class TestConfigIntegrity:
             REPO_ROOT / "AGENTS.md",
             REPO_ROOT / "CLAUDE.md",
             REPO_ROOT / "README.md",
-            REPO_ROOT / "ONBOARDING.md",
             REPO_ROOT / "VERSION",
             REPO_ROOT / "SECURITY.md",
             REPO_ROOT / "CONTRIBUTING.md",

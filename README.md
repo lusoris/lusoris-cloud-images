@@ -150,7 +150,7 @@ make build-ai-infer-nvidia-bleeding # NVIDIA Bleeding Blackwell
 │   ├── versions.pkr.hcl       # Required Packer plugins
 │   ├── variables.pkr.hcl      # Universal build variables
 │   ├── sources.pkr.hcl        # QEMU and Proxmox builder sources
-│   ├── builds.pkr.hcl         # Modular 23-flavor pipeline definitions
+│   ├── builds.pkr.hcl         # Modular 26-flavor pipeline definitions
 │   ├── http/                  # Headless cloud-init seed data
 │   └── provisioners/          # Modular shell scripts (NASA/JPL Power of 10 compliant)
 ├── tests/                     # Automated pytest verification suite
@@ -159,6 +159,5 @@ make build-ai-infer-nvidia-bleeding # NVIDIA Bleeding Blackwell
 ├── CONTRIBUTING.md            # Contribution workflow and PR guidelines
 ├── SECURITY.md                # Vulnerability disclosure policy
 ├── Makefile                   # Unified developer targets
-├── ONBOARDING.md              # Sanitized onboarding guide
 └── README.md                  # Project overview
 ```
