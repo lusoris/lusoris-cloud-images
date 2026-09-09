@@ -1,25 +1,22 @@
 # AGENTS.md — Agent & Contributor Directives
 
 > Authoritative operating guide for all autonomous engineering agents and human contributors in `lusoris-cloud-images`.
+>
+> **Read [`docs/principles.md`](docs/principles.md) before changing this repository.** It is the project-wide engineering and architecture contract. Then consult [`docs/repository-rule-crosswalk.md`](docs/repository-rule-crosswalk.md) for fleet standards cross-walked from `VMAFx/vmafx` and `20-watts-was-enough`.
 
 ---
 
 ## 🌟 TOP-PRIORITY GLOBAL RULES
 
-1. **Single Source of Truth (`versions.json`)**:
-   Never hardcode distribution URLs, Kubernetes versions, container tags, or driver branches in Packer templates or shell provisioners. All versions must originate from [`versions.json`](versions.json) and be injected via Packer environment variables.
-2. **Trunk-Based PR Merge Flow**:
-   Direct commits to `main` are strictly prohibited. Always create a short-lived branch (`feat/*`, `fix/*`, `chore/*`), run all local quality gates, push, and open a PR with `gh pr create`. Merges require passing the `required-checks` aggregator.
-3. **Preserve Architectural Invariants**:
-   Every invariant defined in Section 2 must be maintained across all modifications. If an edit risks violating an invariant, stop, verify, and resolve the invariant first.
-4. **Docs & Code Synchrony**:
-   Every user-discoverable change (new flavor, configuration variable, or provisioner step) must be reflected in documentation ([README.md](README.md) and [`docs/`](docs/)) in the **exact same commit**.
-5. **NASA/JPL Power of 10 Compliance**:
-   All shell provisioner functions must be <= 60 lines, enforce `set -euo pipefail`, check return codes, and pass ShellCheck with zero warnings.
-6. **Privacy & Zero-Leak Invariant**:
-   Never commit private RFC 1918 IP addresses (`10.x`, `192.168.x`, `172.16-31.x`) or local workstation home paths. Use standard documentation placeholders (`pve.example.com`, `192.0.2.x`).
-7. **All Documentation in English**:
-   All commit messages, code comments, documentation, and agent reports must be written in a neutral, professional English register.
+These rules apply to ALL agents, ALL tools, and ALL commits — without exception:
+
+1. **Read `docs/principles.md` First**: It defines the authority classes, Holzmann Power of 10 adaptations, and architectural contracts.
+2. **Single Source of Truth (`versions.json`)**: Never hardcode distribution URLs, Kubernetes versions, container tags, or driver branches in Packer templates or shell provisioners. All versions must originate from [`versions.json`](versions.json) and be injected via Packer environment variables.
+3. **Trunk-Based PR Merge Flow**: Direct commits to `main` are strictly prohibited. Always create a short-lived branch (`feat/*`, `fix/*`, `chore/*`), run all local quality gates, push, and open a PR with `gh pr create`. Merges require passing the `required-checks` aggregator.
+4. **Docs & Code Synchrony**: Every user-discoverable change (new flavor, configuration variable, or provisioner step) must be reflected in documentation ([README.md](README.md) and [`docs/`](docs/)) in the **exact same commit/PR**.
+5. **NASA/JPL Power of 10 Compliance**: All shell provisioner functions must be $\le$ 60 lines, enforce `set -euo pipefail`, check return codes, and pass ShellCheck with zero warnings.
+6. **Privacy & Zero-Leak Invariant**: Never commit private RFC 1918 IP addresses (`10.x`, `192.168.x`, `172.16-31.x`) or local workstation home paths. Use standard documentation placeholders (`192.0.2.x`, `pve.example.com`).
+7. **All Documentation in English**: All commit messages, code comments, documentation, and agent reports must be written in a neutral, professional English register.
 
 ---
 
@@ -36,24 +33,20 @@ Key capabilities:
 
 ---
 
-## 2. Architectural Invariants
+## 2. Conventional Entry Points & Skills Library
 
-1. **Self-Contained & Reproducible Builds**:
-   The Packer templates must build cleanly via standalone QEMU/KVM locally or in CI without requiring an external hypervisor API.
-2. **Declarative Version Manifest**:
-   All upstream versions live in [`versions.json`](versions.json) and are ingested into Packer via `jsondecode()`.
-3. **Modular Provisioners**:
-   Provisioner shell scripts live under `packer/provisioners/` with prefix numbering (`00-`, `10-`, etc.). Scripts must enforce `set -euo pipefail` and pass ShellCheck with zero warnings.
-4. **NASA/JPL Power of 10 Compliance**:
-   Functions <= 60 lines, bounded loops, checked return codes, and zero linter warnings.
-5. **NVIDIA Generational Segmentation**:
-   - `nvidia-legacy`: NVIDIA 535 (Pascal / Volta).
-   - `nvidia-mainstream`: NVIDIA 565 (Turing / Ampere).
-   - `nvidia-modern`: NVIDIA 610 (Ada Lovelace RTX 4090 / Hopper).
-   - `nvidia-bleeding`: NVIDIA 615 (Blackwell RTX 5090 / B200).
-   - `nvidia-datacenter`: NVIDIA Open Kernel Modules + Fabric Manager (Hopper / Blackwell).
-6. **Pre-cached Container Runtime**:
-   Kubernetes node flavors support modular preheat profiles (`lean`, `cilium`, `calico`, `flannel`) injecting DaemonSets directly into containerd's `k8s.io` namespace.
+Autonomous agents should utilize specialized project skills under `.agents/skills/`:
+
+| Task | Skill Entry Point | Description |
+| :--- | :--- | :--- |
+| **Build OS Image** | [`.agents/skills/build-image/SKILL.md`](.agents/skills/build-image/SKILL.md) | Build image flavor via Packer QEMU or Proxmox |
+| **Test Image & Config** | [`.agents/skills/test-image/SKILL.md`](.agents/skills/test-image/SKILL.md) | Run automated pytest verification suite |
+| **Lint Entire Repo** | [`.agents/skills/lint-all/SKILL.md`](.agents/skills/lint-all/SKILL.md) | Run Packer validate, ShellCheck, Yamllint, shfmt |
+| **Format All Files** | [`.agents/skills/format-all/SKILL.md`](.agents/skills/format-all/SKILL.md) | Format shell (`shfmt`), Packer (`packer fmt`), YAML |
+| **Add New Flavor** | [`.agents/skills/add-flavor/SKILL.md`](.agents/skills/add-flavor/SKILL.md) | Add flavor to manifest, HCL, tests, and docs |
+| **Draft Commit Message** | [`.agents/skills/dev-llm-commitmsg/SKILL.md`](.agents/skills/dev-llm-commitmsg/SKILL.md) | Conventional Commits drafting |
+| **Regenerate Docs** | [`.agents/skills/regen-docs/SKILL.md`](.agents/skills/regen-docs/SKILL.md) | Strict Material for MkDocs build |
+| **Prepare Release** | [`.agents/skills/prep-release/SKILL.md`](.agents/skills/prep-release/SKILL.md) | Pre-release verification checklist |
 
 ---
 
@@ -90,20 +83,18 @@ Key capabilities:
 
 ---
 
-## 4. Build & Test Commands
+## 4. Hard Rules
 
-```bash
-make help               # Display all available targets
-make lint               # Run packer validate, shellcheck, and yamllint
-make test               # Run automated pytest verification suite
-make fmt                # Format Packer HCL configurations
-make build-base-generic # Build base-generic image via local QEMU/KVM
-make build-docker-generic # Build docker-generic image
-make build-k8s-generic  # Build k8s-node-generic image (lean)
-make build-k8s-cilium   # Build k8s-node-cilium image (preheated)
-make build-ai-infer-generic # Build CPU inference image
-make build-ai-infer-intel   # Build Intel Arc inference image
-make build-ai-infer-amd     # Build AMD ROCm inference image
-make build-ai-infer-nvidia  # Build NVIDIA 565 inference image
-make build-ai-infer-nvidia-bleeding # Build ai-infer-nvidia-bleeding image
-```
+1. **Single Source of Truth**: Never hardcode versions, tags, or driver branches in templates or scripts (§3).
+2. **Never `git push --force` to `main`**.
+3. **Never commit directly to `main`** — pull requests with squash or rebase merge only.
+4. **Never merge without `make lint` + `make test` green** locally and in CI.
+5. **Every commit message follows Conventional Commits** (`type(scope): subject`).
+6. **Every new script or code file starts with license header** (`Copyright 2026 Lusoris`).
+7. **Every user-discoverable surface ships human-readable documentation** under `docs/` in the same PR.
+8. **Every non-trivial architectural or policy decision ships an ADR** under [`docs/adr/`](docs/adr/) before or alongside the code.
+9. **Power of 10 compliance**: Shell functions $\le$ 60 lines, `set -euo pipefail`, bounded loops, zero linter warnings.
+10. **Privacy & Zero-Leak invariant**: Zero private RFC 1918 IPs, zero `/home/*` workstation paths.
+11. **Worktree discipline**: Background coding agents run in isolated git worktrees or dedicated branches; never execute concurrent tasks in the main worktree.
+12. **All documentation in English**: Commit messages, code comments, and documentation must be in neutral, professional English.
+13. **Interaction style — ask only on real forks**: Act on unambiguous work directly. When a genuine fork arises (destructive trade-off, target ambiguity), ask concise, structured questions.
