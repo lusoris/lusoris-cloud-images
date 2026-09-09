@@ -17,12 +17,11 @@ Only the current rolling branch and the latest two minor tags receive security p
 Please **do not report security vulnerabilities through public GitHub issues**.
 
 Instead, please report vulnerabilities by opening a private GitHub Security Advisory:
-- Navigate to the **Security** tab of this repository.
+- Navigate to the **Security** tab of this repository: [Report a vulnerability](https://github.com/lusoris/lusoris-cloud-images/security/advisories/new).
 - Click **Report a vulnerability**.
 - Provide a detailed description of the vulnerability, affected flavors, and steps to reproduce.
 
-Alternatively, contact security coordinators via email:
-- `security@lusoris.org` (or encrypted via standard channels)
+All vulnerability disclosures are handled confidentially through GitHub Security Advisories.
 
 ### Response Timeline
 - **Initial Acknowledgement**: Within 24 hours.

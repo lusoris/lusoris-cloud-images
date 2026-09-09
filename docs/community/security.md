@@ -19,11 +19,10 @@
 We welcome responsible security research and vulnerability reports. Please **never report potential vulnerabilities through public GitHub issues**.
 
 ### Reporting Channels
-1. **GitHub Private Vulnerability Reporting (Preferred)**:
-   - Navigate to the **Security** tab of [lusoris/lusoris-cloud-images](https://github.com/lusoris/lusoris-cloud-images/security).
-   - Click **Report a vulnerability** to open an encrypted private advisory draft.
-2. **Security Coordinator Email**:
-   - Contact: `security@lusoris.org` (GPG key available on request).
+All vulnerability reports must be submitted through **GitHub Private Vulnerability Reporting**:
+- Navigate to the **Security** tab of [lusoris/lusoris-cloud-images](https://github.com/lusoris/lusoris-cloud-images/security/advisories/new).
+- Click **Report a vulnerability** to open an encrypted private advisory draft.
+- Include affected flavors, reproduction steps, and potential exploit impact.
 
 ### Coordinated Response SLAs
 | Phase | Target Timeline | Action Description |
