@@ -35,7 +35,10 @@ purge_distro_bloat() {
 configure_fast_boot_and_systemd() {
   echo "==> Configuring cloud-init datasource and systemd fast-boot limits..."
   sudo mkdir -p /etc/cloud/cloud.cfg.d
-  echo "datasource_list: [ NoCloud, ConfigDrive, OpenStack, None ]" | sudo tee /etc/cloud/cloud.cfg.d/90_dpkg.cfg
+  cat <<'EOF' | sudo tee /etc/cloud/cloud.cfg.d/90_dpkg.cfg
+datasource_list: [ NoCloud, ConfigDrive, None ]
+manage_etc_hosts: localhost
+EOF
 
   sudo mkdir -p /etc/systemd/system/systemd-networkd-wait-online.service.d
   cat <<'EOF' | sudo tee /etc/systemd/system/systemd-networkd-wait-online.service.d/override.conf
@@ -61,6 +64,9 @@ EOF
     echo 'GRUB_RECORDFAIL_TIMEOUT=0' | sudo tee -a /etc/default/grub
     sudo update-grub 2>/dev/null || true
   fi
+
+  echo "==> Enabling fstrim weekly timer for SSD and sparse disk wear reduction..."
+  sudo systemctl enable fstrim.timer 2>/dev/null || true
 }
 
 install_base_essentials() {
@@ -79,11 +85,26 @@ install_base_essentials() {
   sudo systemctl enable qemu-guest-agent
 }
 
+configure_zram_swap() {
+  echo "==> Configuring ZRAM compressed in-memory swap..."
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends zram-tools 2>/dev/null || {
+    echo "    zram-tools not found, skipping ZRAM userspace service..."
+    return 0
+  }
+  if [ -f /etc/default/zramswap ]; then
+    sudo sed -i 's/^#*ALGO=.*/ALGO=zstd/' /etc/default/zramswap
+    sudo sed -i 's/^#*PERCENT=.*/PERCENT=25/' /etc/default/zramswap
+    sudo sed -i 's/^#*PRIORITY=.*/PRIORITY=100/' /etc/default/zramswap
+    sudo systemctl enable zramswap.service 2>/dev/null || true
+  fi
+}
+
 main() {
   strip_documentation_paths
   purge_distro_bloat
   configure_fast_boot_and_systemd
   install_base_essentials
+  configure_zram_swap
   echo "==> 00-base-strip: Complete."
 }
 

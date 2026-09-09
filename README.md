@@ -22,7 +22,7 @@ Instead of deploying generic stock distributions that spend minutes pulling giga
 - **Single Source of Truth (`versions.json`)**: Upstream distribution URLs, Kubernetes versions, DaemonSets, and driver branches are centrally managed in one file.
 - **Hardware Acceleration Tiers**: Tailored GPU driver stacks for Intel Arc/Flex/Xe, AMD Mesa & ROCm, and NVIDIA generational CUDA (Pascal 535, Ampere/Ada 565, Hopper/Blackwell Open Modules + Fabric Manager).
 - **Multi-Hypervisor Portability**: Coexisting `qemu-guest-agent` and `open-vm-tools`, Unraid `virtiofs`/`9p` host sharing, and ACPI clean power shutdown.
-- **Bare-Metal Performance Engine**: NVMe low-latency I/O scheduling, BBR congestion control, automatic first-boot root expansion (`growpart`), and direct disk streaming (`lusoris-install-to-disk`).
+- **Bare-Metal & Hypervisor Performance Engine**: NVMe/VirtIO `mq-deadline` I/O scheduling, automated weekly `fstrim.timer`, ZRAM in-memory swap guard, fast-boot `NoCloud` cloud-init discovery, BBR congestion control, and direct disk streaming (`lusoris-install-to-disk`).
 - **Resilient Global Time**: Cryptographically authenticated Network Time Security (NTS) using Cloudflare Anycast and European national metrology institutes (PTB, Netnod, SIDN, 3eck).
 
 ---

@@ -44,3 +44,15 @@ cd packer
 packer build -var-file=proxmox.pkrvars.hcl -only="base-intel.proxmox-clone.template" .
 ```
 
+---
+
+## 3. Built-In Proxmox Guest Optimizations
+
+Every `lusoris-cloud-images` template includes out-of-the-box performance and storage enhancements tailored for Proxmox VE:
+
+- **Automated Discard & TRIM (`fstrim.timer`)**: With `discard=on` set on the virtual disk, `fstrim.timer` runs weekly inside the guest to reclaim unused space on Proxmox ZFS pools, Ceph RBD, or thin-LVM without manual intervention.
+- **Fast Cloud-Init Discovery**: Datasources are pre-configured to `[ NoCloud, ConfigDrive, None ]`, bypassing slow public-cloud probe scans and accelerating cold boots by 3–8 seconds.
+- **VirtIO Storage Scheduling**: Udev rules automatically apply the `mq-deadline` multi-queue scheduler to `vd[a-z]` and VirtIO-SCSI disks, balancing low latency with fair queue dispatching.
+- **ZRAM Compressed Memory Guard**: In-memory `zstd` compressed swap absorbs sudden allocation spikes without disk thrashing, protecting low-memory VMs from abrupt OOM kills.
+- **QEMU Guest Agent**: Pre-installed and enabled with systemd dormant guards, ensuring clean shutdown signals, IP reporting, and seamless freeze/thaw during Proxmox backups.
+

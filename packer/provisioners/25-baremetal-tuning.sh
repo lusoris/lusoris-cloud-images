@@ -53,9 +53,10 @@ configure_kernel_and_iommu() {
 configure_nvme_and_expansion() {
   echo "==> Configuring NVMe storage scheduler and cloud-guest auto-growroot..."
   cat <<'EOF' | sudo tee /etc/udev/rules.d/60-baremetal-storage.rules
-# Bare-metal NVMe and high-speed SAS storage tuning
+# Bare-metal NVMe, VirtIO, and high-speed SAS storage tuning
 ACTION=="add|change", KERNEL=="nvme[0-9]*", ATTR{queue/scheduler}="none"
 ACTION=="add|change", KERNEL=="sd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
+ACTION=="add|change", KERNEL=="vd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue/scheduler}="mq-deadline"
 EOF
 
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
