@@ -82,9 +82,13 @@ nav:
       - "0003: NVIDIA Generational Segmentation": adr/0003-nvidia-generational-segmentation.md
       - "0004: Hypervisor Agent Coexistence": adr/0004-hypervisor-agent-coexistence.md
       - "0005: Bare-Metal Streaming Install": adr/0005-baremetal-streaming-install.md
+  - Engineering & Governance:
+      - Engineering Principles: principles.md
+      - Repository Crosswalk: repository-rule-crosswalk.md
   - Community:
       - Contributing Guide: community/contributing.md
       - Security Policy: community/security.md
       - Code of Conduct: community/code-of-conduct.md
       - Governance: community/governance.md
+
 
