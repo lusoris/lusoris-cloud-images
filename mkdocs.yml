@@ -60,6 +60,7 @@ nav:
       - Base Flavors: flavors/base.md
       - Docker & Podman: flavors/containers.md
       - Kubernetes Nodes: flavors/kubernetes.md
+      - K3s Edge Fleet: flavors/k3s.md
       - AI & LLM Inference: flavors/ai-infer.md
   - Hypervisors & Platforms:
       - Proxmox VE: platforms/proxmox.md
@@ -82,6 +83,7 @@ nav:
       - "0003: NVIDIA Generational Segmentation": adr/0003-nvidia-generational-segmentation.md
       - "0004: Hypervisor Agent Coexistence": adr/0004-hypervisor-agent-coexistence.md
       - "0005: Bare-Metal Streaming Install": adr/0005-baremetal-streaming-install.md
+      - "0006: K3s Edge Fleet Flavors": adr/0006-k3s-edge-fleet-flavors.md
   - Engineering & Governance:
       - Engineering Principles: principles.md
       - Repository Crosswalk: repository-rule-crosswalk.md

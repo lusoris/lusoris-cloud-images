@@ -4,7 +4,7 @@
 
 ---
 
-## Comprehensive 30-Flavor Matrix
+## Comprehensive 35-Flavor Matrix
 
 | Flavor Name | Workload Tier | Hardware Stack | Kernel Profile | Preheat Profile | Key Components & Target Platforms |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -32,6 +32,11 @@
 | **`k8s-node-nvidia`** | K8s Worker | NVIDIA Mainstream | `k8s` | `cilium` | containerd 2.3.5 + NVIDIA 565 + NVIDIA K8s Plugin v0.20.0 |
 | **`k8s-node-nvidia-modern`** | K8s Worker | NVIDIA Modern | `k8s` | `cilium` | containerd 2.3.5 + NVIDIA 610 + NVIDIA K8s Plugin v0.20.0 |
 | **`k8s-node-nvidia-bleeding`** | K8s Worker | NVIDIA Bleeding | `k8s` | `cilium` | containerd 2.3.5 + NVIDIA 615 + NVIDIA K8s Plugin v0.20.0 |
+| **`k3s-agent-generic`** | K3s Worker | VirtIO / CPU | `k8s` | None | Lightweight K3s agent, containerd, Flannel (< 300MB RAM) |
+| **`k3s-agent-intel`** | K3s Worker | Intel QuickSync | `k8s` | None | K3s agent + Intel Media Driver (`iHD`) + QuickSync passthrough |
+| **`k3s-agent-amd`** | K3s Worker | AMD ROCm 10 | `k8s` | None | K3s agent + AMD ROCm 10 compute runtime + RADV Vulkan |
+| **`k3s-agent-nvidia`** | K3s Worker | NVIDIA Mainstream | `k8s` | None | K3s agent + NVIDIA 565 + Container Toolkit CDI |
+| **`k3s-server-generic`** | K3s Server | VirtIO / CPU | `k8s` | None | K3s standalone control plane + embedded SQLite + local-path |
 | **`ai-infer-generic`** | AI Inference | CPU High-Throughput | `ai-infer` | None | AMX, AVX-512, NUMA, vLLM / Ollama CPU, Docker CE |
 | **`ai-infer-intel`** | AI Inference | Intel Xe/Arc/Xe2 | `ai-infer` | None | Intel Level Zero, OpenVINO, IPEX-LLM, CDI, Docker CE |
 | **`ai-infer-amd`** | AI Inference | AMD ROCm 10 | `ai-infer` | None | AMD ROCm 10, /dev/kfd, RDNA 3/4 & Instinct, CDI, Docker CE |
@@ -75,6 +80,13 @@ make build-k8s-amd            # AMD ROCm 10 GPU
 make build-k8s-nvidia         # NVIDIA 565 Mainstream
 make build-k8s-nvidia-modern  # NVIDIA 610 Modern (RTX 4090)
 make build-k8s-nvidia-bleeding # NVIDIA 615 Bleeding (RTX 5090)
+
+# K3s Edge Fleet Flavors
+make build-k3s-agent-generic   # Lightweight < 300MB RAM worker
+make build-k3s-agent-intel     # Intel QuickSync / Xe transcoding worker
+make build-k3s-agent-amd       # AMD ROCm 10 compute worker
+make build-k3s-agent-nvidia    # NVIDIA 565 / CDI GPU worker
+make build-k3s-server-generic  # Standalone master with local-path storage
 
 # AI Inference Appliances (All Vendors)
 make build-ai-infer-generic   # CPU High-Throughput / AMX / AVX-512
