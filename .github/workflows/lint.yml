@@ -1,0 +1,54 @@
+---
+name: CI Quality Gates
+
+"on":
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  lint:
+    name: Lint & Validation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Packer
+        uses: hashicorp/setup-packer@v3
+        with:
+          version: "1.11.2"
+
+      - name: Install ShellCheck and Yamllint
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y shellcheck yamllint
+
+      - name: Initialize Packer plugins
+        run: |
+          cd packer
+          packer init .
+
+      - name: Verify Packer formatting
+        run: |
+          cd packer
+          packer fmt -check .
+
+      - name: Validate Packer configuration
+        run: |
+          cd packer
+          packer validate .
+
+      - name: Run ShellCheck on provisioners
+        run: |
+          shellcheck packer/provisioners/*.sh
+
+      - name: Run Yamllint
+        run: |
+          yamllint -d "{extends: default, rules: {line-length: {max: 140}, document-start: disable}}" .github/ packer/http/
+
+      - name: Run Test Suite
+        run: |
+          pip install pytest
+          pytest tests/ -v

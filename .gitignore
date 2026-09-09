@@ -1,0 +1,35 @@
+# Packer build artifacts & cache
+packer_cache/
+output-*/
+*.qcow2
+*.raw
+*.img
+*.vmdk
+*.iso
+
+# Sensitive variable files
+*.pkrvars.hcl
+!examples/*.pkrvars.hcl
+
+# OS & Editor
+.DS_Store
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/extensions.json
+
+# Python & Testing
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs & temp files
+*.log
+/tmp/

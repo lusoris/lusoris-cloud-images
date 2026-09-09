@@ -1,0 +1,51 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "distro": {
+    "name": "ubuntu",
+    "release": "resolute",
+    "version": "26.04",
+    "iso_url": "https://cloud-images.ubuntu.com/daily/server/resolute/current/resolute-server-cloudimg-amd64.img",
+    "iso_checksum": "file:https://cloud-images.ubuntu.com/daily/server/resolute/current/SHA256SUMS"
+  },
+  "kubernetes": {
+    "version": "1.32.2",
+    "major_minor": "1.32",
+    "images": {
+      "pause": "registry.k8s.io/pause:3.10",
+      "coredns": "registry.k8s.io/coredns/coredns:v1.12.0",
+      "cilium": "quay.io/cilium/cilium:v1.17.1",
+      "kube_vip": "ghcr.io/kube-vip/kube-vip:v0.8.9",
+      "node_exporter": "prom/node-exporter:v1.9.0"
+    }
+  },
+  "drivers": {
+    "intel": {
+      "k8s_plugin": "intel/intel-gpu-plugin:0.32.0"
+    },
+    "amd": {
+      "k8s_plugin": "rocm/k8s-device-plugin:v1.32.0",
+      "rocm_version": "6.2"
+    },
+    "nvidia": {
+      "legacy_driver": "535",
+      "mainstream_driver": "565",
+      "datacenter_driver": "565-open",
+      "k8s_plugin": "nvcr.io/nvidia/k8s-device-plugin:v0.17.0"
+    }
+  },
+  "runtimes": {
+    "containerd": "2.0.2",
+    "docker_ce": "28.0"
+  },
+  "time": {
+    "anycast_nts": "time.cloudflare.com",
+    "stratum1_nts": [
+      "ptbtime1.ptb.de",
+      "ptbtime2.ptb.de",
+      "nts.netnod.se",
+      "ntp.time.nl",
+      "ntp.3eck.net"
+    ],
+    "fallback_pool": "2.ubuntu.pool.ntp.org"
+  }
+}
