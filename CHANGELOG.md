@@ -64,6 +64,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Zero-noise Renovate configuration (`renovate.json`) with automated GitHub Action commit SHA pinning (`helpers:pinGitHubActionDigests`), weekly Monday batch scheduling, 3-day release stability quarantine, and SSOT regex managers for `versions.json`.
   - OpenSSF Scorecard least-privilege token permissions across all GitHub Actions workflows (`contents: read` top-level default, job-scoped write permissions only).
   - Automated least-privilege workflow permission enforcement test (`test_workflows_least_privilege_permissions`) in `tests/test_security_privacy.py` and `codeql.yml` verification in `tests/test_governance.py`.
+  - ADR-0015: Progressive Agent Skills, Reference Modularization, and Staged MCP Operations (`docs/adr/0015-progressive-agent-skills-and-staged-mcp-operations.md`).
+  - Progressive Disclosure skills pattern: refactored `.agents/skills/build-image/` and `.agents/skills/add-flavor/` into 3-tier progressive disclosure structures with dedicated `references/` directories.
+  - Two-Phase Staged MCP Operations: implemented `pkg/mcp/staging.go` providing in-memory concurrency-safe action staging, preview cards, and safety guardrails via `list_staged_actions`, `confirm_action`, and `discard_staged_action` for destructive or heavy mutations like `trigger_build`.
+  - ADR-0016: Hypervisor and Image Runtime Optimizations (`docs/adr/0016-hypervisor-and-image-runtime-optimizations.md`), establishing NVMe/VirtIO `mq-deadline`, 1MB QCOW2 cluster sizing, and multi-queue virtio-net tuning.
+  - ADR-0017: Developer Workstations, Single-Node Kubernetes, and Alternative Orchestration Engines (`docs/adr/0017-developer-workstations-single-node-k8s-and-orchestration-expansion.md`), detailing blueprints for `dev-workstation`, `k8s-node-standalone`, Docker Swarm, Nomad, Incus, and `appliance-dev-forge`.
+  - ADR-0018: Storage & NAS Appliance Ecosystem Architecture (`docs/adr/0018-nas-and-storage-appliance-ecosystem.md`), establishing a dual-mode integration strategy for open-source (TrueNAS SCALE, OpenMediaVault, CasaOS/ZimaOS) and proprietary (QNAP QTScloud, Synology vDSM, StarWind) storage environments.
+  - Comprehensive platform guides for TrueNAS SCALE (`docs/platforms/truenas.md`) and NAS/Storage Appliances (`docs/platforms/nas-appliances.md`).
+  - Sister repository architectural blueprint for `lusoris-kernel-forge` (`docs/operations/sister-repo-kernel-forge-blueprint.md`), detailing multi-stream kernel building (`lts`, `mainstream`, `bleeding`, `realtime`) across architectures with zero-leak privacy invariants.
+  - Cross-repository bidirectional synchronization workflows (`.github/workflows/sync-kernel-manifest.yml` and `.github/workflows/dispatch-kernel-requirements.yml`) with OpenSSF Scorecard least-privilege token permissions.
+  - Fleet verification test `test_skills_progressive_disclosure_structure` in `tests/test_agents_fleet.py` ensuring all skills maintain high-density concise root instructions and partitioned reference manuals.
 
 ### Fixed
 - Universal multi-architecture portability: replaced hardcoded `[arch=amd64]` APT repository configurations with dynamic `$(dpkg --print-architecture)` in AMD ROCm (`32-gpu-amd-rocm.sh`) and Docker CE (`40-docker-runtime.sh`) provisioners.

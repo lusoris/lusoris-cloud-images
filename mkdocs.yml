@@ -67,6 +67,8 @@ nav:
   - Hypervisors & Platforms:
       - Proxmox VE: platforms/proxmox.md
       - Unraid: platforms/unraid.md
+      - TrueNAS SCALE: platforms/truenas.md
+      - NAS Appliances & Storage: platforms/nas-appliances.md
       - VMware ESXi: platforms/vmware.md
       - macOS (Apple Silicon): platforms/macos.md
       - Windows (WSL2 & Hyper-V): platforms/windows.md
@@ -86,6 +88,7 @@ nav:
       - Lusoris Forge CLI & MCP: tools/cli-mcp.md
       - Maintenance Cadences & SOPs: operations/maintenance-cadence.md
       - AI Studio & Managed Agents Fleet: operations/managed-agents.md
+      - Sister Repo Kernel Forge Blueprint: operations/sister-repo-kernel-forge-blueprint.md
   - Security & Time:
       - CIS Benchmark Baseline: security/cis-baseline.md
       - Global Anycast NTS Time: security/time-nts.md
@@ -106,6 +109,10 @@ nav:
       - "0012: Universal Arch, Containerd 2.x & Hardening": adr/0012-universal-arch-containerd2-and-dualstack-hardening.md
       - "0013: Hindsight Semantic Memory & MCP": adr/0013-hindsight-semantic-memory-mcp.md
       - "0014: Automated Dependency Management & CodeQL": adr/0014-automated-dependency-management-renovate.md
+      - "0015: Progressive Agent Skills & Staged MCP Operations": adr/0015-progressive-agent-skills-and-staged-mcp-operations.md
+      - "0016: Hypervisor & Image Runtime Optimizations": adr/0016-hypervisor-and-image-runtime-optimizations.md
+      - "0017: Developer Workstations, Single-Node K8s & Orchestration": adr/0017-developer-workstations-single-node-k8s-and-orchestration-expansion.md
+      - "0018: NAS & Storage Appliance Ecosystem": adr/0018-nas-and-storage-appliance-ecosystem.md
   - Engineering & Governance:
       - Engineering Principles: principles.md
       - Repository Crosswalk: repository-rule-crosswalk.md

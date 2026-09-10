@@ -183,13 +183,32 @@ lusoris-forge mcp --transport=stdio
 | **`get_standards`** | `flavor_id` (string) | Query machine-readable CIS/BSI hardening requirements |
 | **`list_epics`** | None | List recurring operational and architectural epics |
 | **`get_milestones`** | None | List active release milestones |
-| **`trigger_build`** | `flavor`, `backend`, `dry_run` | Dispatch build to local or remote CI backends |
+| **`trigger_build`** | `flavor`, `backend`, `dry_run`, `confirmed` | Dispatch build to local or remote CI backends (supports staging) |
 | **`apply_flavor`** | `flavor_id`, `dry_run` | Generate in-place host provisioning bash script |
 | **`inspect_compliance`** | None | Inspect declarative CIS/NIST compliance profile |
+| **`list_staged_actions`** | None | List pending staged actions requiring operator confirmation |
+| **`confirm_action`** | `action_id` (string) | Confirm and execute a pending staged mutation |
+| **`discard_staged_action`** | `action_id` (string) | Discard and abort a pending staged mutation |
 
 ---
 
-### 3.4 MCP Stdio Protocol & Framing Protection Sequence
+### 3.4 Two-Phase Staged Operations & Human-in-the-Loop Guardrails
+
+To prevent accidental execution of heavy or destructive tasks (e.g. running Packer image builds or triggering external CI jobs) by autonomous agents, `lusoris-forge` implements a **Two-Phase Mutation Guardrail** pattern inspired by OmniKube:
+
+1. **Staged Invocation**: When an agent calls `trigger_build` with `dry_run=false` and without `confirmed=true`, the MCP server does not immediately run the command. Instead, it registers a `StagedAction` in an in-memory thread-safe `Stager` store, generates a cryptographically random UUID (`action_id`), and returns a rich preview card:
+   - Action ID and mutation description
+   - Command line or API payload to be dispatched
+   - Risk assessment level (`low`, `medium`, `high`)
+   - Target backend and flavor parameters
+2. **Review & Introspection**: The agent or human operator can review the exact command and inspect all pending operations via `list_staged_actions`.
+3. **Explicit Confirmation or Discard**:
+   - To proceed: invoke `confirm_action(action_id="...")` (or pass `confirmed=true` directly in the initial call if explicitly pre-authorized).
+   - To cancel: invoke `discard_staged_action(action_id="...")`. Staged actions also automatically expire after 15 minutes.
+
+---
+
+### 3.5 MCP Stdio Protocol & Framing Protection Sequence
 
 ```mermaid
 sequenceDiagram
@@ -197,20 +216,29 @@ sequenceDiagram
     actor Agent as AI Coding Agent (Claude / AGY / Cursor)
     participant PipeIn as OS Stdin (FD 0)
     participant Forge as lusoris-forge MCP Server
+    participant Stager as In-Memory Stager Store
     participant PipeRedirect as stdoutRedirect (OS Pipe)
     participant Stderr as OS Stderr (FD 2)
     participant PipeOut as Dedicated Stdout (FD 1)
     participant Backend as Local Packer / CI API / MicroVM
 
     Note over Forge,PipeRedirect: Server init redirects os.Stdout to Stderr
-    Agent->>PipeIn: JSON-RPC Request (e.g. tools/call dispatch_build)
-    PipeIn->>Forge: Read request frames
+    Agent->>PipeIn: JSON-RPC trigger_build (dry_run=false, confirmed=false)
+    PipeIn->>Forge: Read request frame
+    Forge->>Stager: StageAction("build:trigger", params)
+    Stager-->>Forge: Return ActionID (UUID)
+    Forge->>PipeOut: Return Staged Preview Card (Requires confirmation)
+    PipeOut->>Agent: Staged Action Card displayed
+
+    Agent->>PipeIn: JSON-RPC confirm_action(action_id)
+    PipeIn->>Forge: Read confirm frame
+    Forge->>Stager: Retrieve & Remove ActionID
     rect rgba(124, 58, 237, 0.15)
         Note over Forge,PipeRedirect: Internal library logging & diagnostics
         Forge->>PipeRedirect: Third-party logs / fmt.Print / warnings
         PipeRedirect->>Stderr: Emitted cleanly on stderr (colored via tint)
     end
-    Forge->>Backend: Execute build / validate manifest / generate cloud-init
+    Forge->>Backend: Execute confirmed build
     Backend-->>Forge: Execution results & payload
     Forge->>PipeOut: Write pristine JSON-RPC Response frame
     PipeOut->>Agent: Delivered without stdout framing corruption

@@ -1,0 +1,94 @@
+---
+name: sync-kernel-manifest
+on:
+  repository_dispatch:
+    types: [kernel_release_published]
+  workflow_dispatch:
+    inputs:
+      stream:
+        description: "Kernel stream (lts, mainstream, bleeding, realtime)"
+        required: true
+        default: "mainstream"
+      version:
+        description: "Semantic version (e.g. 7.2.4-lusoris1)"
+        required: true
+
+permissions:
+  contents: read
+
+concurrency:
+  group: sync-kernel-manifest
+  cancel-in-progress: false
+
+jobs:
+  sync:
+    name: Sync Kernel Manifest from lusoris-kernel-forge
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+
+      - name: Setup Python
+        uses: actions/setup-python@42375524e23c412d93fb67b49958b491fce71c38 # v5.4.0
+        with:
+          python-version: "3.12"
+
+      - name: Install Validation Dependencies
+        run: pip install --no-cache-dir jsonschema pytest
+
+      - name: Extract Target Stream and Version
+        id: meta
+        run: |
+          STREAM="${{ github.event.client_payload.stream || github.event.inputs.stream || 'mainstream' }}"
+          VERSION="${{ github.event.client_payload.version || github.event.inputs.version || '7.2.4-lusoris1' }}"
+          echo "stream=${STREAM}" >> "$GITHUB_OUTPUT"
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Update versions.json Manifest
+        env:
+          STREAM: ${{ steps.meta.outputs.stream }}
+          VERSION: ${{ steps.meta.outputs.version }}
+        run: |
+          python3 -c "
+          import json, os
+          stream = os.environ.get('STREAM', 'mainstream')
+          version = os.environ.get('VERSION', '7.2.4-lusoris1')
+          with open('versions.json', 'r') as f:
+              data = json.load(f)
+          if 'kernel' not in data:
+              data['kernel'] = {'provider': 'lusoris-kernel-forge', 'streams': {}}
+          if 'streams' not in data['kernel']:
+              data['kernel']['streams'] = {}
+          data['kernel']['streams'][stream] = {'version': version}
+          with open('versions.json', 'w') as f:
+              json.dump(data, f, indent=2)
+              f.write('\n')
+          "
+
+      - name: Validate SSOT Manifest Schema
+        run: |
+          python3 -c "
+          import json, jsonschema
+          schema = json.load(open('versions.schema.json'))
+          manifest = json.load(open('versions.json'))
+          jsonschema.validate(manifest, schema)
+          "
+          pytest tests/test_manifest.py -v
+
+      - name: Propose Kernel Synchronization PR
+        uses: peter-evans/create-pull-request@271a8d0340265f705b14b6d32b9829c8cb932dcc # v7.0.8
+        with:
+          branch: chore/sync-kernel-${{ steps.meta.outputs.stream }}
+          title: "chore(kernel): sync ${{ steps.meta.outputs.stream }} to ${{ steps.meta.outputs.version }}"
+          body: |
+            Automated downstream kernel synchronization from `lusoris-kernel-forge`.
+
+            - **Stream**: `${{ steps.meta.outputs.stream }}`
+            - **Version**: `${{ steps.meta.outputs.version }}`
+            - **Trigger**: `repository_dispatch (kernel_release_published)`
+          commit-message: "chore(kernel): sync ${{ steps.meta.outputs.stream }} to ${{ steps.meta.outputs.version }}"

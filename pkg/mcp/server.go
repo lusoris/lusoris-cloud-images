@@ -39,6 +39,7 @@ func NewServer(logger *slog.Logger) *sdkmcp.Server {
 	registerTrackerTools(s)
 	registerComplianceTools(s)
 	registerExecutionTools(s)
+	registerStagingTools(s)
 
 	return s
 }
@@ -243,18 +244,32 @@ func registerExecutionTools(s *sdkmcp.Server) {
 	s.AddTool(
 		&sdkmcp.Tool{
 			Name:        "trigger_build",
-			Description: "Dispatch an image build to local Packer or remote CI backends (Gitea, Proxmox, GitLab, GitHub)",
-			InputSchema: json.RawMessage(`{"type":"object","required":["flavor","backend"],"properties":{"flavor":{"type":"string"},"backend":{"type":"string"},"dry_run":{"type":"boolean"}}}`),
+			Description: "Dispatch an image build to local Packer or remote CI backends (Gitea, Proxmox, GitLab, GitHub). Mutating operations stage a confirmation card unless confirmed=true or dry_run=true.",
+			InputSchema: json.RawMessage(`{"type":"object","required":["flavor","backend"],"properties":{"flavor":{"type":"string"},"backend":{"type":"string"},"dry_run":{"type":"boolean"},"confirmed":{"type":"boolean"}}}`),
 		},
 		func(ctx context.Context, req *sdkmcp.CallToolRequest) (*sdkmcp.CallToolResult, error) {
 			var args struct {
-				Flavor  string `json:"flavor"`
-				Backend string `json:"backend"`
-				DryRun  bool   `json:"dry_run"`
+				Flavor    string `json:"flavor"`
+				Backend   string `json:"backend"`
+				DryRun    bool   `json:"dry_run"`
+				Confirmed bool   `json:"confirmed"`
 			}
 			if err := json.Unmarshal(req.Params.Arguments, &args); err != nil {
 				return nil, err
 			}
+
+			// Two-phase write staging guardrail (OmniKube pattern)
+			if !args.DryRun && !args.Confirmed {
+				preview := fmt.Sprintf("Trigger image build for flavor %q via backend %q", args.Flavor, args.Backend)
+				staged := DefaultStager.Stage("trigger_build", args.Flavor, map[string]any{
+					"flavor":  args.Flavor,
+					"backend": args.Backend,
+					"dry_run": args.DryRun,
+				}, preview)
+				msg := fmt.Sprintf("⚠️ ACTION STAGED (Two-Phase Verification Guardrail)\nAction ID: %s\nTool: trigger_build\nTarget Flavor: %s\nBackend: %s\n\nTo execute this build, invoke `confirm_action` with `{\"action_id\": %q}` or re-run `trigger_build` with `\"confirmed\": true`.", staged.ID, args.Flavor, args.Backend, staged.ID)
+				return &sdkmcp.CallToolResult{Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: msg}}}, nil
+			}
+
 			res, err := builder.Dispatch(ctx, builder.Request{
 				Backend: builder.Backend(args.Backend),
 				Flavor:  args.Flavor,
@@ -290,6 +305,82 @@ func registerExecutionTools(s *sdkmcp.Server) {
 				return &sdkmcp.CallToolResult{IsError: true, Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: err.Error()}}}, nil
 			}
 			return &sdkmcp.CallToolResult{Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: script}}}, nil
+		},
+	)
+}
+
+func registerStagingTools(s *sdkmcp.Server) {
+	s.AddTool(
+		&sdkmcp.Tool{
+			Name:        "list_staged_actions",
+			Description: "List all pending two-phase staged actions waiting for confirmation",
+			InputSchema: json.RawMessage(`{"type":"object"}`),
+		},
+		func(ctx context.Context, req *sdkmcp.CallToolRequest) (*sdkmcp.CallToolResult, error) {
+			list := DefaultStager.List()
+			out, _ := json.MarshalIndent(list, "", "  ")
+			return &sdkmcp.CallToolResult{Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: string(out)}}}, nil
+		},
+	)
+
+	s.AddTool(
+		&sdkmcp.Tool{
+			Name:        "confirm_action",
+			Description: "Confirm and execute a pending staged action by its action_id",
+			InputSchema: json.RawMessage(`{"type":"object","required":["action_id"],"properties":{"action_id":{"type":"string"}}}`),
+		},
+		func(ctx context.Context, req *sdkmcp.CallToolRequest) (*sdkmcp.CallToolResult, error) {
+			var args struct {
+				ActionID string `json:"action_id"`
+			}
+			if err := json.Unmarshal(req.Params.Arguments, &args); err != nil {
+				return nil, err
+			}
+
+			act, err := DefaultStager.Confirm(args.ActionID)
+			if err != nil {
+				return &sdkmcp.CallToolResult{IsError: true, Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: err.Error()}}}, nil
+			}
+
+			switch act.Tool {
+			case "trigger_build":
+				flavor, _ := act.Payload["flavor"].(string)
+				backend, _ := act.Payload["backend"].(string)
+				dryRun, _ := act.Payload["dry_run"].(bool)
+				res, err := builder.Dispatch(ctx, builder.Request{
+					Backend: builder.Backend(backend),
+					Flavor:  flavor,
+					DryRun:  dryRun,
+				})
+				if err != nil {
+					return &sdkmcp.CallToolResult{IsError: true, Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: err.Error()}}}, nil
+				}
+				out, _ := json.MarshalIndent(res, "", "  ")
+				return &sdkmcp.CallToolResult{Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: fmt.Sprintf("✅ Action %s confirmed and executed:\n%s", act.ID, string(out))}}}, nil
+
+			default:
+				return &sdkmcp.CallToolResult{Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: fmt.Sprintf("✅ Action %s confirmed (tool: %s)", act.ID, act.Tool)}}}, nil
+			}
+		},
+	)
+
+	s.AddTool(
+		&sdkmcp.Tool{
+			Name:        "discard_staged_action",
+			Description: "Discard or cancel a pending staged action",
+			InputSchema: json.RawMessage(`{"type":"object","required":["action_id"],"properties":{"action_id":{"type":"string"}}}`),
+		},
+		func(ctx context.Context, req *sdkmcp.CallToolRequest) (*sdkmcp.CallToolResult, error) {
+			var args struct {
+				ActionID string `json:"action_id"`
+			}
+			if err := json.Unmarshal(req.Params.Arguments, &args); err != nil {
+				return nil, err
+			}
+			if err := DefaultStager.Discard(args.ActionID); err != nil {
+				return &sdkmcp.CallToolResult{IsError: true, Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: err.Error()}}}, nil
+			}
+			return &sdkmcp.CallToolResult{Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: fmt.Sprintf("Action %q discarded successfully", args.ActionID)}}}, nil
 		},
 	)
 }
