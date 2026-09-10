@@ -86,6 +86,9 @@ lusoris-forge cloud-init generate --flavor=base-generic --hostname=node-01
 # Generate Unraid virtiofs user-data
 lusoris-forge cloud-init generate --flavor=docker-generic --platform=unraid
 
+# Generate TrueNAS SCALE NFS & VirtIO-SCSI discard user-data
+lusoris-forge cloud-init generate --flavor=docker-generic --platform=truenas
+
 # Generate Apple Silicon macOS UTM user-data
 lusoris-forge cloud-init generate --flavor=base-generic --platform=macos
 ```

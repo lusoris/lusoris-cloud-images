@@ -33,6 +33,12 @@ type StagedAction struct {
 	CreatedAt time.Time      `json:"created_at"`
 }
 
+// DefaultStagingTTL represents the maximum lifetime of an unconfirmed or completed staged action before eviction.
+const DefaultStagingTTL = 15 * time.Minute
+
+// MaxStagedCapacity defines the maximum number of actions stored before forced eviction of oldest items.
+const MaxStagedCapacity = 1000
+
 // Stager provides concurrency-safe tracking of pending operations.
 type Stager struct {
 	mu      sync.RWMutex
@@ -54,6 +60,10 @@ func (s *Stager) Stage(tool, target string, payload map[string]any, preview stri
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
+	if len(s.actions) >= MaxStagedCapacity {
+		s.pruneLocked(DefaultStagingTTL)
+	}
+
 	id := generateActionID()
 	act := &StagedAction{
 		ID:        id,
@@ -66,6 +76,29 @@ func (s *Stager) Stage(tool, target string, payload map[string]any, preview stri
 	}
 	s.actions[id] = act
 	return act
+}
+
+// Prune removes staged actions whose age exceeds maxAge.
+// If maxAge <= 0, DefaultStagingTTL is used. Returns the count of pruned actions.
+func (s *Stager) Prune(maxAge time.Duration) int {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	return s.pruneLocked(maxAge)
+}
+
+func (s *Stager) pruneLocked(maxAge time.Duration) int {
+	if maxAge <= 0 {
+		maxAge = DefaultStagingTTL
+	}
+	cutoff := time.Now().UTC().Add(-maxAge)
+	pruned := 0
+	for id, act := range s.actions {
+		if act.CreatedAt.Before(cutoff) {
+			delete(s.actions, id)
+			pruned++
+		}
+	}
+	return pruned
 }
 
 // Get retrieves a staged action by ID.

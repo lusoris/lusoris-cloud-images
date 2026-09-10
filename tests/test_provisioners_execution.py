@@ -16,8 +16,8 @@ PROVISIONERS_DIR = REPO_ROOT / "packer" / "provisioners"
 
 @pytest.fixture
 def require_bash():
-    if not GIT_BASH.exists():
-        pytest.skip(f"Git Bash required for mock execution tests, not found at {GIT_BASH}")
+    if not GIT_BASH or not GIT_BASH.exists():
+        pytest.skip(f"Bash required for mock execution tests, not found (got {GIT_BASH})")
 
 
 class TestProvisionersExecution:

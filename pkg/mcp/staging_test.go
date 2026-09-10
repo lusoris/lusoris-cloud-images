@@ -3,6 +3,7 @@ package mcp_test
 
 import (
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -65,4 +66,24 @@ func TestStagerErrors(t *testing.T) {
 
 	err = stager.Discard("nonexistent-id")
 	assert.Error(t, err)
+}
+
+func TestStagerPrune(t *testing.T) {
+	stager := mcp.NewStager()
+	payload := map[string]any{"test": true}
+
+	act := stager.Stage("test_tool", "target1", payload, "preview1")
+	require.NotNil(t, act)
+
+	// Pruning with negative or large TTL shouldn't remove fresh action
+	pruned := stager.Prune(1 * time.Hour)
+	assert.Equal(t, 0, pruned)
+	assert.Len(t, stager.List(), 1)
+
+	// Pruning with 1 nanosecond (effectively anything in past)
+	// We simulate expiration by pruning with -1 ns offset or by sleeping 2ms with 1ms TTL
+	time.Sleep(2 * time.Millisecond)
+	pruned = stager.Prune(1 * time.Millisecond)
+	assert.Equal(t, 1, pruned)
+	assert.Empty(t, stager.List())
 }

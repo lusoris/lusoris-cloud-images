@@ -15,7 +15,7 @@ import yaml
 REPO_ROOT = Path(__file__).resolve().parent.parent
 FORGE_BIN = REPO_ROOT / "bin" / "lusoris-forge.exe"
 
-PLATFORMS = ["proxmox", "unraid", "macos", "windows"]
+PLATFORMS = ["proxmox", "unraid", "truenas", "macos", "windows"]
 TIERS = [
     "base-generic",
     "docker-generic",
@@ -79,6 +79,9 @@ class TestCloudInitDeepMatrix:
         if platform == "unraid":
             mounts = data.get("mounts", [])
             assert any("share" in str(m) and "virtiofs" in str(m) for m in mounts)
+        elif platform == "truenas":
+            mounts = data.get("mounts", [])
+            assert any("truenas" in str(m) for m in mounts)
         elif platform == "macos":
             mounts = data.get("mounts", [])
             assert any("workspace" in str(m) and "virtiofs" in str(m) for m in mounts)
