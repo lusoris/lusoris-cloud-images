@@ -14,6 +14,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - K3s Edge Fleet flavors (`k3s-agent-generic`, `k3s-agent-intel`, `k3s-agent-amd`, `k3s-agent-nvidia`, `k3s-server-generic`).
 - Hypervisor performance engine: weekly `fstrim.timer`, ZRAM swap guard, VirtIO `mq-deadline` scheduler, fast NoCloud cloud-init discovery.
 - Single Source of Truth `versions.schema.json` schema validation for automated version bump decoupling.
+- Dedicated segmented flavor catalog in `FLAVORS.md` partitioning 39 flavors across 6 workload tiers.
+- Streamlined `README.md` with multi-tier badge rows, architecture diagram, and workload summary table.
+- Interactive tabbed flavor explorer in `docs/flavors/matrix.md`.
 
 ## [0.1.0] - 2026-09-09
 
