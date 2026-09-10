@@ -94,3 +94,4 @@
 | `appliance-media-server`| Dual Transcode + NAS | `-only="appliance-media-server.qemu.image"`| Intel QuickSync + AMD Mesa VA-API, `nfs-common`, `cifs-utils` |
 | `appliance-ci-runner` | Multi-Arch DinD | `-only="appliance-ci-runner.qemu.image"` | QEMU ARM64/ARMv7 binfmt, Docker Buildx, `git-lfs`, 4GB tmpfs `/tmp` |
 | `appliance-game-server` | Low-Jitter UDP Game | `-only="appliance-game-server.qemu.image"` | 32-bit `i386` glibc, `steamcmd`, 16MB UDP socket buffer tuning |
+

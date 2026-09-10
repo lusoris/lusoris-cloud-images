@@ -43,9 +43,12 @@ jobs:
 
       - name: Extract Target Stream and Version
         id: meta
+        env:
+          INPUT_STREAM: ${{ github.event.client_payload.stream || github.event.inputs.stream }}
+          INPUT_VERSION: ${{ github.event.client_payload.version || github.event.inputs.version }}
         run: |
-          STREAM="${{ github.event.client_payload.stream || github.event.inputs.stream || 'mainstream' }}"
-          VERSION="${{ github.event.client_payload.version || github.event.inputs.version || '7.2.4-lusoris1' }}"
+          STREAM="${INPUT_STREAM:-mainstream}"
+          VERSION="${INPUT_VERSION:-7.2.4-lusoris1}"
           echo "stream=${STREAM}" >> "$GITHUB_OUTPUT"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
 

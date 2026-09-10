@@ -66,3 +66,4 @@ We establish an enterprise image optimization architecture across 6 core technic
 
 ### Negative / Neutral
 - Generating 5 image formats increases release matrix build duration in GitHub Actions.
+

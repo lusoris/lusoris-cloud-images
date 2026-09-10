@@ -76,3 +76,4 @@ For SMB/CIFS shares, Lusoris kernels support SMB 3.1.1 with multi-channel enable
 Lusoris images enable `fstrim.timer` weekly by default. When using VirtIO-SCSI in TrueNAS:
 - Ensure the disk device is created with **VirtIO-SCSI** and discard is enabled.
 - Reclaimed space inside the VM is automatically returned to the underlying ZFS pool.
+

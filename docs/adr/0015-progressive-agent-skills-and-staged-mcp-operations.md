@@ -61,3 +61,4 @@ In `pkg/mcp/staging.go` and `pkg/mcp/server.go`:
 
 ### Negative / Neutral
 - Multi-turn interactive workflows require an extra confirmation step (`confirm_action`) for mutating operations unless `confirmed: true` is passed upfront.
+

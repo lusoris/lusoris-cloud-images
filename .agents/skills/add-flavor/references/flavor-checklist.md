@@ -38,3 +38,4 @@
 ## 7. Security & Zero-Leak Invariants
 - [ ] Verify zero private RFC 1918 IPs: `pytest tests/test_security_privacy.py -k test_no_private_rfc1918_ips`.
 - [ ] Verify zero developer workstation paths: `pytest tests/test_security_privacy.py -k test_no_developer_workstation_paths`.
+
