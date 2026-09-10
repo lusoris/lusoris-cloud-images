@@ -47,30 +47,38 @@ Stock cloud distributions waste minutes downloading gigabytes of kernel modules,
 ## Build Architecture
 
 ```mermaid
-graph TD
-    classDef base fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#fff;
-    classDef stage fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#fff;
-    classDef target fill:#1e1b4b,stroke:#8b5cf6,stroke-width:2px,color:#fff;
-    classDef out fill:#052e16,stroke:#22c55e,stroke-width:2px,color:#fff;
+flowchart TD
+    subgraph SSOT["Declarative Source of Truth"]
+        SRC["Ubuntu 26.04 Cloud Base<br/><small>Noble / Resolute Minimal</small>"]
+        BOM[("versions.json<br/><small>Pinned Upstream BOM</small>")]
+    end
 
-    A["Ubuntu 26.04 Cloud Base"]:::base --> SSOT["versions.json (SSOT)"]:::base
-    SSOT --> P["Packer Engine (QEMU / Proxmox)"]:::base
+    subgraph Foundation["Hardened Foundation Pipeline (Stages 00–25)"]
+        S0["00-base-strip<br/><small>Purge snapd & telemetry</small>"]
+        S1["05-hypervisor<br/><small>QEMU + VMware + VirtFS</small>"]
+        S2["10-time<br/><small>Multi-peer Anycast NTS</small>"]
+        S3["20-sysctl<br/><small>CIS Baseline & BBR</small>"]
+        S4["25-baremetal<br/><small>NVMe mq-deadline & ZRAM</small>"]
+        S0 --> S1 --> S2 --> S3 --> S4
+    end
 
-    P --> S0["00-base-strip: Purge snaps & telemetry"]:::stage
-    S0 --> S1["05-hypervisor: QEMU + VMware + VirtFS"]:::stage
-    S1 --> S2["10-time: Multi-peer Anycast NTS"]:::stage
-    S2 --> S3["20-sysctl: CIS & BBR Tuning"]:::stage
-    S3 --> S4["25-baremetal: NVMe sched & ZRAM"]:::stage
+    subgraph DualPath["Dual Build & Provisioning Engine"]
+        direction TB
+        subgraph TrackPacker["Track A: Packer Image Factory"]
+            PE["Packer Engine<br/><small>QEMU / Proxmox VE</small>"]
+            PE --> Tiers["44 Production Flavors<br/><small>7 Workload Tiers × Hardware Matrix</small>"]
+            Tiers --> Artifacts[".qcow2.zst · .raw.zst · .vmdk.zst<br/><small>High-Ratio Zstandard Artifacts</small>"]
+        end
+        subgraph TrackImageless["Track B: Imageless & MicroVMs"]
+            CLI["lusoris-forge CLI / MCP<br/><small>Go 1.27 Engine</small>"]
+            CLI --> Apply["In-Place Provisioning<br/><small>SSH / Local Host Apply</small>"]
+            CLI --> Boot["MicroVM Direct Kernel Boot<br/><small>Cloud-Hypervisor & Firecracker</small>"]
+        end
+    end
 
-    S4 --> T1["Tier 1: Minimal Base OS (8)"]:::target
-    S4 --> T2["Tier 2: Container Hosts (7)"]:::target
-    S4 --> T3["Tier 3: Enterprise K8s Nodes (10)"]:::target
-    S4 --> T4["Tier 4: K3s Edge Fleet (5)"]:::target
-    S4 --> T5["Tier 5: CloudNative & Storage (4)"]:::target
-    S4 --> T6["Tier 6: AI & LLM Inference (6)"]:::target
-    S4 --> T7["Tier 7: Homelab Appliances (5)"]:::target
-
-    T1 & T2 & T3 & T4 & T5 & T6 & T7 --> OUT[".qcow2.zst · .raw.zst · .vmdk.zst · Proxmox / Unraid Templates"]:::out
+    SSOT --> Foundation
+    Foundation --> PE
+    Foundation -.-> CLI
 ```
 
 ---
@@ -83,7 +91,7 @@ To keep maintenance low and usability high, flavors are partitioned into 7 disti
 | :--- | :---: | :--- | :--- | :--- |
 | **1. Base Cloud** | 8 | Generic, Intel Xe, AMD Mesa, NVIDIA (535 to 615) | Hardened OS, Anycast NTS, QEMU/VMware agents | [📖 Base Guide](docs/flavors/base.md) |
 | **2. Container Hosts** | 7 | Generic, Intel QuickSync, AMD ROCm, NVIDIA CDI | Docker CE 29.8, Docker Compose v2, Podman 5.x | [📖 Containers Guide](docs/flavors/containers.md) |
-| **3. Enterprise K8s** | 10 | Generic, Intel Arc, AMD ROCm 10, NVIDIA Mainstream/Bleeding | containerd 2.3.5, kubelet 1.37.0, Cilium/Calico preheat | [📖 Kubernetes Guide](docs/flavors/kubernetes.md) |
+| **3. Enterprise K8s** | 9 | Generic, Intel Arc, AMD ROCm 10, NVIDIA Mainstream/Bleeding | containerd 2.3.5, kubelet 1.37.0, Cilium/Calico preheat | [📖 Kubernetes Guide](docs/flavors/kubernetes.md) |
 | **4. K3s Edge Fleet** | 5 | Generic, Intel QuickSync, AMD ROCm 10, NVIDIA CDI | Lightweight K3s (< 300MB RAM), Flannel, SQLite | [📖 K3s Guide](docs/flavors/k3s.md) |
 | **5. CloudNative & Storage** | 4 | Generic, Baremetal, NVMe-oF, OpenZFS 2.3 | Read-only root immutability, OpenZFS, CloudNativePG | [📖 CloudNative Guide](docs/flavors/cloudnative.md) |
 | **6. AI & LLM Inference** | 6 | AMX/AVX-512, Intel Xe2, AMD ROCm 10, NVIDIA (565/610/615) | Transparent Hugepages, NUMA, vLLM / Ollama | [📖 AI Inference Guide](docs/flavors/ai-infer.md) |

@@ -12,6 +12,30 @@
 | **`arm64`** | `aarch64-linux-gnu` | UEFI (AAVMF) / Device Tree | `ttyAMA0,115200n8` | Weak Memory Ordering | Tier 1 (Production Default) |
 | **`riscv64`** | `riscv64-linux-gnu` | OpenSBI + U-Boot / EDK2 | `ttyS0,115200n8` | Weak Memory Ordering (RVWMO) | Tier 2 (Experimental Edge) |
 
+```mermaid
+flowchart TD
+    subgraph x86["x86_64 Architecture (amd64)"]
+        F_x86["Firmware: UEFI (OVMF) / SeaBIOS"]
+        K_x86["Kernel: x86-64-v3 + AVX2 / AVX-512 / AMX"]
+        HW_x86["Hardware: Dell/HPE Servers · Proxmox KVM · N100 TMM"]
+        F_x86 --> K_x86 --> HW_x86
+    end
+
+    subgraph ARM["ARM64 Architecture (aarch64)"]
+        F_arm["Firmware: UEFI (AAVMF) / U-Boot / EEPROM"]
+        K_arm["Kernel: ARMv8.2+ / ARMv9 (Page Size: 4KB/16KB)"]
+        HW_arm["Hardware: RPi 5 · RK3588 · Apple Silicon UTM · Ampere Altra"]
+        F_arm --> K_arm --> HW_arm
+    end
+
+    subgraph RISCV["RISC-V Architecture (riscv64)"]
+        F_riscv["Firmware: OpenSBI + U-Boot / EDK2"]
+        K_riscv["Kernel: rv64gc + Sv39/Sv48 MMU (hart init)"]
+        HW_riscv["Hardware: SiFive HiFive · StarFive JH7110 · QEMU virt"]
+        F_riscv --> K_riscv --> HW_riscv
+    end
+```
+
 ---
 
 ## 2. x86_64 Architecture (`amd64`)

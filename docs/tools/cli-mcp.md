@@ -11,6 +11,37 @@
 3. **Imageless Execution First**: Enables instant in-place host transformation or direct microVM kernel booting without requiring heavy disk imaging pipelines.
 4. **Power of 10 & SEI CERT Compliance**: Every Go function is constrained to $\le 60$ statements with strict error wrapping (`%w`), zero goroutine leaks, and bounded timeouts.
 
+```mermaid
+flowchart TD
+    subgraph CoreEngine["lusoris-forge Core Architecture (Go 1.27)"]
+        CLI["CLI Entrypoint<br/><small>cmd/lusoris-forge (spf13/cobra)</small>"]
+        MCP["MCP Server<br/><small>pkg/mcp (modelcontextprotocol/go-sdk)</small>"]
+
+        subgraph Modules["Subsystem Packages"]
+            Flavors["pkg/flavors<br/><small>44-Flavor Catalog</small>"]
+            Manifest["pkg/manifest<br/><small>versions.json SSOT</small>"]
+            CloudInit["pkg/cloudinit<br/><small>NoCloud Generator</small>"]
+            Builder["pkg/builder<br/><small>9-Backend Dispatcher</small>"]
+            Imageless["pkg/imageless<br/><small>In-Place & MicroVM</small>"]
+            Standards["pkg/standards<br/><small>Hardening Profiles</small>"]
+            Tracker["pkg/tracker<br/><small>Epics & Milestones</small>"]
+        end
+
+        subgraph Execution["Execution Targets"]
+            LocalPacker["Local Packer Engine"]
+            RemoteCI["Remote CI (Gitea / Proxmox / GitLab)"]
+            MicroVM["MicroVM Direct Kernel Boot"]
+            AIAgent["AI Coding Agents (JSON-RPC stdio)"]
+        end
+    end
+
+    CLI --> Modules
+    MCP --> Modules
+    Builder --> LocalPacker & RemoteCI
+    Imageless --> MicroVM
+    MCP -.-> AIAgent
+```
+
 ---
 
 ## 2. Command-Line Interface (CLI) Reference
@@ -145,3 +176,33 @@ lusoris-forge mcp --transport=stdio
 | **`get_milestones`** | None | List active release milestones |
 | **`trigger_build`** | `flavor`, `backend`, `dry_run` | Dispatch build to local or remote CI backends |
 | **`apply_flavor`** | `flavor_id`, `dry_run` | Generate in-place host provisioning bash script |
+
+---
+
+### 3.4 MCP Stdio Protocol & Framing Protection Sequence
+
+```mermaid
+sequenceDiagram
+    autonumber
+    actor Agent as AI Coding Agent (Claude / AGY / Cursor)
+    participant PipeIn as OS Stdin (FD 0)
+    participant Forge as lusoris-forge MCP Server
+    participant PipeRedirect as stdoutRedirect (OS Pipe)
+    participant Stderr as OS Stderr (FD 2)
+    participant PipeOut as Dedicated Stdout (FD 1)
+    participant Backend as Local Packer / CI API / MicroVM
+
+    Note over Forge,PipeRedirect: Server init redirects os.Stdout to Stderr
+    Agent->>PipeIn: JSON-RPC Request (e.g. tools/call dispatch_build)
+    PipeIn->>Forge: Read request frames
+    rect rgb(240, 245, 255)
+        Note over Forge,PipeRedirect: Internal library logging & diagnostics
+        Forge->>PipeRedirect: Third-party logs / fmt.Print / warnings
+        PipeRedirect->>Stderr: Emitted cleanly on stderr (colored via tint)
+    end
+    Forge->>Backend: Execute build / validate manifest / generate cloud-init
+    Backend-->>Forge: Execution results & payload
+    Forge->>PipeOut: Write pristine JSON-RPC Response frame
+    PipeOut->>Agent: Delivered without stdout framing corruption
+```
+

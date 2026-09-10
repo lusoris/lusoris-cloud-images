@@ -10,7 +10,7 @@ This catalog segments all **44 production-ready flavors** into 7 clear workload 
 
 1. [Tier 1: Minimal Base Cloud OS (8 Flavors)](#tier-1-minimal-base-cloud-os-8-flavors)
 2. [Tier 2: Container Hosts — Docker & Podman (7 Flavors)](#tier-2-container-hosts--docker--podman-7-flavors)
-3. [Tier 3: Enterprise Kubernetes Nodes (10 Flavors)](#tier-3-enterprise-kubernetes-nodes-10-flavors)
+3. [Tier 3: Enterprise Kubernetes Nodes (9 Flavors)](#tier-3-enterprise-kubernetes-nodes-9-flavors)
 4. [Tier 4: K3s Edge Fleet (5 Flavors)](#tier-4-k3s-edge-fleet-5-flavors)
 5. [Tier 5: Cloud-Native Immutable & Storage Appliances (4 Flavors)](#tier-5-cloud-native-immutable--storage-appliances-4-flavors)
 6. [Tier 6: AI & LLM Inference Appliances (6 Flavors)](#tier-6-ai--llm-inference-appliances-6-flavors)
@@ -55,7 +55,7 @@ This catalog segments all **44 production-ready flavors** into 7 clear workload 
 
 ---
 
-## Tier 3: Enterprise Kubernetes Nodes (10 Flavors)
+## Tier 3: Enterprise Kubernetes Nodes (9 Flavors)
 
 > **Purpose**: Production Kubernetes worker nodes pre-baked with `containerd 2.3.5`, `kubelet 1.37.0`, `kubeadm`, and optional CNI preheating (Cilium, Calico, Flannel, kube-vip).
 >

@@ -22,32 +22,41 @@ Instead of deploying generic stock distributions that spend minutes pulling giga
 ## Architecture Overview
 
 ```mermaid
-graph TD
-    Upstream[Ubuntu Resolute Cloud Base] --> Forge[Packer Build Engine]
-    BOM[Single Source of Truth: versions.json] --> Forge
+flowchart TD
+    subgraph Inputs["1. Upstream & Declarative SSOT"]
+        Upstream["Ubuntu 26.04 Cloud Base<br/><small>Noble / Resolute Minimal Image</small>"]
+        SSOT[("versions.json<br/><small>Single Source of Truth (BOM)</small>")]
+    end
 
-    Forge --> Base[00-base-strip: Purge snapd & telemetry]
-    Base --> Agents[05-hypervisor-agents: QEMU + VMware + Unraid VirtFS]
-    Agents --> Time[10-network-time: Anycast NTS chrony]
-    Time --> Hardening[20-kernel-sysctl: CIS Baseline & BBR]
-    Hardening --> BM[25-baremetal-tuning: NVMe sched & growroot]
+    subgraph Core["2. Hardened Foundation (Stages 00–25)"]
+        S0["00-base-strip<br/><small>Purge snapd & telemetry</small>"]
+        S1["05-hypervisor-agents<br/><small>QEMU + VMware + VirtFS</small>"]
+        S2["10-network-time<br/><small>Multi-peer Anycast NTS</small>"]
+        S3["20-kernel-sysctl<br/><small>CIS L2 & BBR Congestion</small>"]
+        S4["25-baremetal-tuning<br/><small>NVMe mq-deadline & ZRAM</small>"]
+        S0 --> S1 --> S2 --> S3 --> S4
+    end
 
-    BM --> H_Gen[Generic VirtIO]
-    BM --> H_Intel[30-gpu-intel: Level Zero & VA-API]
-    BM --> H_AMD[31-gpu-amd-mesa / 32-gpu-amd-rocm]
-    BM --> H_NV[33/34/35-gpu-nvidia: Legacy / Mainstream / Datacenter]
+    subgraph Tiers["3. The 4D Production Matrix (44 Flavors across 7 Tiers)"]
+        direction TB
+        T1["Tier 1: Minimal Base OS<br/><small>Generic · Intel · AMD · NVIDIA 535/565/610/615/Open (8)</small>"]
+        T2["Tier 2: Container Hosts<br/><small>Docker CE · Podman Quadlet · GPU Passthrough (7)</small>"]
+        T3["Tier 3: Enterprise K8s Nodes<br/><small>containerd 2.3.5 · Cilium / Calico / Flannel · kube-vip (9)</small>"]
+        T4["Tier 4: K3s Edge Fleet<br/><small>Agent Flavors · Server Master · GPU Passthrough (5)</small>"]
+        T5["Tier 5: CloudNative & Storage<br/><small>Immutable Read-Only · NVMe-oF · ZFS · CNPG (4)</small>"]
+        T6["Tier 6: AI & LLM Inference<br/><small>NUMA · THP · vLLM · Ollama · OpenVINO (6)</small>"]
+        T7["Tier 7: Homelab Appliances<br/><small>Vision NVR · Gateway DNS · Media · CI Runner · Game Server (5)</small>"]
+    end
 
-    H_Gen --> W_Base[Base Minimal OS]
-    H_Intel --> W_Dock[40-docker-runtime: Docker CE + Compose]
-    H_AMD --> W_Pod[41-podman-runtime: Podman Quadlet]
-    H_NV --> W_K8s[50/55-k8s: containerd 2.x + Pre-cached Cilium]
-    H_NV --> W_AI[60-ai-infer: vLLM & Ollama Runtime]
+    subgraph Delivery["4. Universal Hypervisor & Bare-Metal Delivery"]
+        Artifacts[("Production Artifacts<br/><small>.qcow2.zst · .raw.zst · .vmdk.zst</small>")]
+        Platforms(["Proxmox VE · Unraid · VMware ESXi · Cloud Providers · Bare-Metal Install"])
+        Artifacts --> Platforms
+    end
 
-    W_Base --> OUT[Artifacts: .qcow2.zst / .raw.zst / .vmdk.zst]
-    W_Dock --> OUT
-    W_Pod --> OUT
-    W_K8s --> OUT
-    W_AI --> OUT
+    Inputs --> Core
+    Core --> Tiers
+    Tiers --> Artifacts
 ```
 
 ---

@@ -33,7 +33,7 @@ EXPECTED_FLAVORS = [
     "docker-nvidia-modern",
     "docker-nvidia-bleeding",
     "podman-generic",
-    # Tier 3: Enterprise Kubernetes Nodes (10)
+    # Tier 3: Enterprise Kubernetes Nodes (9)
     "k8s-node-generic",
     "k8s-node-cilium",
     "k8s-node-calico",
