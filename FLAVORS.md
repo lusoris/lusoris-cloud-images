@@ -1,8 +1,8 @@
-# lusoris-cloud-images — Flavor Catalog (39 Flavors)
+# lusoris-cloud-images — Flavor Catalog (44 Flavors)
 
 `lusoris-cloud-images` structures operating system images across four orthogonal dimensions: **Platform**, **Workload Tier**, **Hardware Acceleration**, and **Kernel/Preheat Profile**.
 
-This catalog segments all **39 production-ready flavors** into 6 clear workload tiers.
+This catalog segments all **44 production-ready flavors** into 7 clear workload tiers.
 
 ---
 
@@ -14,6 +14,7 @@ This catalog segments all **39 production-ready flavors** into 6 clear workload 
 4. [Tier 4: K3s Edge Fleet (5 Flavors)](#tier-4-k3s-edge-fleet-5-flavors)
 5. [Tier 5: Cloud-Native Immutable & Storage Appliances (4 Flavors)](#tier-5-cloud-native-immutable--storage-appliances-4-flavors)
 6. [Tier 6: AI & LLM Inference Appliances (6 Flavors)](#tier-6-ai--llm-inference-appliances-6-flavors)
+7. [Tier 7: Specialized Homelab Appliances (5 Flavors)](#tier-7-specialized-homelab-appliances-5-flavors)
 
 ---
 
@@ -119,3 +120,20 @@ This catalog segments all **39 production-ready flavors** into 6 clear workload 
 | **`ai-infer-nvidia`** | NVIDIA Mainstream | `ai-infer` | NVIDIA 565, Transparent Hugepages, NUMA, vLLM, Docker CE | `make build-ai-infer-nvidia` |
 | **`ai-infer-nvidia-modern`** | NVIDIA Modern | `ai-infer` | NVIDIA 610, Transparent Hugepages, NUMA, vLLM, Docker CE | `make build-ai-infer-nvidia-modern` |
 | **`ai-infer-nvidia-bleeding`** | NVIDIA Bleeding | `ai-infer` | NVIDIA 615, Blackwell RTX 5090 / B200, vLLM, Docker CE | `make build-ai-infer-nvidia-bleeding` |
+
+---
+
+## Tier 7: Specialized Homelab Appliances (5 Flavors)
+
+> **Purpose**: Turn-key, hardened homelab appliances resolving the most common pain points identified on r/homelab and the Steam Hardware Survey (Google Coral TPU, port 53 DNS collisions, dual-vendor VA-API media transcoding, multi-arch CI runners, and 32-bit SteamCMD game servers).
+>
+> 📖 **Deep Dive**: [`docs/flavors/homelab-appliances.md`](docs/flavors/homelab-appliances.md)
+
+| Flavor Target | Primary Workload | Hardware Stack | Kernel Profile | Key Appliance Stack | Local Make Target |
+| :--- | :--- | :--- | :--- | :--- | :--- |
+| **`appliance-vision-nvr`** | Frigate NVR, Scrypted | Intel GPU + Coral TPU | `generic` | Coral Edge TPU (`gasket-dkms`, udev), Intel QuickSync (`iHD`), CDI spec, Docker CE | `make build-appliance-vision-nvr` |
+| **`appliance-gateway-dns`** | AdGuard Home, Pi-hole | VirtIO / Low-Power CPU | `generic` | Port 53 stub disabled (`DNSStubListener=no`), WireGuard, IP forward (< 150MB RAM) | `make build-appliance-gateway-dns` |
+| **`appliance-media-server`**| Jellyfin, Plex, Tdarr | Intel + AMD GPU + NAS | `baremetal` | Intel QuickSync + AMD Mesa VA-API, `nfs-common`, `cifs-utils`, 4096KB readahead | `make build-appliance-media-server` |
+| **`appliance-ci-runner`** | Self-Hosted CI Runner | Multi-Core CPU / DinD | `generic` | QEMU ARM64/ARMv7 binfmt, Docker Buildx, `git-lfs`, 4GB tmpfs `/tmp` | `make build-appliance-ci-runner` |
+| **`appliance-game-server`**| SteamCMD, Pterodactyl | High Clock CPU | `generic` | 32-bit `i386` glibc, `steamcmd`, 16MB UDP socket buffer tuning, 1M file limits | `make build-appliance-game-server` |
+

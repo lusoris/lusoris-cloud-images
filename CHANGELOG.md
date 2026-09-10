@@ -18,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Streamlined `README.md` with multi-tier badge rows, architecture diagram, and workload summary table.
 - Interactive tabbed flavor explorer in `docs/flavors/matrix.md`.
 - Comprehensive modular test coverage suite (48 tests across 8 modules: manifest SSOT, provisioner static analysis, flavor matrix, cloud-init seed data, documentation/ADR integrity, security/privacy invariants, Packer templates, and repository governance).
+- Tier 7: Specialized Homelab Appliances (5 new flavors: `appliance-vision-nvr`, `appliance-gateway-dns`, `appliance-media-server`, `appliance-ci-runner`, `appliance-game-server`) addressing r/homelab and Steam survey hardware patterns.
+- ADR 0008: Specialized Homelab Appliance Flavors.
 
 ## [0.1.0] - 2026-09-09
 
