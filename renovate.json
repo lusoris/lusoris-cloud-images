@@ -2,12 +2,41 @@
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": [
     "config:recommended",
+    ":dependencyDashboard",
     ":semanticCommits",
     ":semanticCommitTypeAll(chore)",
-    ":semanticCommitScope(deps)"
+    ":semanticCommitScope(deps)",
+    "helpers:pinGitHubActionDigests"
   ],
   "labels": ["dependencies"],
+  "schedule": ["before 6am on monday"],
+  "timezone": "UTC",
+  "minimumReleaseAge": "3 days",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "rebaseWhen": "behind-base-branch",
   "packageRules": [
+    {
+      "matchManagers": ["github-actions"],
+      "groupName": "github-actions",
+      "groupSlug": "github-actions",
+      "pinDigests": true
+    },
+    {
+      "matchManagers": ["pip_requirements", "setup-cfg", "pep621"],
+      "groupName": "python-tooling",
+      "groupSlug": "python-tooling"
+    },
+    {
+      "matchManagers": ["gomod"],
+      "groupName": "go-modules",
+      "groupSlug": "go-modules"
+    },
+    {
+      "matchDatasources": ["docker"],
+      "groupName": "container-images",
+      "groupSlug": "container-images"
+    },
     {
       "matchUpdateTypes": ["minor", "patch"],
       "matchCurrentVersion": "!/^0/",
@@ -21,7 +50,7 @@
   "customManagers": [
     {
       "customType": "regex",
-      "fileMatch": ["^versions\\.json$"],
+      "managerFilePatterns": ["/^versions\\.json$/"],
       "matchStrings": [
         "\"(?<depName>(?:registry\\.k8s\\.io|docker\\.io|quay\\.io|ghcr\\.io|prom|nvcr\\.io|intel|rocm)[^:\"]+):(?<currentValue>[^\"]+)\""
       ],
@@ -29,48 +58,84 @@
     },
     {
       "customType": "regex",
-      "fileMatch": ["^versions\\.json$"],
+      "managerFilePatterns": ["/^versions\\.json$/"],
       "matchStrings": [
-        "\"version\": \"(?<currentValue>1\\.\\d+\\.\\d+)\""
+        "\"version\":\\s*\"(?<currentValue>1\\.\\d+\\.\\d+)\""
       ],
       "depNameTemplate": "kubernetes/kubernetes",
       "datasourceTemplate": "github-releases"
     },
     {
       "customType": "regex",
-      "fileMatch": ["^versions\\.json$"],
+      "managerFilePatterns": ["/^versions\\.json$/"],
       "matchStrings": [
-        "\"containerd\": \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+        "\"containerd\":\\s*\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
       ],
       "depNameTemplate": "containerd/containerd",
       "datasourceTemplate": "github-releases"
     },
     {
       "customType": "regex",
-      "fileMatch": ["^versions\\.json$"],
+      "managerFilePatterns": ["/^versions\\.json$/"],
       "matchStrings": [
-        "\"container_toolkit\": \"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+        "\"container_toolkit\":\\s*\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
       ],
       "depNameTemplate": "NVIDIA/nvidia-container-toolkit",
       "datasourceTemplate": "github-releases"
     },
     {
       "customType": "regex",
-      "fileMatch": ["^versions\\.json$"],
+      "managerFilePatterns": ["/^versions\\.json$/"],
       "matchStrings": [
-        "\"version\": \"(?<currentValue>v\\d+\\.\\d+\\.\\d+\\+k3s\\d+)\""
+        "\"version\":\\s*\"(?<currentValue>v\\d+\\.\\d+\\.\\d+\\+k3s\\d+)\""
       ],
       "depNameTemplate": "k3s-io/k3s",
       "datasourceTemplate": "github-releases"
     },
     {
       "customType": "regex",
-      "fileMatch": ["^versions\\.json$"],
+      "managerFilePatterns": ["/^versions\\.json$/"],
       "matchStrings": [
-        "\"docker_ce\": \"(?<currentValue>\\d+\\.\\d+)\""
+        "\"docker_ce\":\\s*\"(?<currentValue>\\d+\\.\\d+)\""
       ],
       "depNameTemplate": "docker/cli",
       "datasourceTemplate": "github-tags"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^versions\\.json$/"],
+      "matchStrings": [
+        "\"crun\":\\s*\"(?<currentValue>\\d+\\.\\d+)\""
+      ],
+      "depNameTemplate": "containers/crun",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^versions\\.json$/"],
+      "matchStrings": [
+        "\"stargz_snapshotter\":\\s*\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "depNameTemplate": "containerd/stargz-snapshotter",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^versions\\.json$/"],
+      "matchStrings": [
+        "\"cdebug\":\\s*\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "depNameTemplate": "zerok-ai/cdebug",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "customType": "regex",
+      "managerFilePatterns": ["/^versions\\.json$/"],
+      "matchStrings": [
+        "\"enroot\":\\s*\"(?<currentValue>\\d+\\.\\d+\\.\\d+)\""
+      ],
+      "depNameTemplate": "NVIDIA/enroot",
+      "datasourceTemplate": "github-releases"
     }
   ]
 }

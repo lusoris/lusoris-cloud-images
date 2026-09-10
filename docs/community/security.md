@@ -41,13 +41,13 @@ Only the `main` branch (rolling weekly daily-upstream builds) and the two latest
 Every commit and pull request must pass the automated security and quality gates before merge:
 
 ```
-┌────────────────────────────────────────────────────────────────────────────────────────┐
-│                        AUTOMATED SECURITY & INTEGRITY PIPELINE                         │
-├──────────────────────┬──────────────────────┬────────────────────┬─────────────────────┤
-│ OpenSSF Scorecard    │ Trivy Filesystem CVE │ Semgrep SAST Gate  │ Gitleaks Secret Gate│
-│ Score: 5.4 / 10      │ 0 CVEs Detected      │ 0 Code Alerts      │ 0 Leaks Detected    │
-│ 10/10 Core Controls  │ Clean Base Packages  │ Zero Taint Paths   │ Clean Git History   │
-└──────────────────────┴──────────────────────┴────────────────────┴─────────────────────┘
+┌────────────────────────────────────────────────────────────────────────────────────────────────────────┐
+│                                AUTOMATED SECURITY & INTEGRITY PIPELINE                                 │
+├──────────────────────┬──────────────────────┬────────────────────┬───────────────────┬────────────────┤
+│ OpenSSF Scorecard    │ Trivy Filesystem CVE │ Semgrep SAST Gate  │ GitHub CodeQL     │ Gitleaks Gate  │
+│ Least Privilege      │ 0 CVEs Detected      │ 0 Code Alerts      │ Go + Python       │ 0 Leaks Found  │
+│ 10/10 Core Controls  │ Clean Base Packages  │ Zero Taint Paths   │ Security & Quality│ Clean History  │
+└──────────────────────┴──────────────────────┴────────────────────┴───────────────────┴────────────────┘
 ```
 
 ### A. OpenSSF Scorecard Analysis (v5.4.0)
@@ -60,10 +60,10 @@ The repository runs the OpenSSF Scorecard supply-chain security analysis via Git
 | **Vulnerabilities** | **10 / 10** | **PASS (✓)** | Zero known unfixed OSV/CVE vulnerabilities. |
 | **Security-Policy** | **10 / 10** | **PASS (✓)** | Public `SECURITY.md` with explicit disclosure SLA and channels. |
 | **License** | **10 / 10** | **PASS (✓)** | Permissive Apache-2.0 OSI-approved license. |
-| **Dependency-Update** | **10 / 10** | **PASS (✓)** | RenovateBot active with declarative auto-upgrade policies. |
+| **Dependency-Update** | **10 / 10** | **PASS (✓)** | Zero-noise Renovate active with automated grouping and 3-day stability guard. |
 | **CI-Tests** | **10 / 10** | **PASS (✓)** | 100% of pull requests verified by automated test suites. |
-| **Pinned-Dependencies**| **7 / 10** | **PASS (✓)** | 100% of GitHub Actions pinned to 40-character immutable commit SHAs. |
-| **Token-Permissions**| Audited | **PASS (✓)** | Default `contents: read` least privilege enforced across workflows. |
+| **Pinned-Dependencies**| **10 / 10** | **PASS (✓)** | 100% of GitHub Actions pinned to 40-character immutable commit SHAs. |
+| **Token-Permissions**| **10 / 10** | **PASS (✓)** | Top-level `contents: read` least privilege enforced; job-scoped write tokens only. |
 
 ### B. Trivy Vulnerability & Container Scan (v0.36.0)
 - **Scope**: Repository filesystem, package dependency manifests, and workflow configurations.
@@ -75,11 +75,22 @@ The repository runs the OpenSSF Scorecard supply-chain security analysis via Git
 - **Rule Packs**: `p/default`, `p/ci`, `p/secrets`, `p/owasp-top-ten`.
 - **Result**: **0 Security Alerts**, zero taint vulnerabilities.
 
-### D. Gitleaks Deep History Secret Scan (v8.x)
+### D. GitHub CodeQL Static Analysis
+- **Scope**: Go runtime components and Python test and orchestration automation.
+- **Rule Suites**: `+security-and-quality` detecting code flaws, injection surfaces, and concurrency defects.
+- **Result**: **0 Security Alerts**. Executed on push to `main`, pull requests, and scheduled weekly cron (`.github/workflows/codeql.yml`).
+
+### E. Gitleaks Deep History Secret Scan (v8.x)
 - **Scope**: Complete git history from initial root commit to `HEAD`.
 - **Result**: **0 Secret Leaks**. Verified zero exposed private keys, bearer tokens, or sensitive API secrets.
 
-### E. Zero-Leak Privacy Invariant Gate
+### F. Automated Zero-Noise Dependency Governance (Renovate)
+- **Architecture**: Declarative `renovate.json` adhering to [ADR-0014](../adr/0014-automated-dependency-management-renovate.md).
+- **Digest Pinning**: Automatically resolves 40-character commit SHAs for GitHub Actions via `helpers:pinGitHubActionDigests`.
+- **Cadence & Stability**: Weekly batches (Mondays before 6am UTC) with a 3-day minimum release stability quarantine.
+- **SSOT Regex Synchronization**: Directly manages version declarations in `versions.json`.
+
+### G. Zero-Leak Privacy Invariant Gate
 - **Scope**: Automated pre-commit and CI verification (`tests/test_security_privacy.py`).
 - **Enforcement**:
   - Rejects any RFC 1918 private IPv4 addresses (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) in configuration and code files.
@@ -87,7 +98,7 @@ The repository runs the OpenSSF Scorecard supply-chain security analysis via Git
   - Enforces that 100% of external GitHub Actions in `.github/workflows/*.yml` are pinned to immutable 40-character commit SHAs.
 - **Result**: **100% Compliant**.
 
-### F. NASA/JPL Power of 10 Shell Provisioner Quality Audit
+### H. NASA/JPL Power of 10 Shell Provisioner Quality Audit
 - **Scope**: 28 shell provisioner scripts under `packer/provisioners/` verified across 8 dedicated test suites.
 - **Standard**: Gerard J. Holzmann's Power of 10 rules adapted for cloud image engineering ([`docs/principles.md`](../principles.md)).
 - **Metrics**:
