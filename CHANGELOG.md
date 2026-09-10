@@ -5,6 +5,37 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.1](https://github.com/lusoris/lusoris-cloud-images/compare/v0.1.0...v0.1.1) (2026-09-10)
+
+
+### Features
+
+* **agents:** implement ai studio managed agents fleet, compliance pipeline, and diagram styling ([#24](https://github.com/lusoris/lusoris-cloud-images/issues/24)) ([c1605d9](https://github.com/lusoris/lusoris-cloud-images/commit/c1605d98489167c8ba389079bba81a7a0c21721d))
+* **core:** audit modernization, enterprise test suites, and hardened hindsight mcp ([#26](https://github.com/lusoris/lusoris-cloud-images/issues/26)) ([ffb111c](https://github.com/lusoris/lusoris-cloud-images/commit/ffb111c5b79dfa445557e915645e107a169fd6a9))
+* **forge:** add cloudnative immutable and cncf storage appliances ([#18](https://github.com/lusoris/lusoris-cloud-images/issues/18)) ([a8d4cca](https://github.com/lusoris/lusoris-cloud-images/commit/a8d4ccaa164ac99acadca57c53dea1aad67d2e53))
+* **forge:** implement Go 1.27 CLI/MCP, project gates, and hardening ([#22](https://github.com/lusoris/lusoris-cloud-images/issues/22)) ([4327bf8](https://github.com/lusoris/lusoris-cloud-images/commit/4327bf8ad0e6d6c61dffa1a69ac0a69a3f3e8f7f))
+* **governance:** adopt fleet engineering principles, crosswalk, and agent skills ([#10](https://github.com/lusoris/lusoris-cloud-images/issues/10)) ([5be7558](https://github.com/lusoris/lusoris-cloud-images/commit/5be755830de17a8fb3b8ff0521756b872421e859))
+* **gpu-nvidia:** add 600-series (R610) and CUDA 13.3 modern flavors ([#13](https://github.com/lusoris/lusoris-cloud-images/issues/13)) ([284875c](https://github.com/lusoris/lusoris-cloud-images/commit/284875c41301abd9ce9cc3c67e9b24378b48e490))
+* **homelab:** add 5 specialized homelab appliance flavors and provisioners ([#21](https://github.com/lusoris/lusoris-cloud-images/issues/21)) ([4b04cba](https://github.com/lusoris/lusoris-cloud-images/commit/4b04cba18818c2aaa32eb880646b8dcbaa2e89ea))
+* initial repository bootstrap for lusoris-cloud-images ([c0e6389](https://github.com/lusoris/lusoris-cloud-images/commit/c0e63898522f36fe7c5e9ddef40c2575c929d123))
+* **k3s:** add 5 lightweight edge fleet flavors and runtime provisioner ([#17](https://github.com/lusoris/lusoris-cloud-images/issues/17)) ([c4dc002](https://github.com/lusoris/lusoris-cloud-images/commit/c4dc0028390b9463fb8e21e086d242265a1d97d5))
+* **platform:** implement progressive skills, staged mcp, nas ecosystem, and kernel forge blueprint ([#28](https://github.com/lusoris/lusoris-cloud-images/issues/28)) ([73a4e1d](https://github.com/lusoris/lusoris-cloud-images/commit/73a4e1dadd5b206ac828c0230ea7b50be91c8418))
+* **security:** implement native codeql static analysis, zero-noise renovate, and openssf least-privilege workflows ([#27](https://github.com/lusoris/lusoris-cloud-images/issues/27)) ([70ecd68](https://github.com/lusoris/lusoris-cloud-images/commit/70ecd681658cb6c2385c33d11dbe6cee212c1b9d))
+* **ssot:** add versions.schema.json, dynamic test invariants, and fleet rules parity ([#16](https://github.com/lusoris/lusoris-cloud-images/issues/16)) ([68326d3](https://github.com/lusoris/lusoris-cloud-images/commit/68326d306e4ba117e1f9e765e260108a5f290920))
+* universal community image forge, fleet repo setup, and SSOT manifest ([#1](https://github.com/lusoris/lusoris-cloud-images/issues/1)) ([8ac4dc9](https://github.com/lusoris/lusoris-cloud-images/commit/8ac4dc9829f7d6a1636144486be1a15a45d911ae))
+
+
+### Bug Fixes
+
+* **ci:** update scorecard-action to v2.4.4 and fix pymdown-extensions in pages ([#7](https://github.com/lusoris/lusoris-cloud-images/issues/7)) ([ebc41ae](https://github.com/lusoris/lusoris-cloud-images/commit/ebc41ae7aa976efcdd14a836feb7c36908357f33))
+* **docs:** resolve internal markdown links for strict mkdocs build ([#9](https://github.com/lusoris/lusoris-cloud-images/issues/9)) ([c6c4968](https://github.com/lusoris/lusoris-cloud-images/commit/c6c4968b43cc09de5607caa94677a0097d28da6f))
+* **engine:** synchronize flavor catalog, support truenas cloudinit, port mock sandbox, and add systems benchmarks ([#29](https://github.com/lusoris/lusoris-cloud-images/issues/29)) ([62e5533](https://github.com/lusoris/lusoris-cloud-images/commit/62e5533b73556dfb378bae16286c09bfd51e7265))
+
+
+### Performance Improvements
+
+* **base:** add fstrim timer, fast cloud-init, zram and virtio scheduling ([#15](https://github.com/lusoris/lusoris-cloud-images/issues/15)) ([043ad8a](https://github.com/lusoris/lusoris-cloud-images/commit/043ad8a1de823f7d97c858c8fa35dfa3e9150ae2))
+
 ## [Unreleased]
 
 ### Added
