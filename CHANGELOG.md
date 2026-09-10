@@ -48,12 +48,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive CLI unit test suite (`cmd/lusoris-forge/main_test.go`) validating all 10 root commands and subcommands.
 - Declarative compliance inspection MCP tool (`inspect_compliance`) exposing CIS Level 2 and NIST SP 800-53 controls to autonomous agents.
 - Upgraded `stargz_snapshotter` version to `0.18.2` across `versions.json`, Packer templates, and Go manifest structs for containerd 2.3+ compatibility.
+- ADR-0013: Persistent Cross-Session Memory via Hindsight Semantic Backend & MCP Architecture (`docs/adr/0013-hindsight-semantic-memory-mcp.md`).
+- Dual-layer MCP configuration (`.mcp.json` and `.agents/mcp_config.json`) and Hindsight JSON-RPC 2.0 stdio bridge (`scripts/hindsight_mcp_server.py`) with Hard Rule 6 zero-leak pre-sanitization and offline buffer resilience.
+- Cluster tunnel supervisor daemon (`scripts/tunnel_hindsight.py`) managing loopback forwarding to cluster Hindsight services.
+- Enterprise testing architecture expansion (205 tests total):
+  - In-memory MCP JSON-RPC 2.0 protocol client-server test suite (`pkg/mcp/protocol_test.go`) validating all 10 tools.
+  - Deep negative manifest validation across 14 failure modes and zero-allocation benchmark suite (`pkg/manifest/benchmark_test.go`: 461 ns/op, 0 B/op).
+  - Hermetic shell mock execution sandbox (`tests/harness/mock_runner.py`, `tests/test_provisioners_execution.py`) running production provisioners under `set -euo pipefail` with isolated command journaling.
+  - Live Docker container integration suite (`tests/test_container_integration.py`) validating `/usr/sbin/sshd -t`, sysctl kernel tuning, and CDI JSON in `ubuntu:24.04`.
+  - Deep 4-platform x 7-tier cloud-init matrix tests (`tests/test_cloudinit_deep.py`).
+  - Repository automation test suite (`tests/test_scripts_automation.py`) testing fleet manager, fanout worktrees, and zero-leak pre-tool hooks.
+  - Quality gate orchestration targets: `make test-all`, `make test-bench`, `make test-coverage`.
 
 ### Fixed
 - Universal multi-architecture portability: replaced hardcoded `[arch=amd64]` APT repository configurations with dynamic `$(dpkg --print-architecture)` in AMD ROCm (`32-gpu-amd-rocm.sh`) and Docker CE (`40-docker-runtime.sh`) provisioners.
 - Package resolution in `25-baremetal-tuning.sh`: replaced non-existent package `partprobe` with GNU `parted` so disk partition probing utilities install properly.
 - Architecture guard in `79-appliance-game.sh`: restricted `dpkg --add-architecture i386` multiarch registration to `amd64` hosts.
 - CDI specification compliance in `75-appliance-vision.sh`: modernized `cdiVersion` from unquoted float `0.5.0` to semantic string `"0.6.0"`.
+- Hardened loopback urllib usage in Hindsight MCP server (`scripts/hindsight_mcp_server.py`) and tunnel supervisor (`scripts/tunnel_hindsight.py`) with URL scheme validation and nosemgrep annotations, resolving Semgrep dynamic URL audit findings in CI.
 - Corrected base OS badge and metadata to Ubuntu 26.04 LTS Resolute in `README.md`.
 - Synchronized 44-flavor catalog count across repository map in `README.md` and test suite docstrings.
 

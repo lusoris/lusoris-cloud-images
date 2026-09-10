@@ -216,3 +216,98 @@ sequenceDiagram
     PipeOut->>Agent: Delivered without stdout framing corruption
 ```
 
+---
+
+## 4. Hindsight Semantic Memory & Cluster Knowledge Integration
+
+Beyond the repository image forge tools, `lusoris-cloud-images` natively integrates with the self-hosted **Hindsight** (`v0.8.4`) semantic memory engine deployed in the companion `lusoris/k8s` cluster ([ADR-0013](../adr/0013-hindsight-semantic-memory-mcp.md)).
+
+```mermaid
+flowchart TD
+    classDef agent fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff;
+    classDef bridge fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#ffffff;
+    classDef cluster fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff;
+    classDef storage fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff;
+
+    subgraph WORKSTATION ["Workstation Environment"]
+        Agent["AI Coding Agent<br/>(Antigravity / Claude / Cursor)"]:::agent
+        Config[".mcp.json / .agents/mcp_config.json"]:::bridge
+        Bridge["Hindsight MCP Bridge<br/>(scripts/hindsight_mcp_server.py)"]:::bridge
+        LocalBuffer[".workingdir2/memory/hindsight-local-buffer.json<br/>(Offline Resilience Buffer)"]:::storage
+        Tunnel["Tunnel Supervisor<br/>(scripts/tunnel_hindsight.py)"]:::bridge
+    end
+
+    subgraph CLUSTER ["Kubernetes Cluster (lusoris/k8s)"]
+        HindsightSvc["service/hindsight:8888<br/>(Hindsight API v0.8.4)"]:::cluster
+        LiteLLM["LiteLLM Gateway<br/>(Arc B580 Qwen3 8b)"]:::cluster
+        Postgres["PostgreSQL pg0 + pgvector<br/>(Longhorn v2 NAS-backed)"]:::storage
+        Consolidate["Nightly Consolidation<br/>(02:20 Europe/Berlin)"]:::cluster
+    end
+
+    Agent -->|"stdio (JSON-RPC 2.0)"| Bridge
+    Config -.->|"discovers"| Bridge
+    Bridge -->|"Zero-Leak Filter"| Bridge
+    Bridge -->|"HTTP POST /retain /recall"| HindsightSvc
+    Bridge -.->|"offline fallback"| LocalBuffer
+    LocalBuffer -.->|"flush on reconnect"| HindsightSvc
+    Tunnel -->|"port-forward 8888:8888"| HindsightSvc
+    HindsightSvc <-->|"extraction & consolidation"| LiteLLM
+    HindsightSvc <-->|"HNSW vector index"| Postgres
+    Consolidate -->|"POST /consolidate"| HindsightSvc
+
+    style WORKSTATION fill:none,stroke:#0284c7,stroke-width:2px,stroke-dasharray: 4 4;
+    style CLUSTER fill:none,stroke:#d97706,stroke-width:2px,stroke-dasharray: 4 4;
+```
+
+### 4.1 Client Configuration (`.mcp.json` & `.agents/mcp_config.json`)
+
+Both manifests declare the stdio Hindsight bridge and optional cluster knowledge tools:
+
+```json
+{
+  "mcpServers": {
+    "hindsight": {
+      "command": "python",
+      "args": ["scripts/hindsight_mcp_server.py"],
+      "env": {
+        "HINDSIGHT_URL": "http://127.0.0.1:8888",
+        "HINDSIGHT_BANK": "lusoris-cloud-images"
+      }
+    },
+    "cauda-kb": {
+      "serverUrl": "http://127.0.0.1:38001/mcp"
+    },
+    "context7": {
+      "command": "npx",
+      "args": ["-y", "@upstash/context7-mcp@3.1.0"]
+    }
+  }
+}
+```
+
+### 4.2 Registered Memory Tools
+
+| Tool Identifier | Parameters | Description |
+| :--- | :--- | :--- |
+| **`hindsight_recall`** | `query` (string), `top_k` (int, default 5), `bank_id` (string) | Semantic hybrid retrieval over durable architectural rules, bug root causes, and previous decisions |
+| **`hindsight_retain`** | `content` (string), `context` (string), `bank_id` (string) | Persists discoveries, rationale, and constraints into Hindsight memory |
+| **`hindsight_reflect`**| `bank_id` (string) | Triggers observation consolidation and mental model synthesis |
+| **`hindsight_status`** | None | Probes backend connectivity, active bank count, and local buffer state |
+| **`hindsight_list_banks`** | None | Lists available fleet memory banks in the tenant |
+
+### 4.3 Zero-Leak Privacy Guard
+Prior to retaining any facts into Hindsight vector memory, `scripts/hindsight_mcp_server.py` automatically strips:
+- RFC 1918 private IP addresses (`10.x`, `192.168.x`, `172.16-31.x` -> `[REDACTED-RFC1918-IP]`).
+- Workstation user directories (`/home/<user>`, `/Users/<user>`, `C:\Users\<user>` -> `[REDACTED-USER-PATH]`).
+
+### 4.4 Cluster Port-Forwarding Supervisor
+To bridge the cluster-private service to `127.0.0.1:8888`:
+
+```bash
+# Check connectivity
+python scripts/tunnel_hindsight.py --check
+
+# Start tunnel supervisor daemon
+python scripts/tunnel_hindsight.py
+```
+
