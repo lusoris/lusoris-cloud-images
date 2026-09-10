@@ -103,6 +103,7 @@ nav:
       - "0009: Multi-Distribution Base OS Roadmap": adr/0009-multi-distribution-base-roadmap.md
       - "0010: Container Ecosystem Runtimes & Tooling": adr/0010-container-ecosystem-runtimes-and-tooling.md
       - "0011: Enterprise Golden Image Compliance & Lifecycle": adr/0011-enterprise-golden-image-compliance-and-lifecycle.md
+      - "0012: Universal Arch, Containerd 2.x & Hardening": adr/0012-universal-arch-containerd2-and-dualstack-hardening.md
   - Engineering & Governance:
       - Engineering Principles: principles.md
       - Repository Crosswalk: repository-rule-crosswalk.md

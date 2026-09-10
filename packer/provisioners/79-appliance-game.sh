@@ -6,6 +6,13 @@
 set -euo pipefail
 
 enable_i386_multiarch_runtime() {
+  local arch
+  arch="$(dpkg --print-architecture)"
+  if [ "${arch}" != "amd64" ]; then
+    echo "    Notice: Host architecture is '${arch}'; i386 multiarch is x86_64 specific. Skipping."
+    return 0
+  fi
+
   echo "==> Enabling i386 multiarch architecture and runtime libraries..."
   sudo dpkg --add-architecture i386
   sudo apt-get update

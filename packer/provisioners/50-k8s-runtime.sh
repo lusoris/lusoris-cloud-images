@@ -22,8 +22,20 @@ setup_containerd() {
   sudo sed -i "s|sandbox_image = .*|sandbox_image = \"${IMG_PAUSE}\"|" /etc/containerd/config.toml
   sudo sed -i 's/discard_unpacked_layers = false/discard_unpacked_layers = true/' /etc/containerd/config.toml
 
-  # Register crun as alternative high-performance OCI runtime class
-  cat <<'EOF' | sudo tee -a /etc/containerd/config.toml
+  # Register crun as alternative high-performance OCI runtime class (containerd 2.x & 1.x compatible)
+  if grep -q 'io.containerd.cri.v1.runtime' /etc/containerd/config.toml; then
+    cat <<'EOF' | sudo tee -a /etc/containerd/config.toml
+
+[plugins."io.containerd.cri.v1.runtime".containerd.runtimes.crun]
+  runtime_type = "io.containerd.runc.v2"
+  runtime_engine = ""
+  runtime_root = ""
+  [plugins."io.containerd.cri.v1.runtime".containerd.runtimes.crun.options]
+    BinaryName = "crun"
+    SystemdCgroup = true
+EOF
+  else
+    cat <<'EOF' | sudo tee -a /etc/containerd/config.toml
 
 [plugins."io.containerd.grpc.v1.cri".containerd.runtimes.crun]
   runtime_type = "io.containerd.runc.v2"
@@ -33,6 +45,7 @@ setup_containerd() {
     BinaryName = "crun"
     SystemdCgroup = true
 EOF
+  fi
 
   # Configure default crictl endpoint
   cat <<'EOF' | sudo tee /etc/crictl.yaml

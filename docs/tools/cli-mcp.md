@@ -185,6 +185,7 @@ lusoris-forge mcp --transport=stdio
 | **`get_milestones`** | None | List active release milestones |
 | **`trigger_build`** | `flavor`, `backend`, `dry_run` | Dispatch build to local or remote CI backends |
 | **`apply_flavor`** | `flavor_id`, `dry_run` | Generate in-place host provisioning bash script |
+| **`inspect_compliance`** | None | Inspect declarative CIS/NIST compliance profile |
 
 ---
 

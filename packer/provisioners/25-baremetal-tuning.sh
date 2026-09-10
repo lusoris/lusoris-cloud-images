@@ -61,7 +61,7 @@ ACTION=="add|change", KERNEL=="vd[a-z]", ATTR{queue/rotational}=="0", ATTR{queue
 EOF
 
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    cloud-guest-utils fdisk partprobe 2>/dev/null || true
+    cloud-guest-utils fdisk parted 2>/dev/null || true
 }
 
 install_disk_stream_helper() {

@@ -36,6 +36,10 @@ func TestLoadActualVersionsJSON(t *testing.T) {
 	assert.NotEmpty(t, m.K3s.Version)
 	assert.NotEmpty(t, m.Runtimes.Containerd)
 	assert.NotEmpty(t, m.Runtimes.DockerCE)
+	assert.NotEmpty(t, m.Runtimes.Crun)
+	assert.NotEmpty(t, m.Runtimes.StargzSnapshotter)
+	assert.NotEmpty(t, m.Tools.Cdebug)
+	assert.NotEmpty(t, m.Tools.Enroot)
 
 	assert.NotEmpty(t, m.Time.AnycastNTS)
 	assert.NotEmpty(t, m.Time.Stratum1NTS)

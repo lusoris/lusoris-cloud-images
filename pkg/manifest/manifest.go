@@ -82,8 +82,16 @@ type K3s struct {
 
 // Runtimes defines container runtime coordinates.
 type Runtimes struct {
-	Containerd string `json:"containerd"`
-	DockerCE   string `json:"docker_ce"`
+	Containerd        string `json:"containerd"`
+	DockerCE          string `json:"docker_ce"`
+	Crun              string `json:"crun,omitempty"`
+	StargzSnapshotter string `json:"stargz_snapshotter,omitempty"`
+}
+
+// Tools defines diagnostic and sandboxing tooling coordinates.
+type Tools struct {
+	Cdebug string `json:"cdebug,omitempty"`
+	Enroot string `json:"enroot,omitempty"`
 }
 
 // Time defines resilient Anycast and Stratum-1 NTS endpoints.
@@ -101,6 +109,7 @@ type Manifest struct {
 	Drivers    Drivers    `json:"drivers"`
 	K3s        K3s        `json:"k3s"`
 	Runtimes   Runtimes   `json:"runtimes"`
+	Tools      Tools      `json:"tools,omitempty"`
 	Time       Time       `json:"time"`
 }
 
@@ -140,6 +149,9 @@ func (m *Manifest) Validate() error {
 		return err
 	}
 	if err := m.validateRuntimes(); err != nil {
+		return err
+	}
+	if err := m.validateTools(); err != nil {
 		return err
 	}
 	return m.validateTime()
@@ -188,6 +200,13 @@ func (m *Manifest) validateDrivers() error {
 func (m *Manifest) validateRuntimes() error {
 	if m.Runtimes.Containerd == "" || m.Runtimes.DockerCE == "" {
 		return fmt.Errorf("containerd and docker_ce runtimes must not be empty")
+	}
+	return nil
+}
+
+func (m *Manifest) validateTools() error {
+	if m.Tools.Cdebug == "" {
+		return fmt.Errorf("cdebug tool version must not be empty")
 	}
 	return nil
 }

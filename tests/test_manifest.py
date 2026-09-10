@@ -49,7 +49,9 @@ class TestManifestIntegrity:
         assert re.match(r"^\d+\.\d+", runtimes["containerd"])
         assert re.match(r"^\d+\.\d+", runtimes["docker_ce"])
         assert re.match(r"^\d+\.\d+", runtimes["crun"])
+        assert re.match(r"^\d+\.\d+", runtimes["stargz_snapshotter"])
         assert "tools" in data and "cdebug" in data["tools"]
+        assert "tools" in data and "enroot" in data["tools"]
         assert "k3s" in data and len(data["k3s"]) > 0
 
     def test_nvidia_driver_tiers(self) -> None:

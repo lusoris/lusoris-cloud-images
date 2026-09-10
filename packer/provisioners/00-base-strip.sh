@@ -107,7 +107,7 @@ configure_openssh_hardening() {
 # CIS Benchmark Level 2 & DISA STIG OpenSSH Hardening Baseline
 Port 22
 Protocol 2
-AddressFamily inet
+AddressFamily any
 
 # Cryptographic Suite Selection
 KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
