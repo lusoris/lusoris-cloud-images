@@ -52,6 +52,10 @@ EXPECTED_FLAVORS = [
     "k3s-agent-amd",
     "k3s-agent-nvidia",
     "k3s-server-generic",
+    "cloudnative-generic",
+    "cloudnative-k8s",
+    "cloudnative-storage",
+    "cloudnative-pg",
 ]
 
 

@@ -66,7 +66,7 @@ graph TD
 
 ---
 
-## The 4D Flavor Matrix (35 Flavors)
+## The 4D Flavor Matrix (39 Flavors)
 
 | Flavor | Workload | Hardware Stack | Kernel Profile | Key Components |
 | :--- | :--- | :--- | :--- | :--- |
@@ -99,6 +99,10 @@ graph TD
 | **`k3s-agent-amd`** | K3s Worker | AMD GPU | `k8s` | K3s agent + AMD ROCm 10 compute runtime + RADV Vulkan |
 | **`k3s-agent-nvidia`** | K3s Worker | NVIDIA Mainstream | `k8s` | K3s agent + NVIDIA 565 + Container Toolkit CDI |
 | **`k3s-server-generic`** | K3s Server | VirtIO / CPU | `k8s` | K3s standalone master, embedded SQLite, local-path storage |
+| **`cloudnative-generic`** | Immutable Host | VirtIO / CPU | `generic` | Read-only root protection, ephemeral tmpfs, containerd CDI |
+| **`cloudnative-k8s`** | Immutable Worker | VirtIO / CPU | `k8s` | Read-only root protection, containerd 2.3.5, kubelet 1.37.0 |
+| **`cloudnative-storage`** | CNCF Storage | VirtIO / Baremetal | `baremetal` | NVMe-oF (TCP), OpenZFS 2.3, iSCSI, multipath, NFS |
+| **`cloudnative-pg`** | Database Host | VirtIO / Baremetal | `ai-infer` | CloudNativePG tuning, hugepages, strict memory overcommit |
 | **`ai-infer-generic`** | AI Inference | CPU High-Throughput | `ai-infer` | AMX, AVX-512, NUMA, vLLM / Ollama CPU, Docker CE |
 | **`ai-infer-intel`** | AI Inference | Intel Xe/Arc/Xe2 | `ai-infer` | Intel Level Zero, OpenVINO, IPEX-LLM, CDI, Docker CE |
 | **`ai-infer-amd`** | AI Inference | AMD ROCm 10 | `ai-infer` | AMD ROCm 10, /dev/kfd, RDNA 3/4 & Instinct, CDI, Docker CE |
@@ -136,6 +140,8 @@ make build-k8s-generic        # Lean zero-preheat
 make build-k8s-cilium         # Preheated Cilium
 make build-k3s-agent-generic   # Lightweight Edge K3s worker
 make build-k3s-server-generic  # Standalone K3s control plane
+make build-cloudnative-generic # Immutable container host
+make build-cloudnative-storage # CNCF storage appliance
 make build-ai-infer-generic   # CPU High-Throughput
 make build-ai-infer-intel     # Intel Arc / Battlemage Xe2
 make build-ai-infer-amd       # AMD ROCm 10

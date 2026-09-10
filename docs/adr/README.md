@@ -16,4 +16,5 @@ Once an ADR reaches status **Accepted**, its text is immutable. If architectural
 | [0004](0004-hypervisor-agent-coexistence.md) | Hypervisor Guest Agent Coexistence (QEMU + VMware) | Accepted | 2026-09-10 |
 | [0005](0005-baremetal-streaming-install.md) | Bare-Metal Compressed Block Streaming Installation | Accepted | 2026-09-10 |
 | [0006](0006-k3s-edge-fleet-flavors.md) | K3s Lightweight Fleet Edge Flavors | Accepted | 2026-09-10 |
+| [0007](0007-cloudnative-and-cncf-storage-appliances.md) | Cloud-Native Immutable and CNCF Storage Appliances | Accepted | 2026-09-10 |
 
