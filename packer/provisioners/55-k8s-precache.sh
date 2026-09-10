@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 55-k8s-precache.sh — Modular pre-pulling of Kubernetes DaemonSets and runtime images
 # Supports profiles: lean (pause only), cilium, calico, flannel.
 # Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.

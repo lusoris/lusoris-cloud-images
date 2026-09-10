@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 41-podman-runtime.sh — Install Podman 5.x, Buildah, Skopeo, and Quadlet systemd support
 # Configures daemonless, rootless container stack with automated Quadlet generators.
 # Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 36-gpu-nvidia-bleeding.sh — NVIDIA Bleeding (Blackwell RTX 5090/B200, Ada) R615/R610 + CUDA 13.4
 # Cutting-edge driver stack with native Container Device Interface (CDI) and MPS support.
 # Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.

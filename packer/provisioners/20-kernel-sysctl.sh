@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 20-kernel-sysctl.sh — High-performance network sysctl, CIS baseline, and per-flavor kernel tuning
 # Configures BBR, OverlayFS metacopy, cgroup v2 PSI, and per-flavor kernel cmdline parameters.
 # Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.

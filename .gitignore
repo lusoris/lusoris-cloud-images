@@ -1,15 +1,18 @@
 # Packer build artifacts & cache
 packer_cache/
 output-*/
+output-images/
 *.qcow2
 *.raw
 *.img
 *.vmdk
 *.iso
 
-# Sensitive variable files
+# Sensitive variable files & environments
 *.pkrvars.hcl
 !examples/*.pkrvars.hcl
+.env
+*.env
 
 # OS & Editor
 .DS_Store

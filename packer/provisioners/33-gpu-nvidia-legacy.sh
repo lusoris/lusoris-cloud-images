@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 33-gpu-nvidia-legacy.sh — NVIDIA Legacy (Pascal & Volta) driver and container runtime
 # Pinned NVIDIA 535 headless driver and NVIDIA Container Toolkit with legacy CDI hooks.
 set -euo pipefail

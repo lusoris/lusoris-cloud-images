@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 35-gpu-nvidia-datacenter.sh — NVIDIA Datacenter (Hopper & Blackwell) driver stack
 # Installs NVIDIA Open Kernel Modules, Fabric Manager for NVLink, and Container Toolkit.
 set -euo pipefail

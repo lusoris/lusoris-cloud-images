@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 10-network-time.sh — Resilient Global NTS time synchronization via chrony
 # Combines global Anycast NTS, Stratum-1 national laboratories, and graceful pool fallback.
 set -euo pipefail

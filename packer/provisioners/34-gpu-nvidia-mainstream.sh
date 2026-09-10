@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 34-gpu-nvidia-mainstream.sh — NVIDIA Mainstream (Ampere, Ada, Turing) driver stack
 # Pinned NVIDIA 565+ headless driver and NVIDIA Container Toolkit with modern CDI v0.6+.
 set -euo pipefail

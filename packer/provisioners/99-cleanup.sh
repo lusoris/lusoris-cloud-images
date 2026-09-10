@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 99-cleanup.sh — Template sanitization, security cleanup, and thin-provision trimming
 # Ensures clean first boot, password lock, regenerated machine-id, and minimal disk footprint.
 # Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.
