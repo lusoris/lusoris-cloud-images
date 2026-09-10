@@ -5,6 +5,7 @@
 set -euo pipefail
 
 BASE_BRANCH="${NVIDIA_DATACENTER_BRANCH:-565}"
+CLEAN_BRANCH="${BASE_BRANCH%-open}"
 
 setup_datacenter_repositories() {
   echo "==> Configuring NVIDIA Datacenter & Container Toolkit repositories..."
@@ -21,13 +22,13 @@ setup_datacenter_repositories() {
 install_datacenter_driver_and_fabric() {
   echo "==> Installing NVIDIA Open Kernel Modules and Fabric Manager..."
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-    nvidia-driver-"${BASE_BRANCH}"-open \
-    nvidia-fabricmanager-"${BASE_BRANCH}" \
+    nvidia-driver-"${CLEAN_BRANCH}"-open \
+    nvidia-fabricmanager-"${CLEAN_BRANCH}" \
     nvidia-container-toolkit \
     hwinfo || {
     echo "    Warning: specific open branch unavailable, falling back to standard headless..."
     sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
-      nvidia-headless-"${BASE_BRANCH}" nvidia-container-toolkit hwinfo || true
+      nvidia-headless-"${CLEAN_BRANCH}" nvidia-container-toolkit hwinfo || true
   }
 
   sudo systemctl enable nvidia-fabricmanager.service 2>/dev/null || true

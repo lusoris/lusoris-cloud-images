@@ -1,4 +1,5 @@
 .PHONY: help init fmt fmt-check lint test clean compress docs-serve docs-build \
+        build-cli test-go audit lint-workflows lint-manifest \
         build-base-generic build-base-intel build-base-amd \
         build-base-nvidia-legacy build-base-nvidia-mainstream build-base-nvidia-modern build-base-nvidia-bleeding build-base-nvidia-datacenter \
         build-docker-generic build-docker-intel build-docker-amd build-docker-nvidia build-docker-nvidia-modern build-docker-nvidia-bleeding \
@@ -27,18 +28,33 @@ fmt: ## Format Packer HCL configurations
 fmt-check: ## Verify Packer HCL formatting
 	@cd packer && $(PACKER) fmt -check .
 
-lint: fmt-check ## Run packer validate, shellcheck, and yamllint
+lint: fmt-check lint-workflows lint-manifest ## Run packer validate, shellcheck, actionlint, and yamllint
 	@echo "==> Validating Packer configuration..."
 	@cd packer && $(PACKER) validate .
 	@echo "==> Running ShellCheck on provisioner scripts..."
-	@shellcheck packer/provisioners/*.sh
+	@shellcheck packer/provisioners/*.sh scripts/*.sh
 	@if command -v yamllint >/dev/null 2>&1; then \
 		echo "==> Running Yamllint..."; \
 		yamllint -c .yamllint.yml .github/ packer/http/; \
 	fi
 	@echo "==> All lint checks passed successfully."
 
-test: ## Run automated configuration, SSOT, and privacy tests
+lint-workflows: ## Run actionlint on GitHub Actions workflows
+	@PATH="$$HOME/go/bin:$$PATH" actionlint .github/workflows/*.yml
+
+lint-manifest: ## Validate versions.json against schema
+	@python3 -c "import json, jsonschema; jsonschema.validate(json.load(open('versions.json')), json.load(open('versions.schema.json')))"
+
+build-cli: ## Build Go 1.27 lusoris-forge CLI and MCP server
+	@go build -o bin/lusoris-forge ./cmd/lusoris-forge
+
+test-go: ## Run Go unit test suite
+	@go test ./... -v
+
+audit: ## Run comprehensive repository health and quality audit
+	@bash scripts/audit-repository-health.sh
+
+test: test-go ## Run automated configuration, SSOT, and privacy tests
 	@pytest tests/ -v
 
 compress: ## Compress generated output images with zstd (sparse)

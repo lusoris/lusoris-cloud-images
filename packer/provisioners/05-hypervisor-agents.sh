@@ -10,7 +10,11 @@ install_hypervisor_packages() {
   sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
     qemu-guest-agent \
     open-vm-tools \
-    acpid
+    spice-vdagent \
+    acpid || true
+
+  sudo DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends \
+    hyperv-daemons 2>/dev/null || true
 }
 
 configure_unraid_virtfs() {
@@ -31,9 +35,16 @@ EOF
 
 configure_agent_services() {
   echo "==> Enabling hypervisor daemons with dormant condition guards..."
-  sudo systemctl enable qemu-guest-agent.service || true
-  sudo systemctl enable open-vm-tools.service || true
-  sudo systemctl enable acpid.service || true
+  sudo systemctl enable qemu-guest-agent.service 2>/dev/null || true
+  sudo systemctl enable open-vm-tools.service 2>/dev/null || true
+  sudo systemctl enable acpid.service 2>/dev/null || true
+  sudo systemctl enable spice-vdagent.service 2>/dev/null || true
+
+  sudo mkdir -p /etc/systemd/system/open-vm-tools.service.d
+  cat <<'EOF' | sudo tee /etc/systemd/system/open-vm-tools.service.d/10-condition-virt.conf
+[Unit]
+ConditionVirtualization=vmware
+EOF
 }
 
 main() {

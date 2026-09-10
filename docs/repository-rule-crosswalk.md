@@ -51,6 +51,10 @@ Across the reference repositories, the stable architectural pattern is:
 | **Schema-Validated SSOT** | **Adopted** | Declarative [`versions.schema.json`](../versions.schema.json) dynamically enforcing `versions.json` integrity |
 | **Local Audit Ledger** | **Adopted** | `.workingdir2/AUDIT_RESULTS_2026-09-10.md` tracking merge train and audit evidence |
 | **Interactive Question Style** | **Adopted** | Prefer structured popup questions on real forks; act on unambiguous work |
+| **Go 1.27 Engineering Contract** | **Adopted** from `golusoris/*` | Functions $\le 60$ statements, small interfaces, `stdoutRedirect` JSON-RPC framing, `slog` to stderr |
+| **Fine-Grained Path-Filtered CI** | **Adopted** | `dorny/paths-filter` splitting `packer`, `shell`, `go`, `python`, `docs`, `workflows` into conditional jobs |
+| **Declarative Epics & Milestones** | **Adopted** | `.github/epics.json`, `.github/milestones.json`, and automated PR hard gate (`pr-project-gate.yml`) |
+| **Universal Architecture & Survey** | **Adopted** | `x86_64`, `arm64` (RPi 5/Rockchip/Apple Silicon), `riscv64`, 2 Datacenter Tiers, and recurring sync cadences |
 
 ---
 

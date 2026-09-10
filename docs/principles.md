@@ -90,3 +90,27 @@ Cross-generation driver mixing or monolithic "universal" driver bloat is strictl
 
 1. **Atomic Documentation**: Every user-discoverable addition or modification (new flavor, CLI flag, build target, or provisioner parameter) must be fully documented under [the documentation portal](index.md) and [`README.md`](https://github.com/lusoris/lusoris-cloud-images/blob/main/README.md) in the **exact same pull request**.
 2. **Strict MkDocs Verification**: The documentation portal must build with `mkdocs build --strict` with zero broken links and zero warnings.
+
+---
+
+## 9. Universal Architecture, Workstation Portability & Open Standards
+
+1. **Universal Architecture Matrix**: All images structurally target `x86_64` (amd64-v3), `arm64` (Raspberry Pi 5 NVMe, Rockchip RK3588, Apple Silicon M1–M4, Ampere/Grace), and `riscv64` (OpenSBI).
+2. **Developer Workstation Portability**: First-class support for macOS (UTM, OrbStack, Lima, Rosetta 2 Linux translation, VirtIO-FS) and Windows (WSL2 rootfs import with `systemd=true`, Hyper-V Gen2 integration services).
+3. **Ultra-Deep Slimming & Sub-Second Boot**: Every image boots in < 1.5s via NoCloud fast-pathing and systemd unit masking, prunes ~450MB of unnecessary desktop/wireless firmware, and prevents memory exhaustion with in-memory ZRAM swap.
+4. **Open Sovereign Standards**: Built upon Discoverable Partitions Specification (DPS), Unified Kernel Images (UKI), Container Device Interface (CDI v0.6+), VirtIO 1.3, and EU Cyber Resilience Act (CRA) compliance.
+
+---
+
+## 10. Multi-Language Engineering Contract, Automated Epics/Milestones & Fine-Grained CI Minimization
+
+1. **Multi-Language Power of 10 Contract**:
+   - **Shell**: `set -euo pipefail`, functions $\le 60$ lines, bounded network/process execution (`timeout`, `curl --max-time`), zero ShellCheck warnings.
+   - **Python**: Strict type annotations, test functions $\le 60$ lines, table-driven pytest execution, zero linter warnings.
+   - **Go 1.27**: Unified `lusoris-forge` CLI and official Model Context Protocol (MCP) server. Functions $\le 60$ statements, small interfaces ($\le 5$ methods), `stdoutRedirect` JSON-RPC framing protection, and `slog` exclusively to stderr.
+   - **HCL & YAML**: Declarative SSOT injection from `versions.json`, strict yamllint and actionlint compliance.
+2. **Automated Epics & Milestones Lifecycle**:
+   - Machine-readable tracking catalogs in `.github/epics.json` and `.github/milestones.json`.
+   - Automated PR hard gates (`.github/workflows/pr-project-gate.yml`) verifying milestone assignment, issue/epic references, and tier labels.
+3. **Fine-Grained Path-Filtered CI Minimization**:
+   - CI pipelines strictly execute only the jobs corresponding to modified change vectors (`packer`, `shell`, `go`, `python`, `docs`, `workflows`), eliminating maintenance bottlenecks and compute waste.
