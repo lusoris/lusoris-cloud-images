@@ -1,0 +1,12 @@
+# Semgrep ignore rules for lusoris-cloud-images
+packer_cache/
+output-*/
+output-images/
+.workingdir/
+.workingdir2/
+site/
+coverage.out
+coverage
+htmlcov/
+*.qcow2
+*.iso

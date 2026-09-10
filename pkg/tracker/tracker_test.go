@@ -74,8 +74,21 @@ func TestValidatePRMetadata(t *testing.T) {
 	noIssueMeta.Body = "Just some changes with no issue link"
 	assert.ErrorContains(t, tracker.ValidatePRMetadata(noIssueMeta, validMilestones), "reference a tracked issue")
 
-	// Missing labels
-	noLabelMeta := validMeta
-	noLabelMeta.Labels = []string{"random-label"}
-	assert.ErrorContains(t, tracker.ValidatePRMetadata(noLabelMeta, validMilestones), "tier/*")
+	// Unknown milestone
+	unknownMsMeta := validMeta
+	unknownMsMeta.Milestone = "v9999.01.0"
+	assert.ErrorContains(t, tracker.ValidatePRMetadata(unknownMsMeta, validMilestones), "unknown milestone")
+
+	// Empty labels slice
+	emptyLabelsMeta := validMeta
+	emptyLabelsMeta.Labels = []string{}
+	assert.ErrorContains(t, tracker.ValidatePRMetadata(emptyLabelsMeta, validMilestones), "at least one")
+}
+
+func TestLoadInvalidTrackerFiles(t *testing.T) {
+	_, err := tracker.LoadEpics("non-existent.json")
+	assert.Error(t, err)
+
+	_, err = tracker.LoadMilestones("non-existent.json")
+	assert.Error(t, err)
 }

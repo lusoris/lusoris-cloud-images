@@ -127,3 +127,26 @@ class TestProvisionersIntegrity:
         assert "PermitRootLogin no" in content
         assert "TrustedUserCAKeys" in content
         assert "chacha20-poly1305@openssh.com" in content
+        assert "AddressFamily any" in content
+
+    def test_universal_architecture_dynamic_apt_sources(self) -> None:
+        """Verify provisioners use dynamic dpkg architecture resolution, not hardcoded arch=amd64."""
+        hardcoded_pattern = re.compile(r"\[arch=amd64\s+")
+        for script in get_provisioner_scripts():
+            content = script.read_text(encoding="utf-8")
+            assert not hardcoded_pattern.search(content), (
+                f"Hardcoded 'arch=amd64' found in {script.name}. "
+                f"Must use dynamic '$(dpkg --print-architecture)' (Principle 9: Universal Architecture)."
+            )
+
+    def test_cdi_specifications_version_floor(self) -> None:
+        """Verify Container Device Interface (CDI) specs declare cdiVersion 0.6.0+."""
+        cdi_pattern = re.compile(r'cdiVersion:\s*["\']?([0-9]+\.[0-9]+\.[0-9]+)["\']?')
+        for script in get_provisioner_scripts():
+            content = script.read_text(encoding="utf-8")
+            for match in cdi_pattern.finditer(content):
+                version = match.group(1)
+                major, minor, _ = [int(x) for x in version.split(".")]
+                assert (major, minor) >= (0, 6), (
+                    f"CDI version {version} in {script.name} is below 0.6.0 specification floor."
+                )

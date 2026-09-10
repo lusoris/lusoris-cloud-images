@@ -54,7 +54,7 @@
     "containerd": "2.3.5",
     "docker_ce": "29.8",
     "crun": "1.20",
-    "stargz_snapshotter": "0.15.1"
+    "stargz_snapshotter": "0.18.2"
   },
   "tools": {
     "cdebug": "0.5.1",

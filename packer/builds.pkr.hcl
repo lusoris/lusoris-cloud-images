@@ -34,7 +34,9 @@ locals {
   rocm_bleeding_version    = local.manifest.drivers.amd.rocm_bleeding_version
   k3s_version              = try(local.manifest.k3s.version, "v1.36.4+k3s1")
   crun_version             = try(local.manifest.runtimes.crun, "1.20")
+  stargz_version           = try(local.manifest.runtimes.stargz_snapshotter, "0.18.2")
   cdebug_version           = try(local.manifest.tools.cdebug, "0.5.1")
+  enroot_version           = try(local.manifest.tools.enroot, "3.4.1")
 
   common_env = [
     "DISTRO_RELEASE=${local.distro_release}",
@@ -42,7 +44,9 @@ locals {
     "K8S_VERSION=${local.k8s_version}",
     "K3S_VERSION=${local.k3s_version}",
     "CRUN_VERSION=${local.crun_version}",
+    "STARGZ_VERSION=${local.stargz_version}",
     "CDEBUG_VERSION=${local.cdebug_version}",
+    "ENROOT_VERSION=${local.enroot_version}",
     "IMG_PAUSE=${local.img_pause}",
     "IMG_COREDNS=${local.img_coredns}",
     "IMG_CILIUM=${local.img_cilium}",

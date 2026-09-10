@@ -14,7 +14,9 @@ setup_rocm_repository() {
   curl -fsSL https://repo.radeon.com/rocm/rocm.gpg |
     sudo gpg --dearmor --yes -o /etc/apt/keyrings/rocm.gpg
 
-  echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/rocm/apt/${ROCM_VERSION} ${DISTRO_RELEASE} main" |
+  local arch
+  arch="$(dpkg --print-architecture)"
+  echo "deb [arch=${arch} signed-by=/etc/apt/keyrings/rocm.gpg] https://repo.radeon.com/rocm/apt/${ROCM_VERSION} ${DISTRO_RELEASE} main" |
     sudo tee /etc/apt/sources.list.d/rocm.list
 
   sudo apt-get update || echo "    Warning: repository index update returned non-zero, continuing..."

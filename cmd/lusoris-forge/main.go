@@ -37,9 +37,7 @@ func initLogger() {
 	}))
 }
 
-func main() {
-	initLogger()
-
+func newRootCmd() *cobra.Command {
 	rootCmd := &cobra.Command{
 		Use:   "lusoris-forge",
 		Short: "Lusoris Forge — Unified CLI & AI MCP Server for Cloud Images",
@@ -58,6 +56,13 @@ func main() {
 	rootCmd.AddCommand(newAuditCmd())
 	rootCmd.AddCommand(newMCPCmd())
 
+	return rootCmd
+}
+
+func main() {
+	initLogger()
+
+	rootCmd := newRootCmd()
 	if err := rootCmd.Execute(); err != nil {
 		fmt.Fprintf(os.Stderr, "Error: %v\n", err)
 		os.Exit(1)
@@ -84,14 +89,14 @@ func newFlavorsCmd() *cobra.Command {
 				list = flavors.All()
 			}
 			if jsonOutput {
-				enc := json.NewEncoder(os.Stdout)
+				enc := json.NewEncoder(cmd.OutOrStdout())
 				enc.SetIndent("", "  ")
 				return enc.Encode(list)
 			}
-			fmt.Printf("%-28s %-12s %-24s %s\n", "FLAVOR ID", "TIER", "HARDWARE", "DESCRIPTION")
-			fmt.Println(string(make([]byte, 100)))
+			fmt.Fprintf(cmd.OutOrStdout(), "%-28s %-12s %-24s %s\n", "FLAVOR ID", "TIER", "HARDWARE", "DESCRIPTION")
+			fmt.Fprintln(cmd.OutOrStdout(), string(make([]byte, 100)))
 			for _, f := range list {
-				fmt.Printf("%-28s %-12s %-24s %s\n", f.ID, f.TierID, f.HardwareStack, f.Description)
+				fmt.Fprintf(cmd.OutOrStdout(), "%-28s %-12s %-24s %s\n", f.ID, f.TierID, f.HardwareStack, f.Description)
 			}
 			return nil
 		},
@@ -108,7 +113,7 @@ func newFlavorsCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			enc := json.NewEncoder(os.Stdout)
+			enc := json.NewEncoder(cmd.OutOrStdout())
 			enc.SetIndent("", "  ")
 			return enc.Encode(fl)
 		},
@@ -137,15 +142,16 @@ func newManifestCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("✓ Manifest %s is valid.\n", p)
-			fmt.Printf("  Distro: %s (%s %s)\n", m.Distro.Name, m.Distro.Release, m.Distro.Version)
-			fmt.Printf("  Kubernetes: %s (K3s: %s)\n", m.Kubernetes.Version, m.K3s.Version)
-			fmt.Printf("  Runtimes: Containerd %s, Docker CE %s\n", m.Runtimes.Containerd, m.Runtimes.DockerCE)
-			fmt.Printf("  Time: Anycast %s (Stratum-1 endpoints: %d)\n", m.Time.AnycastNTS, len(m.Time.Stratum1NTS))
+			fmt.Fprintf(cmd.OutOrStdout(), "✓ Manifest %s is valid.\n", p)
+			fmt.Fprintf(cmd.OutOrStdout(), "  Distro: %s (%s %s)\n", m.Distro.Name, m.Distro.Release, m.Distro.Version)
+			fmt.Fprintf(cmd.OutOrStdout(), "  Kubernetes: %s (K3s: %s)\n", m.Kubernetes.Version, m.K3s.Version)
+			fmt.Fprintf(cmd.OutOrStdout(), "  Runtimes: Containerd %s, Docker CE %s\n", m.Runtimes.Containerd, m.Runtimes.DockerCE)
+			fmt.Fprintf(cmd.OutOrStdout(), "  Time: Anycast %s (Stratum-1 endpoints: %d)\n", m.Time.AnycastNTS, len(m.Time.Stratum1NTS))
 			return nil
 		},
 	}
 	valCmd.Flags().StringVarP(&path, "file", "f", "versions.json", "Path to versions.json")
+	valCmd.Flags().StringVar(&path, "path", "versions.json", "Path to versions.json (alias)")
 
 	cmd.AddCommand(valCmd)
 	return cmd
@@ -177,7 +183,7 @@ func newCloudInitCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Print(ud)
+			fmt.Fprint(cmd.OutOrStdout(), ud)
 			return nil
 		},
 	}
@@ -186,7 +192,21 @@ func newCloudInitCmd() *cobra.Command {
 	genCmd.Flags().StringVar(&user, "user", "ubuntu", "Default non-root operator user")
 	genCmd.Flags().StringVarP(&platform, "platform", "p", "proxmox", "Platform target (proxmox, unraid, macos, windows)")
 
-	cmd.AddCommand(genCmd)
+	metaCmd := &cobra.Command{
+		Use:   "metadata",
+		Short: "Generate meta-data YAML",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			md, err := cloudinit.GenerateMetaData(cloudinit.Config{Hostname: hostname})
+			if err != nil {
+				return err
+			}
+			fmt.Fprint(cmd.OutOrStdout(), md)
+			return nil
+		},
+	}
+	metaCmd.Flags().StringVar(&hostname, "hostname", "lusoris-node", "Virtual machine hostname")
+
+	cmd.AddCommand(genCmd, metaCmd)
 	return cmd
 }
 
@@ -206,12 +226,12 @@ func newBuildCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Printf("==> Build Dispatch: %s\n", res.Message)
+			fmt.Fprintf(cmd.OutOrStdout(), "==> Build Dispatch: %s\n", res.Message)
 			if res.PipelineID != "" {
-				fmt.Printf("    Pipeline ID: %s\n", res.PipelineID)
+				fmt.Fprintf(cmd.OutOrStdout(), "    Pipeline ID: %s\n", res.PipelineID)
 			}
 			if res.ArtifactURL != "" {
-				fmt.Printf("    Artifact: %s\n", res.ArtifactURL)
+				fmt.Fprintf(cmd.OutOrStdout(), "    Artifact: %s\n", res.ArtifactURL)
 			}
 			return nil
 		},
@@ -238,7 +258,7 @@ func newApplyCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Print(script)
+			fmt.Fprint(cmd.OutOrStdout(), script)
 			return nil
 		},
 	}
@@ -264,7 +284,7 @@ func newBootCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Println(bootCmd)
+			fmt.Fprintln(cmd.OutOrStdout(), bootCmd)
 			return nil
 		},
 	}
@@ -286,14 +306,14 @@ func newStandardsCmd() *cobra.Command {
 		Short: "List standards across all 44 flavors",
 		RunE: func(cmd *cobra.Command, args []string) error {
 			stds := standards.All()
-			fmt.Printf("%-28s %-12s %-40s %s\n", "FLAVOR ID", "TIER", "SECURITY BASELINE", "CDI")
-			fmt.Println(string(make([]byte, 100)))
+			fmt.Fprintf(cmd.OutOrStdout(), "%-28s %-12s %-40s %s\n", "FLAVOR ID", "TIER", "SECURITY BASELINE", "CDI")
+			fmt.Fprintln(cmd.OutOrStdout(), string(make([]byte, 100)))
 			for _, s := range stds {
 				cdiStr := "no"
 				if s.CDISpecRequired {
 					cdiStr = "yes"
 				}
-				fmt.Printf("%-28s %-12s %-40s %s\n", s.FlavorID, s.Tier, s.SecurityBaseline, cdiStr)
+				fmt.Fprintf(cmd.OutOrStdout(), "%-28s %-12s %-40s %s\n", s.FlavorID, s.Tier, s.SecurityBaseline, cdiStr)
 			}
 			return nil
 		},
@@ -308,7 +328,7 @@ func newStandardsCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			enc := json.NewEncoder(os.Stdout)
+			enc := json.NewEncoder(cmd.OutOrStdout())
 			enc.SetIndent("", "  ")
 			return enc.Encode(std)
 		},
@@ -324,22 +344,30 @@ func newEpicsCmd() *cobra.Command {
 		Short: "Inspect tracked architectural and operational recurring epics",
 	}
 
+	var file string
 	listCmd := &cobra.Command{
 		Use:   "list",
 		Short: "List all active epics",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			epics, err := tracker.LoadEpics(filepath.Join(".github", "epics.json"))
+			p := file
+			if p == "" {
+				p = filepath.Join(".github", "epics.json")
+			}
+			epics, err := tracker.LoadEpics(p)
 			if err != nil {
 				return err
 			}
-			fmt.Printf("%-10s %-12s %-50s %s\n", "ID", "CADENCE", "TITLE", "STATUS")
-			fmt.Println(string(make([]byte, 85)))
+			fmt.Fprintf(cmd.OutOrStdout(), "%-10s %-12s %-50s %s\n", "ID", "CADENCE", "TITLE", "STATUS")
+			fmt.Fprintln(cmd.OutOrStdout(), string(make([]byte, 85)))
 			for _, e := range epics {
-				fmt.Printf("%-10s %-12s %-50s %s\n", e.ID, e.Cadence, e.Title, e.Status)
+				fmt.Fprintf(cmd.OutOrStdout(), "%-10s %-12s %-50s %s\n", e.ID, e.Cadence, e.Title, e.Status)
 			}
 			return nil
 		},
 	}
+	listCmd.Flags().StringVarP(&file, "file", "f", "", "Path to epics.json")
+	listCmd.Flags().StringVar(&file, "path", "", "Path to epics.json (alias)")
+
 	cmd.AddCommand(listCmd)
 	return cmd
 }
@@ -350,22 +378,30 @@ func newMilestonesCmd() *cobra.Command {
 		Short: "Inspect release milestones",
 	}
 
+	var file string
 	listCmd := &cobra.Command{
 		Use:   "list",
 		Short: "List all open milestones",
 		RunE: func(cmd *cobra.Command, args []string) error {
-			ms, err := tracker.LoadMilestones(filepath.Join(".github", "milestones.json"))
+			p := file
+			if p == "" {
+				p = filepath.Join(".github", "milestones.json")
+			}
+			ms, err := tracker.LoadMilestones(p)
 			if err != nil {
 				return err
 			}
-			fmt.Printf("%-14s %-8s %-22s %s\n", "TITLE", "STATE", "DUE ON", "DESCRIPTION")
-			fmt.Println(string(make([]byte, 85)))
+			fmt.Fprintf(cmd.OutOrStdout(), "%-14s %-8s %-22s %s\n", "TITLE", "STATE", "DUE ON", "DESCRIPTION")
+			fmt.Fprintln(cmd.OutOrStdout(), string(make([]byte, 85)))
 			for _, m := range ms {
-				fmt.Printf("%-14s %-8s %-22s %s\n", m.Title, m.State, m.DueOn, m.Description)
+				fmt.Fprintf(cmd.OutOrStdout(), "%-14s %-8s %-22s %s\n", m.Title, m.State, m.DueOn, m.Description)
 			}
 			return nil
 		},
 	}
+	listCmd.Flags().StringVarP(&file, "file", "f", "", "Path to milestones.json")
+	listCmd.Flags().StringVar(&file, "path", "", "Path to milestones.json (alias)")
+
 	cmd.AddCommand(listCmd)
 	return cmd
 }

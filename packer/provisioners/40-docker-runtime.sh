@@ -13,7 +13,9 @@ setup_docker_repository() {
   curl -fsSL https://download.docker.com/linux/ubuntu/gpg |
     sudo gpg --dearmor --yes -o /etc/apt/keyrings/docker.gpg
 
-  echo "deb [arch=amd64 signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu ${DISTRO_RELEASE} stable" |
+  local arch
+  arch="$(dpkg --print-architecture)"
+  echo "deb [arch=${arch} signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu ${DISTRO_RELEASE} stable" |
     sudo tee /etc/apt/sources.list.d/docker.list
 
   sudo apt-get update || echo "    Warning: apt update returned non-zero, continuing..."

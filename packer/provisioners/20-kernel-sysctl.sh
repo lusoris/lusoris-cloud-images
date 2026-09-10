@@ -52,6 +52,7 @@ kernel.kptr_restrict = 2
 kernel.dmesg_restrict = 1
 kernel.yama.ptrace_scope = 1
 net.core.bpf_jit_harden = 2
+net.ipv4.tcp_syncookies = 1
 net.ipv4.conf.all.rp_filter = 1
 net.ipv4.conf.default.rp_filter = 1
 net.ipv4.conf.all.accept_redirects = 0
@@ -68,7 +69,7 @@ EOF
 }
 
 configure_kernel_cmdline() {
-  local cmdline_base="console=tty1 console=ttyS0,115200n8 quiet audit=0 fsck.repair=yes net.ifnames=0 biosdevname=0 cgroup_no_v1=all systemd.unified_cgroup_hierarchy=1 psi=1"
+  local cmdline_base="console=tty1 console=ttyS0,115200n8 quiet audit=1 audit_backlog_limit=8192 fsck.repair=yes net.ifnames=0 biosdevname=0 cgroup_no_v1=all systemd.unified_cgroup_hierarchy=1 psi=1"
   local extra_params=""
 
   case "${KERNEL_PROFILE}" in

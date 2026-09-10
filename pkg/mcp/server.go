@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"os"
 	"path/filepath"
 
 	sdkmcp "github.com/modelcontextprotocol/go-sdk/mcp"
@@ -36,6 +37,7 @@ func NewServer(logger *slog.Logger) *sdkmcp.Server {
 	registerCloudInitTools(s)
 	registerStandardsTools(s)
 	registerTrackerTools(s)
+	registerComplianceTools(s)
 	registerExecutionTools(s)
 
 	return s
@@ -132,6 +134,9 @@ func registerCloudInitTools(s *sdkmcp.Server) {
 			if err := json.Unmarshal(req.Params.Arguments, &args); err != nil {
 				return nil, err
 			}
+			if _, err := flavors.Get(args.Flavor); err != nil {
+				return &sdkmcp.CallToolResult{IsError: true, Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: err.Error()}}}, nil
+			}
 			cfg := cloudinit.DefaultConfig(args.Flavor)
 			if args.Hostname != "" {
 				cfg.Hostname = args.Hostname
@@ -205,6 +210,31 @@ func registerTrackerTools(s *sdkmcp.Server) {
 			}
 			out, _ := json.MarshalIndent(ms, "", "  ")
 			return &sdkmcp.CallToolResult{Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: string(out)}}}, nil
+		},
+	)
+}
+
+func registerComplianceTools(s *sdkmcp.Server) {
+	s.AddTool(
+		&sdkmcp.Tool{
+			Name:        "inspect_compliance",
+			Description: "Inspect the declarative Goss compliance-as-code specification (CIS Level 2, DISA STIG, NIST SP 800-53)",
+			InputSchema: json.RawMessage(`{"type":"object","properties":{"path":{"type":"string","description":"Optional path to goss.yaml"}}}`),
+		},
+		func(ctx context.Context, req *sdkmcp.CallToolRequest) (*sdkmcp.CallToolResult, error) {
+			var args struct {
+				Path string `json:"path"`
+			}
+			_ = json.Unmarshal(req.Params.Arguments, &args)
+			p := args.Path
+			if p == "" {
+				p = filepath.Join("tests", "compliance", "goss.yaml")
+			}
+			data, err := os.ReadFile(p)
+			if err != nil {
+				return &sdkmcp.CallToolResult{IsError: true, Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: err.Error()}}}, nil
+			}
+			return &sdkmcp.CallToolResult{Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: string(data)}}}, nil
 		},
 	)
 }

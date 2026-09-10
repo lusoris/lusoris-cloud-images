@@ -38,7 +38,7 @@ generate_cdi_specifications() {
   echo "==> Generating Container Device Interface (CDI) spec for Coral TPU..."
   sudo mkdir -p /etc/cdi
   cat <<'CDI' | sudo tee /etc/cdi/coral.yaml >/dev/null
-cdiVersion: 0.5.0
+cdiVersion: "0.6.0"
 kind: coral.google.com/edgetpu
 devices:
   - name: apex0
