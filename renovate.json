@@ -53,6 +53,24 @@
       ],
       "depNameTemplate": "NVIDIA/nvidia-container-toolkit",
       "datasourceTemplate": "github-releases"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^versions\\.json$"],
+      "matchStrings": [
+        "\"version\": \"(?<currentValue>v\\d+\\.\\d+\\.\\d+\\+k3s\\d+)\""
+      ],
+      "depNameTemplate": "k3s-io/k3s",
+      "datasourceTemplate": "github-releases"
+    },
+    {
+      "customType": "regex",
+      "fileMatch": ["^versions\\.json$"],
+      "matchStrings": [
+        "\"docker_ce\": \"(?<currentValue>\\d+\\.\\d+)\""
+      ],
+      "depNameTemplate": "docker/cli",
+      "datasourceTemplate": "github-tags"
     }
   ]
 }

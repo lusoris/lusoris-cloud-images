@@ -16,7 +16,7 @@ We introduce 4 specialized Cloud-Native and Storage appliance flavors:
 3. **`cloudnative-storage`**: CNCF storage appliance with pre-configured NVMe-oF TCP module autoloading (`nvme-core`, `nvme-fabrics`, `nvme-tcp`), OpenZFS 2.3 (`zfsutils-linux`), `multipath-tools`, and `open-iscsi`.
 4. **`cloudnative-pg`**: Production PostgreSQL and CloudNativePG host pre-tuned with strict memory overcommit ratios, bounded dirty page writeback, transparent hugepage madvise support, and elevated file descriptor limits.
 
-All provisioners (`60-cloudnative-immutable.sh`, `65-storage-cncf.sh`, `70-cloudnative-pg.sh`) adhere strictly to NASA/JPL Power of 10 bash rules ($\le 60$ lines per function, `set -euo pipefail`).
+All provisioners (`61-cloudnative-immutable.sh`, `65-storage-cncf.sh`, `70-cloudnative-pg.sh`) adhere strictly to NASA/JPL Power of 10 bash rules ($\le 60$ lines per function, `set -euo pipefail`).
 
 ## Consequences
 - Expands the flavor matrix to 39 fully automated flavors.

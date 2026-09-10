@@ -43,3 +43,7 @@ htmlcov/
 .agyfleet/
 .claude/
 
+# Go build binaries
+bin/
+/lusoris-forge
+

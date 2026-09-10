@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "epics": [
+    {
+      "id": "EPIC-01",
+      "title": "Hardware Market Surveys & Driver Realignment",
+      "cadence": "Quarterly",
+      "status": "active",
+      "required_labels": ["area/hardware", "area/drivers"],
+      "description": "Continuous survey synchronization with Steam GPU trends, r/homelab & STH decommissioned server cycles, and Top500 AI accelerators."
+    },
+    {
+      "id": "EPIC-02",
+      "title": "Kubernetes & CNI Preheating Matrix Support",
+      "cadence": "Quarterly",
+      "status": "active",
+      "required_labels": ["area/k8s", "area/cni"],
+      "description": "Lifecycle tracking for containerd, kubelet/kubeadm, and CNI preheat images across Cilium, Calico, Flannel, and kube-vip."
+    },
+    {
+      "id": "EPIC-03",
+      "title": "CIS L2 & BSI IT-Grundschutz Hardening Audits",
+      "cadence": "Monthly",
+      "status": "active",
+      "required_labels": ["area/security", "area/hardening"],
+      "description": "Automated security compliance verification against CIS Ubuntu Server Benchmark L2 and German BSI SYS.1.3 standards."
+    },
+    {
+      "id": "EPIC-04",
+      "title": "Multi-Architecture & Single-Board Computer Portability",
+      "cadence": "Quarterly",
+      "status": "active",
+      "required_labels": ["area/arch", "area/sbc"],
+      "description": "Expand and maintain support for x86_64, ARM64 (RPi 5 NVMe HAT, Rockchip RK3588, Apple Silicon), and RISC-V OpenSBI."
+    },
+    {
+      "id": "EPIC-05",
+      "title": "Imageless Host Provisioning & MicroVM Engine",
+      "cadence": "Continuous",
+      "status": "active",
+      "required_labels": ["area/imageless", "area/cli"],
+      "description": "Develop and harden direct SSH/host flavor provisioning and microVM direct kernel/initramfs boot configuration tooling."
+    }
+  ]
+}

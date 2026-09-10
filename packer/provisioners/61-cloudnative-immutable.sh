@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Copyright 2026 Lusoris
-# 60-cloudnative-immutable.sh — Immutable container host tuning & drift prevention
+# 61-cloudnative-immutable.sh — Immutable container host tuning & drift prevention
 # Implements read-only root protection, ephemeral tmpfs, and containerd CDI standards.
 # Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.
 set -euo pipefail

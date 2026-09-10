@@ -23,3 +23,8 @@ Active contributors who consistently demonstrate:
 3. Sustained contributions over several release cycles.
 
 may be nominated by an existing Maintainer.
+
+## Epics, Milestones & PR Hard Gates
+
+- Recurring and cross-cutting architectural work is tracked through declarative epics in [`.github/epics.json`](.github/epics.json) and monthly release milestones in [`.github/milestones.json`](.github/milestones.json).
+- Every Pull Request must satisfy automated governance hard gates (`.github/workflows/pr-project-gate.yml`) requiring assignment to an active open milestone, explicit reference to a tracked issue/epic, and appropriate workload/area labels.

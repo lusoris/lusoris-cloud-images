@@ -778,7 +778,7 @@ build {
       "${path.root}/provisioners/20-kernel-sysctl.sh",
       "${path.root}/provisioners/25-baremetal-tuning.sh",
       "${path.root}/provisioners/40-docker-runtime.sh",
-      "${path.root}/provisioners/60-cloudnative-immutable.sh",
+      "${path.root}/provisioners/61-cloudnative-immutable.sh",
       "${path.root}/provisioners/99-cleanup.sh"
     ]
   }
@@ -799,7 +799,7 @@ build {
       "${path.root}/provisioners/25-baremetal-tuning.sh",
       "${path.root}/provisioners/50-k8s-runtime.sh",
       "${path.root}/provisioners/55-k8s-precache.sh",
-      "${path.root}/provisioners/60-cloudnative-immutable.sh",
+      "${path.root}/provisioners/61-cloudnative-immutable.sh",
       "${path.root}/provisioners/99-cleanup.sh"
     ]
   }

@@ -68,12 +68,23 @@ nav:
       - Proxmox VE: platforms/proxmox.md
       - Unraid: platforms/unraid.md
       - VMware ESXi: platforms/vmware.md
+      - macOS (Apple Silicon): platforms/macos.md
+      - Windows (WSL2 & Hyper-V): platforms/windows.md
       - Bare-Metal & iPXE: platforms/baremetal.md
       - Cloud Generic: platforms/cloud.md
   - Hardware Acceleration:
+      - Architectures & Form Factors: hardware/architectures-and-form-factors.md
       - Intel Arc / Xe / Flex: hardware/intel.md
       - AMD Radeon & ROCm: hardware/amd.md
       - NVIDIA Generational CUDA: hardware/nvidia.md
+  - Standards & Architecture:
+      - Flavor Hardening Standards: standards/flavor-hardening-standards.md
+      - Image Optimization & Slimming: standards/image-optimization-and-hardening.md
+      - Open Standards Architecture: standards/open-standards-architecture.md
+      - Hardware & Datacenter Survey: standards/hardware-market-and-datacenter-survey.md
+  - Tools & Operations:
+      - Lusoris Forge CLI & MCP: tools/cli-mcp.md
+      - Maintenance Cadences & SOPs: operations/maintenance-cadence.md
   - Security & Time:
       - CIS Benchmark Baseline: security/cis-baseline.md
       - Global Anycast NTS Time: security/time-nts.md

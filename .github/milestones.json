@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "version": "1.0.0",
+  "milestones": [
+    {
+      "title": "v2026.04.0",
+      "state": "open",
+      "due_on": "2026-04-07T00:00:00Z",
+      "description": "April 2026 Monthly Stable Release Milestone - Universal Architecture & Imageless Engine"
+    },
+    {
+      "title": "v2026.05.0",
+      "state": "open",
+      "due_on": "2026-05-05T00:00:00Z",
+      "description": "May 2026 Monthly Stable Release Milestone - Hardware Survey Synchronization"
+    },
+    {
+      "title": "v2026.06.0",
+      "state": "open",
+      "due_on": "2026-06-02T00:00:00Z",
+      "description": "June 2026 Monthly Stable Release Milestone - Kubernetes 1.38 & Top500 Alignment"
+    }
+  ]
+}
