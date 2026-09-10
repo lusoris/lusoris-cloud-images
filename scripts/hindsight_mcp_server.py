@@ -101,12 +101,8 @@ def http_api(
     conn: http.client.HTTPConnection | None = None
     try:
         host = parsed.hostname or "127.0.0.1"
-        if parsed.scheme == "https":
-            port = parsed.port or 443
-            conn = http.client.HTTPSConnection(host, port, timeout=REQUEST_TIMEOUT)
-        else:
-            port = parsed.port or 80
-            conn = http.client.HTTPConnection(host, port, timeout=REQUEST_TIMEOUT)
+        port = parsed.port or 8888
+        conn = http.client.HTTPConnection(host, port, timeout=REQUEST_TIMEOUT)
 
         conn.request(method, full_path, body=data, headers=headers)
         resp = conn.getresponse()
