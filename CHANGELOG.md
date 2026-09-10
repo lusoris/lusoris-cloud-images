@@ -22,6 +22,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive documentation bug hunt: corrected Tier 3 Kubernetes flavor count from 10 to 9, fixed 44-flavor count synchrony across matrix.md, and updated provisioner log messages in `61-cloudnative-immutable.sh`.
 - Visual architecture overhaul: integrated 10 low-cognitive-load, theme-resilient Mermaid diagrams across landing pages, flavor matrix, Kubernetes node stack, AI inference pipeline, NTS multi-peer time architecture, direct disk streaming, CLI/MCP framing sequence, and multi-architecture boot hierarchy.
 - Automated Mermaid syntax and diagram type verification suite in `tests/test_docs.py`.
+- ADR-0009: Multi-Distribution Base OS Architecture and Roadmap (`docs/adr/0009-multi-distribution-base-roadmap.md`), establishing a 4-tier upstream strategy (Ubuntu LTS, Debian, Alpine, and bootc).
+- High-contrast semantic color styling and theming across all architecture Mermaid flowcharts (landing pages, matrix, Kubernetes, AI inference, homelab appliances, and time security).
+- ADR-0010: Modern Container Runtimes, Lazy-Pulling Snapshotters, and Zero-Footprint Diagnostic Tooling (`docs/adr/0010-container-ecosystem-runtimes-and-tooling.md`), incorporating insights from `pditommaso/awesome-containers` and companion cloud-native lists.
+- High-performance dual OCI runtime support: configured `crun` alternative `RuntimeClass` in containerd alongside standard `runc` in `k8s-node-*` appliances, reducing container resident memory from ~25MB to ~4MB and cutting startup latency by 2–3x.
+- Zero-footprint container diagnostics: integrated `cdebug` static binary across container appliances (`docker-*`, `podman-*`, `k8s-node-*`) for ephemeral container and pod troubleshooting without image bloat.
+- Declarative SSOT schema expansion in `versions.json` and `versions.schema.json` tracking `runtimes.crun`, `runtimes.stargz_snapshotter`, `tools.cdebug`, and `tools.enroot`.
+- ADR-0011: Enterprise Golden Image Hardening, Compliance Crosswalk, and Lifecycle Governance (`docs/adr/0011-enterprise-golden-image-compliance-and-lifecycle.md`).
+- OpenSSH hardening drop-in (`/etc/ssh/sshd_config.d/00-hardened-sshd.conf`) enforcing CIS Level 2 / DISA STIG cryptographic suites (`chacha20-poly1305`, `aes256-gcm`), root login restriction, and OpenSSH Certificate Authority (`TrustedUserCAKeys`) support.
+- NIST SP 800-53 (Rev. 5) & NIST SP 800-190 compliance crosswalk documented in `docs/standards/flavor-hardening-standards.md`.
+- Multi-cloud KMS CMK cross-account grant patterns for `AWSServiceRoleForAutoScaling` and image gallery governance documented in `docs/platforms/cloud.md`.
+- 30-day immutable image deprecation lifecycle policy and zero-patching fleet contract documented in `docs/operations/maintenance-cadence.md`.
+- Declarative Goss dynamic compliance-as-code verification profile in `tests/compliance/goss.yaml`.
+- Google AI Studio Managed Agents Fleet: defined 6 specialized autonomous agent manifests (`infra-forge`, `security-compliance`, `container-k8s`, `qa-gatekeeper`, `deep-researcher`, `docs-architect`) under `.agents/agents/` powered by `antigravity-preview-05-2026` and `deep-research-pro-preview-12-2025`.
+- Dynamic Google AI Studio & Gemini Interactions API Agent Management CLI (`scripts/manage_aistudio_agents.py`) supporting agent validation, dry-run registration, and fleet synchronization.
+- Worktree-isolated parallel agent execution engine (`scripts/orchestrate_fanout.py`) spawning isolated git worktrees (`.workingdir2/worktrees/agent-<role>`) complying with Hard Rule 11.
+- Pre-execution privacy and zero-leak lifecycle guard (`.agents/hooks.json` and `.agents/hooks-scripts/guard_privacy.py`) intercepting tool calls to guarantee zero private RFC 1918 IPs or workstation home paths before any file modification.
+- Comprehensive Managed Agents operations guide with saturated jewel-tone architecture flowcharts in `docs/operations/managed-agents.md`.
+- Automated agent fleet integrity test suite in `tests/test_agents_fleet.py` validating schema adherence, hooks wiring, and privacy guard interception.
+
+### Fixed
+- Corrected base OS badge and metadata to Ubuntu 26.04 LTS Resolute in `README.md`.
+- Synchronized 44-flavor catalog count across repository map in `README.md` and test suite docstrings.
 
 ## [0.1.0] - 2026-09-09
 

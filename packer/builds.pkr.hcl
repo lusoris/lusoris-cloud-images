@@ -33,12 +33,16 @@ locals {
   rocm_legacy_version      = local.manifest.drivers.amd.rocm_legacy_version
   rocm_bleeding_version    = local.manifest.drivers.amd.rocm_bleeding_version
   k3s_version              = try(local.manifest.k3s.version, "v1.36.4+k3s1")
+  crun_version             = try(local.manifest.runtimes.crun, "1.20")
+  cdebug_version           = try(local.manifest.tools.cdebug, "0.5.1")
 
   common_env = [
     "DISTRO_RELEASE=${local.distro_release}",
     "K8S_MAJOR_MINOR=${local.k8s_major_minor}",
     "K8S_VERSION=${local.k8s_version}",
     "K3S_VERSION=${local.k3s_version}",
+    "CRUN_VERSION=${local.crun_version}",
+    "CDEBUG_VERSION=${local.cdebug_version}",
     "IMG_PAUSE=${local.img_pause}",
     "IMG_COREDNS=${local.img_coredns}",
     "IMG_CILIUM=${local.img_cilium}",

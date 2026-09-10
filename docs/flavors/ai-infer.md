@@ -19,40 +19,53 @@ All appliances come pre-configured with **Docker CE 29.8**, vendor Container Dev
 
 ```mermaid
 flowchart TD
+    %% Semantic class definitions with vibrant, high-contrast jewel palettes
+    classDef hw fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff
+    classDef kernel fill:#334155,stroke:#1e293b,stroke-width:2px,color:#ffffff
+    classDef cdi fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#ffffff
+    classDef engine fill:#e11d48,stroke:#be123c,stroke-width:2px,color:#ffffff
+    classDef api fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff
+
     subgraph Hardware["1. Multi-Vendor Compute Hardware"]
-        CPU["High-Throughput CPU<br/><small>EPYC / Xeon (AMX, AVX-512)</small>"]
-        Intel["Intel Arc & Xe2<br/><small>Battlemage / Flex / Max</small>"]
-        AMD["AMD RDNA & Instinct<br/><small>RX 7900 / MI300</small>"]
-        Nvidia["NVIDIA Generational<br/><small>535 / 565 / 610 / 615 Blackwell</small>"]
+        CPU["High-Throughput CPU<br/><small>EPYC / Xeon (AMX, AVX-512)</small>"]:::hw
+        Intel["Intel Arc & Xe2<br/><small>Battlemage / Flex / Max</small>"]:::hw
+        AMD["AMD RDNA & Instinct<br/><small>RX 7900 / MI300</small>"]:::hw
+        Nvidia["NVIDIA Generational<br/><small>535 / 565 / 610 / 615 Blackwell</small>"]:::hw
     end
 
     subgraph KernelTuning["2. Appliance Kernel & Memory Optimizations"]
-        THP["transparent_hugepage=always<br/><small>Zero-Overhead Tensor Allocs</small>"]
-        NUMA["numactl & OMP_PROC_BIND=spread<br/><small>Multi-Socket Memory Affinity</small>"]
-        Limits["vm.max_map_count = 1048576<br/><small>High KV-Cache Capacity</small>"]
+        THP["transparent_hugepage=always<br/><small>Zero-Overhead Tensor Allocs</small>"]:::kernel
+        NUMA["numactl & OMP_PROC_BIND=spread<br/><small>Multi-Socket Memory Affinity</small>"]:::kernel
+        Limits["vm.max_map_count = 1048576<br/><small>High KV-Cache Capacity</small>"]:::kernel
     end
 
     subgraph RuntimeCDI["3. Container Runtime & CDI Routing"]
-        Docker["Docker CE 29.8 (CDI Enabled)"]
-        CDI_Intel["/etc/cdi/intel.yaml"]
-        CDI_AMD["/etc/cdi/amd.yaml"]
-        CDI_Nvidia["/etc/cdi/nvidia.yaml"]
+        Docker["Docker CE 29.8 (CDI Enabled)"]:::cdi
+        CDI_Intel["/etc/cdi/intel.yaml"]:::cdi
+        CDI_AMD["/etc/cdi/amd.yaml"]:::cdi
+        CDI_Nvidia["/etc/cdi/nvidia.yaml"]:::cdi
     end
 
     subgraph Engines["4. Turnkey Inference Engines"]
-        VLLM["vLLM OpenAI Server<br/><small>Continuous Batching & PagedAttention</small>"]
-        Ollama["Ollama Runtime<br/><small>GGUF / Multi-Model Serving</small>"]
-        OpenVINO["OpenVINO Model Server<br/><small>Intel Xe / Battlemage Optimized</small>"]
+        VLLM["vLLM OpenAI Server<br/><small>Continuous Batching & PagedAttention</small>"]:::engine
+        Ollama["Ollama Runtime<br/><small>GGUF / Multi-Model Serving</small>"]:::engine
+        OpenVINO["OpenVINO Model Server<br/><small>Intel Xe / Battlemage Optimized</small>"]:::engine
     end
 
     subgraph Clients["5. Standardized Application APIs"]
-        API["OpenAI-Compatible HTTP API<br/><small>Port 8000 / 11434 (:v1/chat/completions)</small>"]
+        API["OpenAI-Compatible HTTP API<br/><small>Port 8000 / 11434 (:v1/chat/completions)</small>"]:::api
     end
 
     Hardware --> KernelTuning
     KernelTuning --> RuntimeCDI
     RuntimeCDI --> Engines
     Engines --> Clients
+
+    style Hardware fill:none,stroke:#d97706,stroke-width:2px,stroke-dasharray: 4 4
+    style KernelTuning fill:none,stroke:#334155,stroke-width:2px,stroke-dasharray: 4 4
+    style RuntimeCDI fill:none,stroke:#7c3aed,stroke-width:2px,stroke-dasharray: 4 4
+    style Engines fill:none,stroke:#e11d48,stroke-width:2px,stroke-dasharray: 4 4
+    style Clients fill:none,stroke:#0284c7,stroke-width:2px,stroke-dasharray: 4 4
 ```
 
 ---

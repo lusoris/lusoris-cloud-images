@@ -13,20 +13,24 @@ The **Lusoris Tier 7 Appliances** solve this by delivering hardened, pre-baked a
 
 ```mermaid
 flowchart TD
+    %% Semantic class definitions with vibrant, high-contrast jewel palettes
+    classDef app fill:#e11d48,stroke:#be123c,stroke-width:2px,color:#ffffff
+    classDef hw fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff
+
     subgraph Tier7["Tier 7: Specialized Homelab Appliances (5 Turn-Key Flavors)"]
         direction TB
-        A1["appliance-vision-nvr<br/><small>Google Coral Edge TPU · Intel QuickSync iHD · CDI</small>"]
-        A2["appliance-gateway-dns<br/><small>Port 53 Stub Disabled · WireGuard · Forwarding (&lt;150MB)</small>"]
-        A3["appliance-media-server<br/><small>Dual VA-API (Intel+AMD) · NFS/SMB · 4096KB Readahead</small>"]
-        A4["appliance-ci-runner<br/><small>QEMU binfmt (ARM64/v7) · Docker Buildx · 4GB tmpfs</small>"]
-        A5["appliance-game-server<br/><small>i386 32-bit Glibc · SteamCMD · 16MB UDP Buffers</small>"]
+        A1["appliance-vision-nvr<br/><small>Google Coral Edge TPU · Intel QuickSync iHD · CDI</small>"]:::app
+        A2["appliance-gateway-dns<br/><small>Port 53 Stub Disabled · WireGuard · Forwarding (&lt;150MB)</small>"]:::app
+        A3["appliance-media-server<br/><small>Dual VA-API (Intel+AMD) · NFS/SMB · 4096KB Readahead</small>"]:::app
+        A4["appliance-ci-runner<br/><small>QEMU binfmt (ARM64/v7) · Docker Buildx · 4GB tmpfs</small>"]:::app
+        A5["appliance-game-server<br/><small>i386 32-bit Glibc · SteamCMD · 16MB UDP Buffers</small>"]:::app
     end
 
     subgraph HardwareTargets["Hardware Deployment Targets"]
-        N100["Intel N100 / Alder Lake-N Mini-PCs"]
-        CoralM2["M.2 / PCIe Coral Acceleration"]
-        NAS["ZFS / TrueNAS / Synology Storage"]
-        AMDAPU["AMD RDNA 3/3.5 APUs"]
+        N100["Intel N100 / Alder Lake-N Mini-PCs"]:::hw
+        CoralM2["M.2 / PCIe Coral Acceleration"]:::hw
+        NAS["ZFS / TrueNAS / Synology Storage"]:::hw
+        AMDAPU["AMD RDNA 3/3.5 APUs"]:::hw
     end
 
     A1 --> CoralM2 & N100
@@ -34,6 +38,9 @@ flowchart TD
     A3 --> N100 & AMDAPU & NAS
     A4 --> N100
     A5 --> N100 & AMDAPU
+
+    style Tier7 fill:none,stroke:#e11d48,stroke-width:2px,stroke-dasharray: 4 4
+    style HardwareTargets fill:none,stroke:#d97706,stroke-width:2px,stroke-dasharray: 4 4
 ```
 
 ---

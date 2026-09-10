@@ -1,0 +1,18 @@
+{
+  "events": [
+    {
+      "event": "pre_tool",
+      "tools": [
+        "filesystem_tools.write_file",
+        "filesystem_tools.replace_file_content"
+      ],
+      "hooks": [
+        {
+          "type": "command",
+          "command": "python3 /.agents/hooks-scripts/guard_privacy.py",
+          "timeout": 10
+        }
+      ]
+    }
+  ]
+}

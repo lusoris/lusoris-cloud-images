@@ -23,3 +23,35 @@ openstack image create "lusoris-base-generic" \
   --public
 ```
 
+---
+
+## Multi-Cloud Golden Image Governance
+
+Following [ADR-0011](../adr/0011-enterprise-golden-image-compliance-and-lifecycle.md), deploying encrypted golden images across multi-account cloud environments requires explicit key management and metadata service configurations:
+
+### 1. Amazon Web Services (AWS) KMS & Auto Scaling Grants
+When sharing encrypted AMIs across AWS accounts, EBS snapshots must be encrypted with a Customer Managed Key (CMK). AWS-managed keys (`aws/ebs`) cannot be shared across account boundaries.
+
+To enable target accounts to launch instances via Auto Scaling Groups without launch failures (`Client.InternalError`):
+1. **Target Account KMS Grant**: Create a persistent KMS grant for the target account's Auto Scaling Service-Linked Role:
+   ```bash
+   aws kms create-grant \
+     --region us-east-1 \
+     --key-id "arn:aws:kms:us-east-1:192002000001:key/source-cmk-id" \
+     --grantee-principal "arn:aws:iam::192002000002:role/aws-service-role/autoscaling.amazonaws.com/AWSServiceRoleForAutoScaling" \
+     --operations Decrypt GenerateDataKeyWithoutPlainText CreateGrant DescribeKey ReEncryptFrom ReEncryptTo
+   ```
+2. **Mandatory IMDSv2**: Enforce token-backed metadata access with hop-count limits:
+   - `http_tokens = "required"`
+   - `http_put_response_hop_limit = 1`
+
+### 2. Microsoft Azure Compute Gallery (ACG)
+- Publish golden image definitions into a centralized Azure Compute Gallery (formerly Shared Image Gallery).
+- Grant consumer subscriptions the `Compute Reader` and `Virtual Machine Contributor` roles.
+- Automate geo-replication across operational regions while preserving regional data locality.
+
+### 3. Google Cloud Platform (GCP) Cross-Project Images
+- Maintain validated golden images in a dedicated central project (e.g., `corp-compute-images`).
+- Grant consumer service accounts the `roles/compute.imageUser` IAM role on the central project.
+- Deploy instances directly referencing the centralized image family to receive automated updates.
+

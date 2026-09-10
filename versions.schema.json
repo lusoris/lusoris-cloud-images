@@ -102,10 +102,19 @@
     },
     "runtimes": {
       "type": "object",
-      "required": ["containerd", "docker_ce"],
+      "required": ["containerd", "docker_ce", "crun"],
       "properties": {
         "containerd": { "type": "string" },
-        "docker_ce": { "type": "string" }
+        "docker_ce": { "type": "string" },
+        "crun": { "type": "string" },
+        "stargz_snapshotter": { "type": "string" }
+      }
+    },
+    "tools": {
+      "type": "object",
+      "properties": {
+        "cdebug": { "type": "string" },
+        "enroot": { "type": "string" }
       }
     },
     "time": {

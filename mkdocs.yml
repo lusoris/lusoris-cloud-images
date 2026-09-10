@@ -85,6 +85,7 @@ nav:
   - Tools & Operations:
       - Lusoris Forge CLI & MCP: tools/cli-mcp.md
       - Maintenance Cadences & SOPs: operations/maintenance-cadence.md
+      - AI Studio & Managed Agents Fleet: operations/managed-agents.md
   - Security & Time:
       - CIS Benchmark Baseline: security/cis-baseline.md
       - Global Anycast NTS Time: security/time-nts.md
@@ -99,6 +100,9 @@ nav:
       - "0006: K3s Edge Fleet Flavors": adr/0006-k3s-edge-fleet-flavors.md
       - "0007: CloudNative & CNCF Storage Appliances": adr/0007-cloudnative-and-cncf-storage-appliances.md
       - "0008: Specialized Homelab Appliances": adr/0008-specialized-homelab-appliances.md
+      - "0009: Multi-Distribution Base OS Roadmap": adr/0009-multi-distribution-base-roadmap.md
+      - "0010: Container Ecosystem Runtimes & Tooling": adr/0010-container-ecosystem-runtimes-and-tooling.md
+      - "0011: Enterprise Golden Image Compliance & Lifecycle": adr/0011-enterprise-golden-image-compliance-and-lifecycle.md
   - Engineering & Governance:
       - Engineering Principles: principles.md
       - Repository Crosswalk: repository-rule-crosswalk.md

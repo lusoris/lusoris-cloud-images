@@ -10,6 +10,13 @@ clean_cloud_init_and_auth() {
   sudo cloud-init clean --logs --seed || true
   sudo passwd -l ubuntu || true
   sudo rm -f /etc/sudoers.d/90-cloud-init-users || true
+
+  echo "==> Enforcing PasswordAuthentication no on final snapshot sealing..."
+  echo "PasswordAuthentication no" | sudo tee -a /etc/ssh/sshd_config.d/00-hardened-sshd.conf
+  sudo chmod 0600 /etc/ssh/sshd_config.d/00-hardened-sshd.conf
+
+  echo "==> Restricting low-level binary permissions..."
+  sudo chmod 0700 /usr/bin/as /usr/bin/byacc 2>/dev/null || true
 }
 
 clean_apt_cache() {

@@ -9,6 +9,7 @@ Enforces license headers, shebangs, strict mode, and ShellCheck cleanliness.
 """
 
 from pathlib import Path
+import os
 import re
 import subprocess
 
@@ -29,8 +30,19 @@ class TestProvisionersIntegrity:
     def test_scripts_executable(self) -> None:
         """Verify all shell provisioners have executable permission (+x)."""
         for script in get_provisioner_scripts():
-            mode = script.stat().st_mode
-            assert mode & 0o111, f"Script {script.name} is not executable (chmod +x required)"
+            if os.name == "nt":
+                rel = script.relative_to(REPO_ROOT).as_posix()
+                res = subprocess.run(
+                    ["git", "ls-files", "-s", rel],
+                    capture_output=True,
+                    text=True,
+                    cwd=str(REPO_ROOT),
+                    check=False,
+                )
+                assert res.stdout.startswith("100755"), f"Script {script.name} is not executable in git"
+            else:
+                mode = script.stat().st_mode
+                assert mode & 0o111, f"Script {script.name} is not executable (chmod +x required)"
 
     def test_shebang_and_strict_mode(self) -> None:
         """Verify shebang and strict mode 'set -euo pipefail' on all scripts."""
@@ -105,3 +117,13 @@ class TestProvisionersIntegrity:
             check=False,
         )
         assert result.returncode == 0, f"ShellCheck failed on provisioners:\n{result.stdout}"
+
+    def test_openssh_hardening_configuration(self) -> None:
+        """Verify OpenSSH CIS Level 2 / DISA STIG hardening declarations in 00-base-strip.sh."""
+        base_script = PROVISIONERS_DIR / "00-base-strip.sh"
+        assert base_script.exists(), "00-base-strip.sh is missing"
+        content = base_script.read_text(encoding="utf-8")
+        assert "00-hardened-sshd.conf" in content
+        assert "PermitRootLogin no" in content
+        assert "TrustedUserCAKeys" in content
+        assert "chacha20-poly1305@openssh.com" in content

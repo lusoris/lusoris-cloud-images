@@ -53,10 +53,26 @@ EOF
   sudo systemctl enable docker.service 2>/dev/null || true
 }
 
+install_cdebug() {
+  local version="${CDEBUG_VERSION:-0.5.1}"
+  local arch
+  arch=$(uname -m)
+  case "${arch}" in
+    x86_64) arch="amd64" ;;
+    aarch64 | arm64) arch="arm64" ;;
+    *) return 0 ;;
+  esac
+  echo "==> Installing cdebug v${version} for zero-footprint diagnostics..."
+  local url="https://github.com/iximiuz/cdebug/releases/download/v${version}/cdebug_${version}_linux_${arch}.tar.gz"
+  curl -fsSL --max-time 30 "${url}" | sudo tar -xz -C /usr/local/bin cdebug 2>/dev/null || true
+  sudo chmod 755 /usr/local/bin/cdebug 2>/dev/null || true
+}
+
 main() {
   setup_docker_repository
   install_docker_packages
   configure_docker_daemon
+  install_cdebug
   echo "==> 40-docker-runtime: Complete."
 }
 

@@ -19,30 +19,41 @@ lusoris-install-to-disk https://releases.lusoris.org/lusoris-base-generic.raw.zs
 
 ```mermaid
 flowchart LR
+    %% Semantic class definitions with vibrant, high-contrast jewel palettes
+    classDef rescue fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff
+    classDef remote fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff
+    classDef disk fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#ffffff
+    classDef boot fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff
+
     subgraph RescueEnv["Live Rescue Environment (RAM / Netboot)"]
-        Curl["curl -fsSL (HTTP Stream)"]
-        Zstd["zstdcat (Decompress Stream)"]
-        DD["dd of=/dev/nvme0n1 bs=4M conv=fsync"]
+        Curl["curl -fsSL (HTTP Stream)"]:::rescue
+        Zstd["zstdcat (Decompress Stream)"]:::rescue
+        DD["dd of=/dev/nvme0n1 bs=4M conv=fsync"]:::rescue
         Curl -->|Unix Pipe| Zstd -->|Raw Blocks| DD
     end
 
     subgraph RemoteStorage["Release Server / Object Storage"]
-        RemoteImg[("lusoris-*.raw.zst<br/><small>Compressed Image Stream</small>")]
+        RemoteImg[("lusoris-*.raw.zst<br/><small>Compressed Image Stream</small>")]:::remote
     end
 
     subgraph TargetDrive["Target Physical NVMe / SATA Disk"]
-        GPT["GPT Partition Table<br/><small>Root Partition (20GB)</small>"]
+        GPT["GPT Partition Table<br/><small>Root Partition (20GB)</small>"]:::disk
     end
 
     subgraph FirstBoot["First Boot Sequence"]
-        Growpart["growpart & resize2fs<br/><small>Expands to fill 100% of Drive</small>"]
-        FullRoot[("Expanded Root Filesystem<br/><small>Full Capacity Online</small>")]
+        Growpart["growpart & resize2fs<br/><small>Expands to fill 100% of Drive</small>"]:::boot
+        FullRoot[("Expanded Root Filesystem<br/><small>Full Capacity Online</small>")]:::boot
         Growpart --> FullRoot
     end
 
     RemoteImg -->|Network Stream| Curl
     DD -->|Direct Write| GPT
     GPT -.-> FirstBoot
+
+    style RescueEnv fill:none,stroke:#d97706,stroke-width:2px,stroke-dasharray: 4 4
+    style RemoteStorage fill:none,stroke:#0284c7,stroke-width:2px,stroke-dasharray: 4 4
+    style TargetDrive fill:none,stroke:#7c3aed,stroke-width:2px,stroke-dasharray: 4 4
+    style FirstBoot fill:none,stroke:#059669,stroke-width:2px,stroke-dasharray: 4 4
 ```
 
 ---

@@ -13,25 +13,30 @@
 
 ```mermaid
 flowchart TD
+    %% Semantic class definitions with vibrant, high-contrast jewel palettes
+    classDef entry fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff
+    classDef mod fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#ffffff
+    classDef exec fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff
+
     subgraph CoreEngine["lusoris-forge Core Architecture (Go 1.27)"]
-        CLI["CLI Entrypoint<br/><small>cmd/lusoris-forge (spf13/cobra)</small>"]
-        MCP["MCP Server<br/><small>pkg/mcp (modelcontextprotocol/go-sdk)</small>"]
+        CLI["CLI Entrypoint<br/><small>cmd/lusoris-forge (spf13/cobra)</small>"]:::entry
+        MCP["MCP Server<br/><small>pkg/mcp (modelcontextprotocol/go-sdk)</small>"]:::entry
 
         subgraph Modules["Subsystem Packages"]
-            Flavors["pkg/flavors<br/><small>44-Flavor Catalog</small>"]
-            Manifest["pkg/manifest<br/><small>versions.json SSOT</small>"]
-            CloudInit["pkg/cloudinit<br/><small>NoCloud Generator</small>"]
-            Builder["pkg/builder<br/><small>9-Backend Dispatcher</small>"]
-            Imageless["pkg/imageless<br/><small>In-Place & MicroVM</small>"]
-            Standards["pkg/standards<br/><small>Hardening Profiles</small>"]
-            Tracker["pkg/tracker<br/><small>Epics & Milestones</small>"]
+            Flavors["pkg/flavors<br/><small>44-Flavor Catalog</small>"]:::mod
+            Manifest["pkg/manifest<br/><small>versions.json SSOT</small>"]:::mod
+            CloudInit["pkg/cloudinit<br/><small>NoCloud Generator</small>"]:::mod
+            Builder["pkg/builder<br/><small>9-Backend Dispatcher</small>"]:::mod
+            Imageless["pkg/imageless<br/><small>In-Place & MicroVM</small>"]:::mod
+            Standards["pkg/standards<br/><small>Hardening Profiles</small>"]:::mod
+            Tracker["pkg/tracker<br/><small>Epics & Milestones</small>"]:::mod
         end
 
         subgraph Execution["Execution Targets"]
-            LocalPacker["Local Packer Engine"]
-            RemoteCI["Remote CI (Gitea / Proxmox / GitLab)"]
-            MicroVM["MicroVM Direct Kernel Boot"]
-            AIAgent["AI Coding Agents (JSON-RPC stdio)"]
+            LocalPacker["Local Packer Engine"]:::exec
+            RemoteCI["Remote CI (Gitea / Proxmox / GitLab)"]:::exec
+            MicroVM["MicroVM Direct Kernel Boot"]:::exec
+            AIAgent["AI Coding Agents (JSON-RPC stdio)"]:::exec
         end
     end
 
@@ -40,6 +45,10 @@ flowchart TD
     Builder --> LocalPacker & RemoteCI
     Imageless --> MicroVM
     MCP -.-> AIAgent
+
+    style CoreEngine fill:none,stroke:#64748b,stroke-width:2px
+    style Modules fill:none,stroke:#7c3aed,stroke-width:2px,stroke-dasharray: 4 4
+    style Execution fill:none,stroke:#059669,stroke-width:2px,stroke-dasharray: 4 4
 ```
 
 ---
@@ -195,7 +204,7 @@ sequenceDiagram
     Note over Forge,PipeRedirect: Server init redirects os.Stdout to Stderr
     Agent->>PipeIn: JSON-RPC Request (e.g. tools/call dispatch_build)
     PipeIn->>Forge: Read request frames
-    rect rgb(240, 245, 255)
+    rect rgba(124, 58, 237, 0.15)
         Note over Forge,PipeRedirect: Internal library logging & diagnostics
         Forge->>PipeRedirect: Third-party logs / fmt.Print / warnings
         PipeRedirect->>Stderr: Emitted cleanly on stderr (colored via tint)

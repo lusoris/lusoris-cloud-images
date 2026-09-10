@@ -14,26 +14,35 @@
 
 ```mermaid
 flowchart TD
+    %% Semantic class definitions with vibrant, high-contrast jewel palettes
+    classDef x86 fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff
+    classDef arm fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff
+    classDef riscv fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#ffffff
+
     subgraph x86["x86_64 Architecture (amd64)"]
-        F_x86["Firmware: UEFI (OVMF) / SeaBIOS"]
-        K_x86["Kernel: x86-64-v3 + AVX2 / AVX-512 / AMX"]
-        HW_x86["Hardware: Dell/HPE Servers · Proxmox KVM · N100 TMM"]
+        F_x86["Firmware: UEFI (OVMF) / SeaBIOS"]:::x86
+        K_x86["Kernel: x86-64-v3 + AVX2 / AVX-512 / AMX"]:::x86
+        HW_x86["Hardware: Dell/HPE Servers · Proxmox KVM · N100 TMM"]:::x86
         F_x86 --> K_x86 --> HW_x86
     end
 
     subgraph ARM["ARM64 Architecture (aarch64)"]
-        F_arm["Firmware: UEFI (AAVMF) / U-Boot / EEPROM"]
-        K_arm["Kernel: ARMv8.2+ / ARMv9 (Page Size: 4KB/16KB)"]
-        HW_arm["Hardware: RPi 5 · RK3588 · Apple Silicon UTM · Ampere Altra"]
+        F_arm["Firmware: UEFI (AAVMF) / U-Boot / EEPROM"]:::arm
+        K_arm["Kernel: ARMv8.2+ / ARMv9 (Page Size: 4KB/16KB)"]:::arm
+        HW_arm["Hardware: RPi 5 · RK3588 · Apple Silicon UTM · Ampere Altra"]:::arm
         F_arm --> K_arm --> HW_arm
     end
 
     subgraph RISCV["RISC-V Architecture (riscv64)"]
-        F_riscv["Firmware: OpenSBI + U-Boot / EDK2"]
-        K_riscv["Kernel: rv64gc + Sv39/Sv48 MMU (hart init)"]
-        HW_riscv["Hardware: SiFive HiFive · StarFive JH7110 · QEMU virt"]
+        F_riscv["Firmware: OpenSBI + U-Boot / EDK2"]:::riscv
+        K_riscv["Kernel: rv64gc + Sv39/Sv48 MMU (hart init)"]:::riscv
+        HW_riscv["Hardware: SiFive HiFive · StarFive JH7110 · QEMU virt"]:::riscv
         F_riscv --> K_riscv --> HW_riscv
     end
+
+    style x86 fill:none,stroke:#0284c7,stroke-width:2px,stroke-dasharray: 4 4
+    style ARM fill:none,stroke:#d97706,stroke-width:2px,stroke-dasharray: 4 4
+    style RISCV fill:none,stroke:#7c3aed,stroke-width:2px,stroke-dasharray: 4 4
 ```
 
 ---
