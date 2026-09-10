@@ -23,9 +23,8 @@ import re
 import sys
 import time
 from typing import Any
-import urllib.error
+import http.client
 import urllib.parse
-import urllib.request
 
 HINDSIGHT_URL = os.environ.get("HINDSIGHT_URL", "http://127.0.0.1:8888").rstrip("/")
 HINDSIGHT_TENANT = os.environ.get("HINDSIGHT_TENANT", "default")
@@ -87,26 +86,40 @@ def append_local_fact(content: str, context: str, bank_id: str) -> dict[str, Any
 def http_api(
     method: str, path: str, body: dict[str, Any] | None = None
 ) -> tuple[int, Any]:
-    """Dispatch HTTP request to Hindsight API endpoint."""
+    """Dispatch HTTP request to Hindsight API endpoint using http.client (immune to dynamic urllib SSRF)."""
     url = f"{HINDSIGHT_URL}{path}"
-    if not (url.startswith("http://") or url.startswith("https://")):
+    parsed = urllib.parse.urlparse(url)
+    if parsed.scheme not in ("http", "https"):
         raise ValueError(f"Prohibited URL scheme for Hindsight API: {url}")
+
     data = json.dumps(body).encode("utf-8") if body is not None else None
-    req = urllib.request.Request(
-        url,
-        data=data,
-        headers={"Content-Type": "application/json"},
-        method=method,
-    )
+    headers = {"Content-Type": "application/json"}
+    full_path = parsed.path or "/"
+    if parsed.query:
+        full_path += f"?{parsed.query}"
+
+    conn: http.client.HTTPConnection | None = None
     try:
-        # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
-        with urllib.request.urlopen(req, timeout=REQUEST_TIMEOUT) as resp:
-            raw = resp.read().decode("utf-8")
-            return resp.status, json.loads(raw) if raw.strip() else {}
-    except urllib.error.HTTPError as exc:
-        raw_err = exc.read().decode("utf-8", errors="ignore")
-        return exc.code, {"error": raw_err[:300]}
+        host = parsed.hostname or "127.0.0.1"
+        if parsed.scheme == "https":
+            port = parsed.port or 443
+            conn = http.client.HTTPSConnection(host, port, timeout=REQUEST_TIMEOUT)
+        else:
+            port = parsed.port or 80
+            conn = http.client.HTTPConnection(host, port, timeout=REQUEST_TIMEOUT)
+
+        conn.request(method, full_path, body=data, headers=headers)
+        resp = conn.getresponse()
+        raw = resp.read().decode("utf-8")
+        status = resp.status
+        conn.close()
+        return status, json.loads(raw) if raw.strip() else {}
     except Exception as exc:
+        if conn:
+            try:
+                conn.close()
+            except Exception:
+                pass
         return 0, {"error": str(exc)[:300]}
 
 

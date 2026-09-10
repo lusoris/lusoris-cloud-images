@@ -13,11 +13,10 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import http.client
 import subprocess
 import sys
 import time
-import urllib.error
-import urllib.request
 
 DEFAULT_PORT = 8888
 NAMESPACE = "ai"
@@ -25,15 +24,16 @@ SERVICE = "service/hindsight"
 
 
 def check_health(port: int = DEFAULT_PORT) -> bool:
-    """Probe Hindsight health endpoint on loopback."""
+    """Probe Hindsight health endpoint on loopback using http.client (avoids dynamic urllib SSRF)."""
     if not (1 <= port <= 65535):
         return False
-    url = f"http://127.0.0.1:{port}/v1/default/banks"
     try:
-        req = urllib.request.Request(url, method="GET")
-        # nosemgrep: python.lang.security.audit.dynamic-urllib-use-detected
-        with urllib.request.urlopen(req, timeout=3) as resp:
-            return 200 <= resp.status < 300
+        conn = http.client.HTTPConnection("127.0.0.1", port, timeout=3)
+        conn.request("GET", "/v1/default/banks")
+        resp = conn.getresponse()
+        status = resp.status
+        conn.close()
+        return 200 <= status < 300
     except Exception:
         return False
 
