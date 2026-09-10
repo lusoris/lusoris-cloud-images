@@ -97,6 +97,13 @@ func appendPlatformUserData(sb *strings.Builder, platform string) {
 	case "unraid":
 		sb.WriteString("mounts:\n")
 		sb.WriteString("  - [ share, /mnt/share, virtiofs, \"rw,sync\", \"0\", \"0\" ]\n\n")
+	case "truenas":
+		sb.WriteString("mounts:\n")
+		sb.WriteString("  - [ nfs_share, /mnt/truenas, nfs, \"rw,hard,intr,noatime\", \"0\", \"0\" ]\n\n")
+		sb.WriteString("write_files:\n")
+		sb.WriteString("  - path: /etc/udev/rules.d/99-truenas-virtio.rules\n")
+		sb.WriteString("    content: |\n")
+		sb.WriteString("      ACTION==\"add|change\", SUBSYSTEM==\"block\", KERNEL==\"sd[a-z]|vd[a-z]\", ATTR{queue/discard_max_bytes}!=\"0\", ATTR{queue/discard_granularity}!=\"0\"\n\n")
 	case "macos", "utm":
 		sb.WriteString("mounts:\n")
 		sb.WriteString("  - [ workspace, /mnt/workspace, virtiofs, \"rw,sync\", \"0\", \"0\" ]\n\n")

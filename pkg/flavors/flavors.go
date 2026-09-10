@@ -49,7 +49,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "VirtIO / Generic CPU",
 		KernelProfile: "generic",
 		Description:   "Minimal hardened OS, Anycast NTS, QEMU+VMware agents",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "base-intel",
@@ -59,7 +59,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "Intel Xe / Arc / Xe2",
 		KernelProfile: "generic",
 		Description:   "Intel Media Driver (iHD), Level Zero, vainfo",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "30-gpu-intel.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "30-gpu-intel.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "base-amd",
@@ -69,7 +69,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "AMD Radeon / APU",
 		KernelProfile: "generic",
 		Description:   "Mesa Gallium radeonsi, RADV Vulkan, AMDGPU DRM",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "31-gpu-amd.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "31-gpu-amd-mesa.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "base-nvidia-legacy",
@@ -79,7 +79,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "NVIDIA Pascal / Volta",
 		KernelProfile: "generic",
 		Description:   "NVIDIA 535 driver, CUDA 12.2 (GTX 1080, P4, P40, V100)",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "32-gpu-nvidia-legacy.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "33-gpu-nvidia-legacy.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "base-nvidia-mainstream",
@@ -89,7 +89,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "NVIDIA Turing / Ampere",
 		KernelProfile: "generic",
 		Description:   "NVIDIA 565 driver, CUDA 12.8 (RTX 20/30/40, A100, L4)",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "33-gpu-nvidia-mainstream.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "34-gpu-nvidia-mainstream.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "base-nvidia-modern",
@@ -99,7 +99,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "NVIDIA Ada / Hopper",
 		KernelProfile: "generic",
 		Description:   "NVIDIA 610 driver, CUDA 13.3 (RTX 4080/4090, L40S, H100)",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "34-gpu-nvidia-modern.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "37-gpu-nvidia-modern.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "base-nvidia-bleeding",
@@ -109,7 +109,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "NVIDIA Blackwell",
 		KernelProfile: "generic",
 		Description:   "NVIDIA 615 driver, CUDA 13.4 (RTX 5090, B200)",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "34-gpu-nvidia-bleeding.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "36-gpu-nvidia-bleeding.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "base-nvidia-datacenter",
@@ -131,7 +131,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "VirtIO / Generic CPU",
 		KernelProfile: "generic",
 		Description:   "Docker CE 29.8, Docker Compose v2, systemd cgroups",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "40-docker-runtime.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "40-docker-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "docker-intel",
@@ -141,7 +141,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "Intel Xe / Arc / Xe2",
 		KernelProfile: "generic",
 		Description:   "Docker CE + Intel QuickSync passthrough + CDI spec",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "30-gpu-intel.sh", "40-docker-runtime.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "30-gpu-intel.sh", "40-docker-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "docker-amd",
@@ -151,7 +151,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "AMD Radeon / Instinct",
 		KernelProfile: "generic",
 		Description:   "Docker CE + AMD ROCm 10 compute runtime + CDI spec",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "31-gpu-amd.sh", "40-docker-runtime.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "32-gpu-amd-rocm.sh", "40-docker-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "docker-nvidia",
@@ -161,7 +161,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "NVIDIA Mainstream",
 		KernelProfile: "generic",
 		Description:   "Docker CE + NVIDIA 565 + Container Toolkit CDI",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "33-gpu-nvidia-mainstream.sh", "40-docker-runtime.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "34-gpu-nvidia-mainstream.sh", "40-docker-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "docker-nvidia-modern",
@@ -171,7 +171,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "NVIDIA Modern",
 		KernelProfile: "generic",
 		Description:   "Docker CE + NVIDIA 610 + Container Toolkit CDI",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "34-gpu-nvidia-modern.sh", "40-docker-runtime.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "37-gpu-nvidia-modern.sh", "40-docker-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "docker-nvidia-bleeding",
@@ -181,7 +181,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "NVIDIA Bleeding",
 		KernelProfile: "generic",
 		Description:   "Docker CE + NVIDIA 615 + Container Toolkit CDI",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "34-gpu-nvidia-bleeding.sh", "40-docker-runtime.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "36-gpu-nvidia-bleeding.sh", "40-docker-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "podman-generic",
@@ -191,7 +191,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "VirtIO / Generic CPU",
 		KernelProfile: "generic",
 		Description:   "Podman 5.x, Buildah, Skopeo, Quadlet, Netavark CNI",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "45-podman-runtime.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "41-podman-runtime.sh", "99-cleanup.sh"},
 	},
 
 	// Tier 3: Kubernetes (9 flavors)
@@ -204,7 +204,7 @@ var allFlavors = []Flavor{
 		KernelProfile:  "k8s",
 		PreheatProfile: "lean",
 		Description:    "containerd 2.3.5, kubelet 1.37.0, zero preheat",
-		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
+		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:             "k8s-node-cilium",
@@ -215,7 +215,7 @@ var allFlavors = []Flavor{
 		KernelProfile:  "k8s",
 		PreheatProfile: "cilium",
 		Description:    "containerd 2.3.5, preheated Cilium 1.20.1 & kube-vip 1.2.3",
-		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
+		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:             "k8s-node-calico",
@@ -226,7 +226,7 @@ var allFlavors = []Flavor{
 		KernelProfile:  "k8s",
 		PreheatProfile: "calico",
 		Description:    "containerd 2.3.5, preheated Calico 3.32.2 & kube-vip 1.2.3",
-		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
+		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:             "k8s-node-flannel",
@@ -237,7 +237,7 @@ var allFlavors = []Flavor{
 		KernelProfile:  "k8s",
 		PreheatProfile: "flannel",
 		Description:    "containerd 2.3.5, preheated Flannel 0.28.9 & kube-vip 1.2.3",
-		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
+		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:             "k8s-node-intel",
@@ -248,7 +248,7 @@ var allFlavors = []Flavor{
 		KernelProfile:  "k8s",
 		PreheatProfile: "cilium",
 		Description:    "containerd 2.3.5 + Intel drivers + Intel K8s Plugin",
-		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "30-gpu-intel.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
+		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "30-gpu-intel.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:             "k8s-node-amd",
@@ -259,7 +259,7 @@ var allFlavors = []Flavor{
 		KernelProfile:  "k8s",
 		PreheatProfile: "cilium",
 		Description:    "containerd 2.3.5 + AMD ROCm 10 + AMD K8s Plugin",
-		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "31-gpu-amd.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
+		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "32-gpu-amd-rocm.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:             "k8s-node-nvidia",
@@ -270,7 +270,7 @@ var allFlavors = []Flavor{
 		KernelProfile:  "k8s",
 		PreheatProfile: "cilium",
 		Description:    "containerd 2.3.5 + NVIDIA 565 + NVIDIA K8s Plugin",
-		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "33-gpu-nvidia-mainstream.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
+		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "34-gpu-nvidia-mainstream.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:             "k8s-node-nvidia-modern",
@@ -281,7 +281,7 @@ var allFlavors = []Flavor{
 		KernelProfile:  "k8s",
 		PreheatProfile: "cilium",
 		Description:    "containerd 2.3.5 + NVIDIA 610 + NVIDIA K8s Plugin",
-		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "34-gpu-nvidia-modern.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
+		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "37-gpu-nvidia-modern.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:             "k8s-node-nvidia-bleeding",
@@ -292,7 +292,7 @@ var allFlavors = []Flavor{
 		KernelProfile:  "k8s",
 		PreheatProfile: "cilium",
 		Description:    "containerd 2.3.5 + NVIDIA 615 + NVIDIA K8s Plugin",
-		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "34-gpu-nvidia-bleeding.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
+		Provisioners:   []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "36-gpu-nvidia-bleeding.sh", "50-k8s-runtime.sh", "55-k8s-precache.sh", "99-cleanup.sh"},
 	},
 
 	// Tier 4: K3s Edge Fleet (5 flavors)
@@ -304,7 +304,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "VirtIO / CPU",
 		KernelProfile: "generic",
 		Description:   "Lightweight K3s agent, containerd, Flannel (< 300MB RAM)",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "48-k3s-agent.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "52-k3s-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "k3s-agent-intel",
@@ -314,7 +314,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "Intel GPU",
 		KernelProfile: "generic",
 		Description:   "K3s agent + Intel QuickSync (iHD) + Level Zero",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "30-gpu-intel.sh", "48-k3s-agent.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "30-gpu-intel.sh", "52-k3s-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "k3s-agent-amd",
@@ -324,7 +324,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "AMD GPU",
 		KernelProfile: "generic",
 		Description:   "K3s agent + AMD ROCm 10 compute runtime + RADV Vulkan",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "31-gpu-amd.sh", "48-k3s-agent.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "32-gpu-amd-rocm.sh", "52-k3s-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "k3s-agent-nvidia",
@@ -334,7 +334,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "NVIDIA Mainstream",
 		KernelProfile: "generic",
 		Description:   "K3s agent + NVIDIA 565 + Container Toolkit CDI",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "33-gpu-nvidia-mainstream.sh", "48-k3s-agent.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "34-gpu-nvidia-mainstream.sh", "52-k3s-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "k3s-server-generic",
@@ -344,7 +344,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "VirtIO / CPU",
 		KernelProfile: "generic",
 		Description:   "K3s standalone master, embedded SQLite, local-path storage",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "49-k3s-server.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "52-k3s-runtime.sh", "99-cleanup.sh"},
 	},
 
 	// Tier 5: CloudNative (4 flavors)
@@ -386,7 +386,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "Database (CNPG)",
 		KernelProfile: "ai-infer",
 		Description:   "CloudNativePG kernel tuning, hugepages, strict overcommit",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "70-cloudnative-pg.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "40-docker-runtime.sh", "70-cloudnative-pg.sh", "99-cleanup.sh"},
 	},
 
 	// Tier 6: AI Inference (6 flavors)
@@ -398,7 +398,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "CPU High-Throughput",
 		KernelProfile: "ai-infer",
 		Description:   "AMX, AVX-512, NUMA, vLLM/Ollama CPU, Docker CE",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "40-docker-runtime.sh", "60-ai-infer-runtime.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "40-docker-runtime.sh", "60-ai-infer-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "ai-infer-intel",
@@ -408,7 +408,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "Intel Xe / Arc / Xe2",
 		KernelProfile: "ai-infer",
 		Description:   "Intel Level Zero, OpenVINO, IPEX-LLM, CDI, Docker CE",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "30-gpu-intel.sh", "40-docker-runtime.sh", "60-ai-infer-runtime.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "30-gpu-intel.sh", "40-docker-runtime.sh", "60-ai-infer-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "ai-infer-amd",
@@ -418,7 +418,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "AMD ROCm 10",
 		KernelProfile: "ai-infer",
 		Description:   "AMD ROCm 10, /dev/kfd, RDNA 3/4 & Instinct, CDI, Docker CE",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "31-gpu-amd.sh", "40-docker-runtime.sh", "60-ai-infer-runtime.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "32-gpu-amd-rocm.sh", "40-docker-runtime.sh", "60-ai-infer-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "ai-infer-nvidia",
@@ -428,7 +428,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "NVIDIA Mainstream",
 		KernelProfile: "ai-infer",
 		Description:   "Transparent hugepages, numactl, vLLM/Ollama (NVIDIA 565)",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "33-gpu-nvidia-mainstream.sh", "40-docker-runtime.sh", "60-ai-infer-runtime.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "34-gpu-nvidia-mainstream.sh", "40-docker-runtime.sh", "60-ai-infer-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "ai-infer-nvidia-modern",
@@ -438,7 +438,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "NVIDIA Modern",
 		KernelProfile: "ai-infer",
 		Description:   "Transparent hugepages, numactl, vLLM/Ollama (NVIDIA 610)",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "34-gpu-nvidia-modern.sh", "40-docker-runtime.sh", "60-ai-infer-runtime.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "37-gpu-nvidia-modern.sh", "40-docker-runtime.sh", "60-ai-infer-runtime.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "ai-infer-nvidia-bleeding",
@@ -448,7 +448,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "NVIDIA Bleeding",
 		KernelProfile: "ai-infer",
 		Description:   "Transparent hugepages, Blackwell RTX 5090 / B200 (NVIDIA 615)",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "34-gpu-nvidia-bleeding.sh", "40-docker-runtime.sh", "60-ai-infer-runtime.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "36-gpu-nvidia-bleeding.sh", "40-docker-runtime.sh", "60-ai-infer-runtime.sh", "99-cleanup.sh"},
 	},
 
 	// Tier 7: Homelab Appliances (5 flavors)
@@ -460,7 +460,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "Intel GPU + Coral TPU",
 		KernelProfile: "generic",
 		Description:   "Coral Edge TPU (gasket-dkms, udev), Intel QuickSync (iHD), CDI, Docker CE",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "30-gpu-intel.sh", "40-docker-runtime.sh", "80-appliance-coral.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "40-docker-runtime.sh", "75-appliance-vision.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "appliance-gateway-dns",
@@ -470,7 +470,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "VirtIO / Low-Power CPU",
 		KernelProfile: "generic",
 		Description:   "Port 53 stub disabled, WireGuard, line-rate forwarding (< 150MB RAM)",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "81-appliance-dns-gateway.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "76-appliance-gateway.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "appliance-media-server",
@@ -480,7 +480,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "Intel + AMD GPU + NAS",
 		KernelProfile: "baremetal",
 		Description:   "Intel QuickSync + AMD Mesa VA-API, nfs-common, cifs-utils, 4096KB readahead",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "30-gpu-intel.sh", "31-gpu-amd.sh", "82-appliance-media.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "40-docker-runtime.sh", "77-appliance-media.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "appliance-ci-runner",
@@ -490,7 +490,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "Multi-Core CPU / DinD",
 		KernelProfile: "generic",
 		Description:   "QEMU ARM64/ARMv7 binfmt, Docker Buildx, git-lfs, 4GB tmpfs /tmp",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "40-docker-runtime.sh", "83-appliance-ci-runner.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "40-docker-runtime.sh", "78-appliance-runner.sh", "99-cleanup.sh"},
 	},
 	{
 		ID:            "appliance-game-server",
@@ -500,7 +500,7 @@ var allFlavors = []Flavor{
 		HardwareStack: "High Clock CPU",
 		KernelProfile: "generic",
 		Description:   "32-bit i386 glibc, steamcmd, 16MB UDP socket buffer tuning, 1M file limits",
-		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "84-appliance-steamcmd.sh", "99-cleanup.sh"},
+		Provisioners:  []string{"00-base-strip.sh", "05-hypervisor-agents.sh", "10-network-time.sh", "20-kernel-sysctl.sh", "25-baremetal-tuning.sh", "40-docker-runtime.sh", "79-appliance-game.sh", "99-cleanup.sh"},
 	},
 }
 
@@ -514,25 +514,33 @@ func Tiers() []Tier {
 	return append([]Tier(nil), allTiers...)
 }
 
+var (
+	flavorIndex = make(map[string]Flavor, len(allFlavors))
+	tierIndex   = make(map[string][]Flavor)
+)
+
+func init() {
+	for _, f := range allFlavors {
+		flavorIndex[f.ID] = f
+		tID := strings.ToLower(f.TierID)
+		tierIndex[tID] = append(tierIndex[tID], f)
+	}
+}
+
 // Get finds a flavor by exact ID.
 func Get(id string) (Flavor, error) {
-	for _, f := range allFlavors {
-		if f.ID == id {
-			return f, nil
-		}
+	if f, ok := flavorIndex[id]; ok {
+		return f, nil
 	}
 	return Flavor{}, fmt.Errorf("flavor %q not found across 44 targets", id)
 }
 
 // FilterByTier returns all flavors belonging to a given tier.
 func FilterByTier(tierID string) []Flavor {
-	var result []Flavor
-	for _, f := range allFlavors {
-		if strings.EqualFold(f.TierID, tierID) {
-			result = append(result, f)
-		}
+	if list, ok := tierIndex[strings.ToLower(tierID)]; ok {
+		return append([]Flavor(nil), list...)
 	}
-	return result
+	return nil
 }
 
 // Search queries flavors by substring matching against ID, name, hardware stack, or description.

@@ -55,8 +55,12 @@ func Get(flavorID string) (Standard, error) {
 func enrichTierStandard(std *Standard, fl flavors.Flavor) {
 	switch fl.TierID {
 	case "containers":
-		std.RequiredPackages = append(std.RequiredPackages, "docker-ce", "docker-compose-plugin")
-		std.SystemdUnits = append(std.SystemdUnits, "docker.service")
+		if strings.HasPrefix(fl.ID, "podman") {
+			std.RequiredPackages = append(std.RequiredPackages, "podman", "buildah", "skopeo")
+		} else {
+			std.RequiredPackages = append(std.RequiredPackages, "docker-ce", "docker-compose-plugin")
+			std.SystemdUnits = append(std.SystemdUnits, "docker.service")
+		}
 		if strings.Contains(fl.ID, "nvidia") || strings.Contains(fl.ID, "intel") || strings.Contains(fl.ID, "amd") {
 			std.CDISpecRequired = true
 		}
@@ -68,6 +72,11 @@ func enrichTierStandard(std *Standard, fl flavors.Flavor) {
 		std.SystemdUnits = append(std.SystemdUnits, "containerd.service", "kubelet.service")
 	case "k3s":
 		std.RequiredPackages = append(std.RequiredPackages, "curl", "iptables")
+		if fl.ID == "k3s-server-generic" {
+			std.SystemdUnits = append(std.SystemdUnits, "k3s.service")
+		} else {
+			std.SystemdUnits = append(std.SystemdUnits, "k3s-agent.service")
+		}
 		std.MaxIdleMemoryMB = 300
 	case "cloudnative":
 		if fl.ID == "cloudnative-storage" {
@@ -79,15 +88,24 @@ func enrichTierStandard(std *Standard, fl flavors.Flavor) {
 	case "ai-infer":
 		std.RequiredPackages = append(std.RequiredPackages, "numactl", "docker-ce")
 		std.KernelParameters["vm.zone_reclaim_mode"] = "0"
-		if strings.Contains(fl.ID, "nvidia") {
+		if strings.Contains(fl.ID, "nvidia") || strings.Contains(fl.ID, "intel") || strings.Contains(fl.ID, "amd") {
 			std.CDISpecRequired = true
 		}
 	case "homelab":
 		if fl.ID == "appliance-vision-nvr" {
-			std.RequiredPackages = append(std.RequiredPackages, "gasket-dkms", "intel-media-va-driver-non-free")
+			std.RequiredPackages = append(std.RequiredPackages, "gasket-dkms", "intel-media-va-driver-non-free", "docker-ce")
+			std.CDISpecRequired = true
 		} else if fl.ID == "appliance-gateway-dns" {
 			std.RequiredPackages = append(std.RequiredPackages, "wireguard", "iptables")
 			std.MaxIdleMemoryMB = 150
+		} else if fl.ID == "appliance-game-server" {
+			std.RequiredPackages = append(std.RequiredPackages, "steamcmd", "docker-ce")
+			std.KernelParameters["net.core.rmem_max"] = "16777216"
+			std.KernelParameters["net.core.wmem_max"] = "16777216"
+		} else if fl.ID == "appliance-media-server" {
+			std.RequiredPackages = append(std.RequiredPackages, "nfs-common", "cifs-utils", "docker-ce")
+		} else if fl.ID == "appliance-ci-runner" {
+			std.RequiredPackages = append(std.RequiredPackages, "docker-ce", "git-lfs")
 		}
 	}
 }

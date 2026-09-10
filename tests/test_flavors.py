@@ -127,3 +127,20 @@ class TestFlavorsIntegrity:
             assert p_file.name in content, (
                 f"Provisioner script {p_file.name} is not referenced in builds.pkr.hcl"
             )
+
+    def test_go_catalog_provisioners_synchrony(self) -> None:
+        """Verify every provisioner in pkg/flavors/flavors.go exists in packer/provisioners/."""
+        go_file = REPO_ROOT / "pkg" / "flavors" / "flavors.go"
+        assert go_file.is_file(), "pkg/flavors/flavors.go must exist"
+        go_content = go_file.read_text(encoding="utf-8")
+
+        matches = re.findall(r'Provisioners:\s*\[\]string\{([^}]+)\}', go_content)
+        all_go_provisioners = set()
+        for m in matches:
+            scripts = [s.strip().strip('"') for s in m.split(',') if s.strip()]
+            all_go_provisioners.update(scripts)
+
+        actual_provisioners = {p.name for p in (PACKER_DIR / "provisioners").glob("*.sh")}
+        diff = all_go_provisioners - actual_provisioners
+        assert not diff, f"Provisioner scripts in Go catalog not found in packer/provisioners/: {diff}"
+

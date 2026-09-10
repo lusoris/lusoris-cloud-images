@@ -72,10 +72,10 @@ func GenerateApplyScript(opts ApplyOptions) (string, error) {
 
 // MicroVMBootConfig defines direct kernel boot parameters for QEMU / Cloud-Hypervisor / Firecracker.
 type MicroVMBootConfig struct {
-	FlavorID    string
-	KernelPath  string
-	InitrdPath  string
-	RootDevice  string
+	FlavorID     string
+	KernelPath   string
+	InitrdPath   string
+	RootDevice   string
 	ExtraCmdline string
 }
 

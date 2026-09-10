@@ -96,7 +96,7 @@ func Dispatch(ctx context.Context, req Request) (Result, error) {
 
 func dispatchLocal(ctx context.Context, req Request, res Result) (Result, error) {
 	res.Success = true
-	res.Message = fmt.Sprintf("local build command formulated: packer build -only=%s.qemu.image .", req.Flavor)
+	res.Message = fmt.Sprintf("local build command formulated: packer build -only=%s.qemu.image packer/", req.Flavor)
 	return res, nil
 }
 

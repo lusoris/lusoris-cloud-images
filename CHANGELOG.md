@@ -74,8 +74,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Sister repository architectural blueprint for `lusoris-kernel-forge` (`docs/operations/sister-repo-kernel-forge-blueprint.md`), detailing multi-stream kernel building (`lts`, `mainstream`, `bleeding`, `realtime`) across architectures with zero-leak privacy invariants.
   - Cross-repository bidirectional synchronization workflows (`.github/workflows/sync-kernel-manifest.yml` and `.github/workflows/dispatch-kernel-requirements.yml`) with OpenSSF Scorecard least-privilege token permissions.
   - Fleet verification test `test_skills_progressive_disclosure_structure` in `tests/test_agents_fleet.py` ensuring all skills maintain high-density concise root instructions and partitioned reference manuals.
+  - High-performance systems benchmarking suites: added `pkg/flavors/benchmark_test.go` ($O(1)$ lookups at ~9.5 ns/op, 0 allocs), `pkg/cloudinit/benchmark_test.go` (~494 ns/op), and `pkg/mcp/benchmark_test.go` (~11.9 ns/op).
+  - Cross-platform hermetic mock execution sandbox (`tests/harness/mock_runner.py`) with dynamic bash resolution enabling 100% test execution on Linux, macOS, and Windows.
+  - TrueNAS SCALE platform configuration in hardened cloud-init generator (`pkg/cloudinit/cloudinit.go`) with VirtIO-SCSI discard rules and NFS mounts.
+  - Two-phase staged MCP operations TTL eviction guard and capacity bounding (`pkg/mcp/staging.go`).
+  - Automated Go catalog and provisioner script synchrony invariant test (`test_go_catalog_provisioners_synchrony` in `tests/test_flavors.py`).
 
 ### Fixed
+- Catalog desynchronization in `pkg/flavors/flavors.go`: aligned 13 provisioner script references with `packer/builds.pkr.hcl` across AMD, NVIDIA, Podman, K3s, and homelab appliance tiers, eliminating silent failures in imageless host conversion.
+- Podman standard requirements inversion in `pkg/standards/standards.go`: ensured `podman-generic` enforces `podman`, `buildah`, `skopeo`, and `netavark` rather than Docker CE.
+- Local Packer build command path in `pkg/builder/builder.go`: updated target directory from `.` to `packer/` for seamless execution from repository root.
 - Universal multi-architecture portability: replaced hardcoded `[arch=amd64]` APT repository configurations with dynamic `$(dpkg --print-architecture)` in AMD ROCm (`32-gpu-amd-rocm.sh`) and Docker CE (`40-docker-runtime.sh`) provisioners.
 - Package resolution in `25-baremetal-tuning.sh`: replaced non-existent package `partprobe` with GNU `parted` so disk partition probing utilities install properly.
 - Architecture guard in `79-appliance-game.sh`: restricted `dpkg --add-architecture i386` multiarch registration to `amd64` hosts.

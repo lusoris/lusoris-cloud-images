@@ -9,10 +9,31 @@ and recording execution journals and simulated filesystem mutations.
 from dataclasses import dataclass, field
 from pathlib import Path
 import os
+import shutil
 import subprocess
+import sys
 from typing import Dict, List, Optional
 
-GIT_BASH = Path(r"C:\Program Files\Git\bin\bash.exe")
+
+def _find_bash() -> Optional[Path]:
+    found = shutil.which("bash")
+    if found:
+        return Path(found)
+    if sys.platform == "win32":
+        for cand in [
+            Path(r"C:\Program Files\Git\bin\bash.exe"),
+            Path(r"C:\Program Files (x86)\Git\bin\bash.exe"),
+        ]:
+            if cand.exists():
+                return cand
+    for cand in [Path("/bin/bash"), Path("/usr/bin/bash")]:
+        if cand.exists():
+            return cand
+    return None
+
+
+BASH_BIN = _find_bash()
+GIT_BASH = BASH_BIN
 
 
 @dataclass
@@ -309,12 +330,18 @@ export -f chmod
     def run_script(
         self, script_path: Path, env_vars: Optional[Dict[str, str]] = None
     ) -> ExecutionResult:
-        if not GIT_BASH.exists():
-            raise RuntimeError(f"Git Bash not found at {GIT_BASH}")
+        if not BASH_BIN or not BASH_BIN.exists():
+            raise RuntimeError("Bash executable not found")
 
-        drive = self.sandbox_root.drive.rstrip(":").lower()
-        sandbox_posix = f"/{drive}{self.sandbox_root.as_posix()[2:]}"
-        prelude_posix = f"/{drive}{self.prelude_file.as_posix()[2:]}"
+        if sys.platform == "win32" and self.sandbox_root.drive:
+            drive = self.sandbox_root.drive.rstrip(":").lower()
+            sandbox_posix = f"/{drive}{self.sandbox_root.as_posix()[2:]}"
+            prelude_posix = f"/{drive}{self.prelude_file.as_posix()[2:]}"
+            script_posix = f"/{drive}{script_path.as_posix()[2:]}"
+        else:
+            sandbox_posix = str(self.sandbox_root.resolve())
+            prelude_posix = str(self.prelude_file.resolve())
+            script_posix = str(script_path.resolve())
 
         run_env = os.environ.copy()
         run_env["SANDBOX_ROOT"] = sandbox_posix
@@ -325,8 +352,7 @@ export -f chmod
             for k, v in env_vars.items():
                 run_env[k] = v
 
-        script_posix = f"/{drive}{script_path.as_posix()[2:]}"
-        cmd = [str(GIT_BASH), "-euo", "pipefail", script_posix]
+        cmd = [str(BASH_BIN), "-euo", "pipefail", script_posix]
         proc = subprocess.run(
             cmd,
             env=run_env,

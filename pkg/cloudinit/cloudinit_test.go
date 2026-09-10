@@ -31,6 +31,13 @@ func TestGenerateUserDataPlatforms(t *testing.T) {
 	require.NoError(t, err)
 	assert.Contains(t, udUnraid, "virtiofs")
 
+	cfgTrueNAS := cloudinit.DefaultConfig("docker-generic")
+	cfgTrueNAS.Platform = "truenas"
+	udTrueNAS, err := cloudinit.GenerateUserData(cfgTrueNAS)
+	require.NoError(t, err)
+	assert.Contains(t, udTrueNAS, "nfs_share")
+	assert.Contains(t, udTrueNAS, "99-truenas-virtio.rules")
+
 	cfgMacOS := cloudinit.DefaultConfig("base-generic")
 	cfgMacOS.Platform = "macos"
 	udMacOS, err := cloudinit.GenerateUserData(cfgMacOS)
