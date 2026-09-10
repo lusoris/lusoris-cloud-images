@@ -324,6 +324,34 @@ chmod() {{
   return 0
 }}
 export -f chmod
+
+rm() {{
+  echo "rm $*" >> "$SANDBOX_ROOT/journal_cmds.log"
+  for arg in "$@"; do
+    case "$arg" in
+      -*) ;;
+      /*)
+        local clean="${{arg#/}}"
+        if [ -e "$SANDBOX_ROOT/$clean" ]; then
+          command rm -rf "$SANDBOX_ROOT/$clean" 2>/dev/null || true
+        fi
+        ;;
+      *)
+        if [ -e "$arg" ]; then
+          command rm -rf "$arg" 2>/dev/null || true
+        fi
+        ;;
+    esac
+  done
+  return 0
+}}
+export -f rm
+
+ln() {{
+  echo "ln $*" >> "$SANDBOX_ROOT/journal_cmds.log"
+  return 0
+}}
+export -f ln
 """
         self.prelude_file.write_text(prelude_script, encoding="utf-8", newline="\n")
 
