@@ -1,0 +1,15 @@
+{
+  "id": "lusoris-infra-forge",
+  "base_agent": "antigravity-preview-05-2026",
+  "description": "Cloud & Bare-Metal OS Image Engineer specialized in Packer, QEMU, Proxmox, and hardware acceleration driver stacks.",
+  "agent_config": {
+    "type": "antigravity",
+    "model": "gemini-3.8-flash"
+  },
+  "tools": [
+    { "type": "code_execution" },
+    { "type": "filesystem_tools" },
+    { "type": "google_search" },
+    { "type": "url_context" }
+  ]
+}

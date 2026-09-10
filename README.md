@@ -8,7 +8,7 @@
 [![Release Matrix](https://img.shields.io/github/actions/workflow/status/lusoris/lusoris-cloud-images/release-matrix.yml?branch=main&label=Release%20Engine&logo=packer&logoColor=white&style=flat-square)](https://github.com/lusoris/lusoris-cloud-images/actions/workflows/release-matrix.yml)
 
 [![Flavors](https://img.shields.io/badge/Flavors-44%20Production%20Targets-blue?logo=linux&logoColor=white&style=flat-square)](FLAVORS.md)
-[![Base OS](https://img.shields.io/badge/Base%20OS-Ubuntu%2026.04%20Noble-E95420?logo=ubuntu&logoColor=white&style=flat-square)](versions.json)
+[![Base OS](https://img.shields.io/badge/Base%20OS-Ubuntu%2026.04%20LTS%20Resolute-E95420?logo=ubuntu&logoColor=white&style=flat-square)](versions.json)
 [![Packer](https://img.shields.io/badge/Packer-1.11%2B-02A8EF?logo=packer&logoColor=white&style=flat-square)](https://www.packer.io/)
 [![SSOT Schema](https://img.shields.io/badge/SSOT-Draft%202020--12-success?logo=json&style=flat-square)](versions.schema.json)
 [![Time Security](https://img.shields.io/badge/Time%20Security-NTS%20RFC%208915-informational?style=flat-square)](docs/security/time-nts.md)
@@ -40,6 +40,7 @@ Stock cloud distributions waste minutes downloading gigabytes of kernel modules,
 - **Single Source of Truth (`versions.json`)**: Every upstream URL, driver branch, and container tag originates from a single declarative manifest validated against `versions.schema.json`.
 - **Multi-Generational Hardware**: Tailored driver stacks for Intel Arc/Flex/Xe2, AMD Mesa/ROCm 10, and NVIDIA generational CUDA (Pascal 535, Ampere/Ada 565, Hopper/Blackwell 610/615).
 - **Hypervisor & Bare-Metal Speed Engine**: Coexisting `qemu-guest-agent` + `open-vm-tools`, Unraid `virtiofs`/`9p` host sharing, fast-boot `NoCloud` discovery (< 2s), ZRAM compressed swap guard, weekly `fstrim.timer`, and VirtIO `mq-deadline` I/O scheduling.
+- **Multi-Distribution Upstream Roadmap**: Standardized on Ubuntu 26.04/24.04 LTS for accelerator-rich workloads, with an active architectural roadmap ([ADR-0009](docs/adr/0009-multi-distribution-base-roadmap.md)) targeting Debian Bookworm/Trixie for lean microVMs and storage appliances, and Alpine for ultra-lean edge gateways.
 - **Resilient Global Time**: Cryptographically authenticated Network Time Security (NTS RFC 8915) combining Cloudflare Anycast and European national metrology laboratories (PTB, Netnod, SIDN, 3eck).
 
 ---
@@ -48,37 +49,55 @@ Stock cloud distributions waste minutes downloading gigabytes of kernel modules,
 
 ```mermaid
 flowchart TD
-    subgraph SSOT["Declarative Source of Truth"]
-        SRC["Ubuntu 26.04 Cloud Base<br/><small>Noble / Resolute Minimal</small>"]
-        BOM[("versions.json<br/><small>Pinned Upstream BOM</small>")]
+    %% Semantic class definitions with vibrant, high-contrast jewel palettes
+    classDef ssot fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff
+    classDef foundation fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff
+    classDef packer fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#ffffff
+    classDef imageless fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff
+    classDef tiers fill:#e11d48,stroke:#be123c,stroke-width:2px,color:#ffffff
+    classDef artifacts fill:#4338ca,stroke:#3730a3,stroke-width:2px,color:#ffffff
+
+    subgraph SSOT["Declarative Source of Truth & Upstream Matrix"]
+        SRC["Upstream Base OS Matrix<br/><small>Ubuntu LTS Core · Debian · Alpine Roadmap</small>"]:::ssot
+        BOM[("versions.json<br/><small>Pinned Upstream BOM & SSOT</small>")]:::ssot
     end
 
     subgraph Foundation["Hardened Foundation Pipeline (Stages 00–25)"]
-        S0["00-base-strip<br/><small>Purge snapd & telemetry</small>"]
-        S1["05-hypervisor<br/><small>QEMU + VMware + VirtFS</small>"]
-        S2["10-time<br/><small>Multi-peer Anycast NTS</small>"]
-        S3["20-sysctl<br/><small>CIS Baseline & BBR</small>"]
-        S4["25-baremetal<br/><small>NVMe mq-deadline & ZRAM</small>"]
+        S0["00-base-strip<br/><small>Purge snapd & telemetry</small>"]:::foundation
+        S1["05-hypervisor<br/><small>QEMU + VMware + VirtFS</small>"]:::foundation
+        S2["10-time<br/><small>Multi-peer Anycast NTS</small>"]:::foundation
+        S3["20-sysctl<br/><small>CIS Baseline & BBR</small>"]:::foundation
+        S4["25-baremetal<br/><small>NVMe mq-deadline & ZRAM</small>"]:::foundation
         S0 --> S1 --> S2 --> S3 --> S4
     end
 
     subgraph DualPath["Dual Build & Provisioning Engine"]
         direction TB
         subgraph TrackPacker["Track A: Packer Image Factory"]
-            PE["Packer Engine<br/><small>QEMU / Proxmox VE</small>"]
-            PE --> Tiers["44 Production Flavors<br/><small>7 Workload Tiers × Hardware Matrix</small>"]
-            Tiers --> Artifacts[".qcow2.zst · .raw.zst · .vmdk.zst<br/><small>High-Ratio Zstandard Artifacts</small>"]
+            PE["Packer Engine<br/><small>QEMU / Proxmox VE</small>"]:::packer
+            Tiers["44 Production Flavors<br/><small>7 Workload Tiers × Hardware Matrix</small>"]:::tiers
+            Artifacts[".qcow2.zst · .raw.zst · .vmdk.zst<br/><small>High-Ratio Zstandard Artifacts</small>"]:::artifacts
+            PE --> Tiers
+            Tiers --> Artifacts
         end
         subgraph TrackImageless["Track B: Imageless & MicroVMs"]
-            CLI["lusoris-forge CLI / MCP<br/><small>Go 1.27 Engine</small>"]
-            CLI --> Apply["In-Place Provisioning<br/><small>SSH / Local Host Apply</small>"]
-            CLI --> Boot["MicroVM Direct Kernel Boot<br/><small>Cloud-Hypervisor & Firecracker</small>"]
+            CLI["lusoris-forge CLI / MCP<br/><small>Go 1.27 Engine</small>"]:::imageless
+            Apply["In-Place Provisioning<br/><small>SSH / Local Host Apply</small>"]:::imageless
+            Boot["MicroVM Direct Kernel Boot<br/><small>Cloud-Hypervisor & Firecracker</small>"]:::imageless
+            CLI --> Apply
+            CLI --> Boot
         end
     end
 
     SSOT --> Foundation
     Foundation --> PE
     Foundation -.-> CLI
+
+    style SSOT fill:none,stroke:#0284c7,stroke-width:2px,stroke-dasharray: 4 4
+    style Foundation fill:none,stroke:#d97706,stroke-width:2px,stroke-dasharray: 4 4
+    style TrackPacker fill:none,stroke:#7c3aed,stroke-width:2px,stroke-dasharray: 4 4
+    style TrackImageless fill:none,stroke:#059669,stroke-width:2px,stroke-dasharray: 4 4
+    style DualPath fill:none,stroke:#64748b,stroke-width:2px
 ```
 
 ---
@@ -139,14 +158,14 @@ make build-ai-infer-nvidia     # AI inference appliance (vLLM / NUMA tuning)
 .
 ├── versions.json              # Single Source of Truth (SSOT) for all versions
 ├── versions.schema.json       # JSON Schema (Draft 2020-12) validating SSOT
-├── FLAVORS.md                 # Segmented catalog of all 39 flavors & make targets
+├── FLAVORS.md                 # Segmented catalog of all 44 production flavors & make targets
 ├── mkdocs.yml                 # Documentation portal configuration
 ├── docs/                      # Comprehensive engineering documentation
 │   ├── flavors/               # Detailed guides for each workload tier
 │   ├── platforms/             # Hypervisors: Proxmox, Unraid, VMware, Bare-Metal
 │   ├── hardware/              # Acceleration: NVIDIA CUDA, Intel Arc, AMD ROCm
 │   ├── security/              # CIS Benchmarks, Anycast NTS, Supply Chain
-│   ├── adr/                   # Architecture Decision Records (0001–0007)
+│   ├── adr/                   # Architecture Decision Records (0001–0011)
 │   └── community/             # Contributing, Security, Audits, Governance
 ├── packer/                    # Modular Packer HCL2 templates & shell provisioners
 ├── tests/                     # Automated pytest verification suite

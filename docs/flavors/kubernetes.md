@@ -16,38 +16,46 @@ To balance zero first-boot latency with disk footprint, `lusoris-cloud-images` p
 
 ```mermaid
 flowchart TD
+    %% Semantic class definitions with vibrant, high-contrast jewel palettes
+    classDef vip fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff
+    classDef core fill:#e11d48,stroke:#be123c,stroke-width:2px,color:#ffffff
+    classDef runtime fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#ffffff
+    classDef cni fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff
+    classDef hw fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff
+    classDef os fill:#334155,stroke:#1e293b,stroke-width:2px,color:#ffffff
+
     subgraph ControlPlaneVIP["High Availability Virtual IP"]
-        KV["kube-vip:v1.2.3<br/><small>Control Plane API HA</small>"]
+        KV["kube-vip:v1.2.3<br/><small>Control Plane API HA</small>"]:::vip
     end
 
     subgraph NodeStack["Kubernetes Worker Node Architecture"]
         direction TB
         subgraph K8sCore["Node Core Binaries (Pinned v1.37.0)"]
-            Kubelet["kubelet (Cgroup v2)"]
-            Kubeadm["kubeadm & kubectl"]
+            Kubelet["kubelet (Cgroup v2)"]:::core
+            Kubeadm["kubeadm & kubectl"]:::core
         end
 
         subgraph RuntimeLayer["Container Runtime (containerd 2.3.5)"]
-            Containerd["containerd.service<br/><small>SystemdCgroup = true · discard_unpacked_layers</small>"]
-            Pause["registry.k8s.io/pause:3.10"]
+            Containerd["containerd.service<br/><small>SystemdCgroup = true · discard_unpacked_layers</small>"]:::runtime
+            Pause["registry.k8s.io/pause:3.10"]:::runtime
         end
 
         subgraph CNIProfiles["Modular CNI Profiles"]
-            Cilium["Cilium 1.20.1<br/><small>eBPF Routing & Policies</small>"]
-            Calico["Calico 3.32.2<br/><small>BGP & VXLAN Overlay</small>"]
-            Flannel["Flannel 0.28.9<br/><small>Lightweight VXLAN</small>"]
+            Cilium["Cilium 1.20.1<br/><small>eBPF Routing & Policies</small>"]:::cni
+            Calico["Calico 3.32.2<br/><small>BGP & VXLAN Overlay</small>"]:::cni
+            Flannel["Flannel 0.28.9<br/><small>Lightweight VXLAN</small>"]:::cni
         end
 
         subgraph HardwareCDI["Hardware Acceleration & CDI"]
-            IntelDP["Intel GPU Device Plugin<br/><small>Level Zero / iHD</small>"]
-            AMDDP["AMD ROCm Device Plugin<br/><small>/dev/kfd & /dev/dri</small>"]
-            NvidiaDP["NVIDIA Device Plugin<br/><small>CDI / NVLink Fabric</small>"]
+            IntelDP["Intel GPU Device Plugin<br/><small>Level Zero / iHD</small>"]:::hw
+            AMDDP["AMD ROCm Device Plugin<br/><small>/dev/kfd & /dev/dri</small>"]:::hw
+            NvidiaDP["NVIDIA Device Plugin<br/><small>CDI / NVLink Fabric</small>"]:::hw
         end
 
-        subgraph OSFoundation["Linux Kernel 6.14+ (Ubuntu Resolute)"]
-            BBR["BBR + TCP ECN"]
-            BPF["bpf_jit_harden = 2"]
-            Netfilter["br_netfilter & OverlayFS Metacopy"]
+        subgraph OSFoundation["Linux Kernel 6.14+ (Hardened Foundation)"]
+            BBR["BBR + TCP ECN"]:::os
+            BPF["bpf_jit_harden = 2"]:::os
+            Netfilter["br_netfilter & OverlayFS Metacopy"]:::os
         end
     end
 
@@ -56,6 +64,14 @@ flowchart TD
     RuntimeLayer --> CNIProfiles
     RuntimeLayer --> HardwareCDI
     K8sCore -.-> KV
+
+    style ControlPlaneVIP fill:none,stroke:#0284c7,stroke-width:2px,stroke-dasharray: 4 4
+    style NodeStack fill:none,stroke:#64748b,stroke-width:2px
+    style K8sCore fill:none,stroke:#e11d48,stroke-width:2px,stroke-dasharray: 4 4
+    style RuntimeLayer fill:none,stroke:#7c3aed,stroke-width:2px,stroke-dasharray: 4 4
+    style CNIProfiles fill:none,stroke:#059669,stroke-width:2px,stroke-dasharray: 4 4
+    style HardwareCDI fill:none,stroke:#d97706,stroke-width:2px,stroke-dasharray: 4 4
+    style OSFoundation fill:none,stroke:#334155,stroke-width:2px,stroke-dasharray: 4 4
 ```
 
 ---
@@ -86,4 +102,47 @@ All hardware-specific flavors include the respective Container Device Interface 
 - **`k8s-node-nvidia`**: NVIDIA Mainstream 565 driver with NVIDIA K8s Device Plugin (`nvcr.io/nvidia/k8s-device-plugin:v0.20.0`).
 - **`k8s-node-nvidia-modern`**: NVIDIA Modern 610 driver (Ada Lovelace / Hopper) with NVIDIA K8s Device Plugin.
 - **`k8s-node-nvidia-bleeding`**: NVIDIA Bleeding 615 driver (Blackwell RTX 5090 / B200) with NVIDIA K8s Device Plugin.
+
+---
+
+## High-Performance Dual Runtimes (`runc` & `crun`)
+
+Following [ADR-0010](../adr/0010-container-ecosystem-runtimes-and-tooling.md), all `k8s-node-*` appliances ship with both standard `runc` and the ultra-fast, C-based `crun` OCI runtime:
+
+- **Default Runtime (`runc`)**: Guarantees universal compatibility with third-party tools, security scanners, and stock Kubernetes workloads.
+- **Accelerated Runtime (`crun`)**: Pre-registered in `/etc/containerd/config.toml` (`io.containerd.runc.v2` with `BinaryName = "crun"`). Cuts container creation latency by 2–3x and reduces per-container runtime resident memory from ~25MB to ~4MB.
+
+To utilize `crun` on any deployment, define a cluster `RuntimeClass` and reference it in the Pod spec:
+
+```yaml
+apiVersion: node.k8s.io/v1
+kind: RuntimeClass
+metadata:
+  name: crun
+handler: crun
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: high-performance-workload
+spec:
+  runtimeClassName: crun
+  containers:
+    - name: app
+      image: registry.example.com/workload:latest
+```
+
+---
+
+## Zero-Footprint Container Diagnostics (`cdebug`)
+
+All Kubernetes node images pre-bake `cdebug` under `/usr/local/bin/cdebug`. Operators can troubleshoot distroless or minimal containers directly on the host without mutating the target container or installing debugging packages inside production pods:
+
+```bash
+# Attach an ephemeral debugging shell to a running container via containerd
+sudo cdebug exec -it --runtime containerd <container-id>
+
+# Attach a fully-equipped network diagnostic toolkit (netshoot) to a pod namespace
+sudo cdebug exec -it --image nicolaka/netshoot --runtime containerd <container-id>
+```
 

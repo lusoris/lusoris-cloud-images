@@ -84,14 +84,29 @@ Lusoris provisioners enforce compliance with **Center for Internet Security (CIS
 
 ---
 
-## 5. Multi-Distribution Matrix Evaluation
+## 5. Multi-Distribution Matrix Evaluation & Roadmap
 
-While Ubuntu 24.04 LTS serves as the primary base distribution for hardware and driver breadth, Lusoris evaluates and architecturally accommodates alternate bases:
+While Ubuntu LTS (Ubuntu 26.04 LTS Resolute Minimal, maintaining Ubuntu 24.04 LTS compatibility) serves as the primary base distribution for hardware and driver breadth, Lusoris formalizes an active multi-distribution upstream roadmap ([ADR-0009](../adr/0009-multi-distribution-base-roadmap.md)):
 
-| Distribution Base | Strengths | Weaknesses | Architectural Suitability |
+| Distribution Base | Strengths | Weaknesses | Architectural Roadmap Status |
 | :--- | :--- | :--- | :--- |
-| **Ubuntu 24.04 LTS** | Broadest GPU/accelerator driver support, Canonical security backports, first-class cloud-init | Larger base image size without pruning | **Default Foundation** across all 44 flavors |
-| **Debian 12 (Bookworm)** | Extremely lean base, predictable upstream, rock-solid stability | Slower backports for bleeding-edge NVIDIA/ROCm drivers | Ideal for minimal microVMs and base appliance |
-| **Alpine Linux** | Tiny footprint (< 50MB), musl libc security | musl glibc incompatibility with proprietary NVIDIA/CUDA drivers | Excellent for non-GPU micro-appliances |
-| **Talos Linux** | Completely immutable, API-driven, zero SSH, ephemeral root | Inflexible for custom host-level homelab appliances | Gold standard for pure Kubernetes nodes |
-| **bootc (CentOS/Fedora)** | OCI image-based boot, transactional OSTree updates | Heavy container registry dependence during boot | Candidate for next-gen cloudnative tier |
+| **Ubuntu LTS (26.04 / 24.04)** | Broadest GPU/accelerator driver support, Canonical security backports, first-class cloud-init | Larger base image size without pruning | **Production Foundation** across all 44 GPU/compute flavors |
+| **Debian 13 (Trixie) / 12 (Bookworm)** | Extremely lean base, predictable upstream, rock-solid stability | Slower backports for bleeding-edge NVIDIA/ROCm drivers | **Phase 2 Target**: Minimal microVMs, storage appliances (`cloudnative-storage`) |
+| **Alpine Linux (3.21+)** | Tiny footprint (< 50MB), musl libc security | musl glibc incompatibility with proprietary NVIDIA/CUDA drivers | **Phase 3 Target**: Lightweight edge gateway appliances & microVMs |
+| **bootc (CentOS/Fedora)** | OCI image-based boot, transactional OSTree updates | Heavy container registry dependence during boot | **Phase 4 Target**: Declarative immutable host (`cloudnative-generic`) |
+| **Talos Linux** | Completely immutable, API-driven, zero SSH, ephemeral root | Inflexible for custom host-level homelab appliances | Evaluated reference benchmark for pure Kubernetes nodes |
+
+---
+
+## 6. Modern Container Runtimes & Zero-Footprint Diagnostics
+
+Following insights from the container ecosystem and [`pditommaso/awesome-containers`](https://github.com/pditommaso/awesome-containers) codified in [ADR-0010](../adr/0010-container-ecosystem-runtimes-and-tooling.md), container workloads in `lusoris-cloud-images` implement modern performance and operational standards:
+
+1. **Dual OCI Runtime Engines (`runc` & `crun`)**:
+   - Standard `runc` remains active for default compatibility.
+   - High-performance `crun` is pre-baked and configured in containerd as an alternative `RuntimeClass`, cutting container startup latency by 2–3x and reducing resident memory overhead from ~25MB to ~4MB per container.
+2. **Zero-Footprint Troubleshooting (`cdebug`)**:
+   - Production images strictly avoid bundling debugging utilities (`gdb`, `strace`, `tcpdump`, `curl`, `netshoot`) into container base layers.
+   - Instead, the host operating system provides `cdebug` (`/usr/local/bin/cdebug`), enabling operators to attach ephemeral troubleshooting toolkits into any running container or Pod namespace on-demand without image modification.
+3. **Lazy-Pulling Snapshotter Roadmap (eStargz)**:
+   - For multi-gigabyte AI/ML inference containers (Ollama, vLLM, PyTorch), `stargz-snapshotter` enables startup in $< 2\text{s}$ by streaming content on-demand over HTTP range requests rather than waiting for full-image downloads.

@@ -1,0 +1,15 @@
+{
+  "id": "lusoris-container-k8s",
+  "base_agent": "antigravity-preview-05-2026",
+  "description": "Cloud-Native Kubernetes & Runtime Specialist specialized in containerd 2.3.5, crun OCI, Cilium eBPF, Calico, kube-vip, and CDI device plugins.",
+  "agent_config": {
+    "type": "antigravity",
+    "model": "gemini-3.8-flash"
+  },
+  "tools": [
+    { "type": "code_execution" },
+    { "type": "filesystem_tools" },
+    { "type": "google_search" },
+    { "type": "url_context" }
+  ]
+}

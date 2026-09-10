@@ -6,29 +6,38 @@ All 44 flavors originate from a single base configuration and are customized via
 
 ```mermaid
 flowchart LR
+    %% Semantic class definitions with vibrant, high-contrast jewel palettes
+    classDef dim fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff
+    classDef tier fill:#e11d48,stroke:#be123c,stroke-width:2px,color:#ffffff
+    classDef out fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff
+
     subgraph Dimensions["The 4 Orthogonal Dimensions"]
-        D1["Dimension 1: Platform<br/><small>Proxmox · Unraid · ESXi · BareMetal</small>"]
-        D2["Dimension 2: Workload Tier<br/><small>Base · Containers · K8s · K3s · CloudNative · AI · Homelab</small>"]
-        D3["Dimension 3: Hardware Acceleration<br/><small>VirtIO · Intel Xe · AMD ROCm · NVIDIA 535–615 · Coral</small>"]
-        D4["Dimension 4: Hardening Profile<br/><small>CIS L2 · NTS Chrony · BBR · Immutable Root</small>"]
+        D1["Dimension 1: Platform<br/><small>Proxmox · Unraid · ESXi · BareMetal</small>"]:::dim
+        D2["Dimension 2: Workload Tier<br/><small>Base · Containers · K8s · K3s · CloudNative · AI · Homelab</small>"]:::dim
+        D3["Dimension 3: Hardware Acceleration<br/><small>VirtIO · Intel Xe · AMD ROCm · NVIDIA 535–615 · Coral</small>"]:::dim
+        D4["Dimension 4: Hardening Profile<br/><small>CIS L2 · NTS Chrony · BBR · Immutable Root</small>"]:::dim
     end
 
     subgraph Tiers["7 Workload Tiers (44 Production Flavors)"]
-        T1["Tier 1: Base Cloud (8)"]
-        T2["Tier 2: Container Hosts (7)"]
-        T3["Tier 3: Enterprise K8s (9)"]
-        T4["Tier 4: K3s Edge Fleet (5)"]
-        T5["Tier 5: CloudNative & Storage (4)"]
-        T6["Tier 6: AI & LLM Inference (6)"]
-        T7["Tier 7: Homelab Appliances (5)"]
+        T1["Tier 1: Base Cloud (8)"]:::tier
+        T2["Tier 2: Container Hosts (7)"]:::tier
+        T3["Tier 3: Enterprise K8s (9)"]:::tier
+        T4["Tier 4: K3s Edge Fleet (5)"]:::tier
+        T5["Tier 5: CloudNative & Storage (4)"]:::tier
+        T6["Tier 6: AI & LLM Inference (6)"]:::tier
+        T7["Tier 7: Homelab Appliances (5)"]:::tier
     end
 
     subgraph Deliverables["Output Artifacts"]
-        Out["44 Production Cloud Images<br/><small>.qcow2.zst · .raw.zst · .vmdk.zst</small>"]
+        Out["44 Production Cloud Images<br/><small>.qcow2.zst · .raw.zst · .vmdk.zst</small>"]:::out
     end
 
     Dimensions --> Tiers
     Tiers --> Deliverables
+
+    style Dimensions fill:none,stroke:#0284c7,stroke-width:2px,stroke-dasharray: 4 4
+    style Tiers fill:none,stroke:#e11d48,stroke-width:2px,stroke-dasharray: 4 4
+    style Deliverables fill:none,stroke:#059669,stroke-width:2px,stroke-dasharray: 4 4
 ```
 
 ---

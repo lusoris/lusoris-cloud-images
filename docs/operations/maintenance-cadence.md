@@ -88,3 +88,16 @@ Annual maintenance focuses on cryptographic identity hygiene and architectural r
    - Update key fingerprints in documentation and security policy files.
 3. **Top500 & Green500 Supercomputing Realignment**:
    - Survey the Top500 supercomputing rankings to validate datacenter AI accelerator profiles, Fabric Manager configurations, and NVLink interconnect topologies.
+
+---
+
+## 6. Immutable Image Deprecation & Fleet Lifecycle Policy
+
+Following [ADR-0011](../adr/0011-enterprise-golden-image-compliance-and-lifecycle.md), production infrastructure deployed with `lusoris-cloud-images` operates on a strict **Zero-Patching Fleet Immutability** model:
+
+1. **Strict 30-Day Image Lifespan**:
+   - Published golden images enforce a 30-day active lifespan. Autoscaling node pools and hypervisor clusters are recycled continuously over newly forged baselines.
+   - Older images are flagged with cloud deprecation markers (e.g. `aws ec2 enable-image-deprecation --image-id <ami-id> --deprecate-at <timestamp>`), hiding deprecated images from general provisioning while leaving existing running instances uninterrupted.
+2. **Zero In-Place Host Patching**:
+   - Live production nodes must never be patched in place via manual SSH, apt upgrades, or ad-hoc configuration scripts.
+   - Security errata and package upgrades trigger a deterministic pipeline rebuild, producing an updated golden artifact deployed via automated rolling replacement.

@@ -8,27 +8,36 @@
 
 ```mermaid
 flowchart TD
+    %% Semantic class definitions with vibrant, high-contrast jewel palettes
+    classDef l1 fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff
+    classDef l2 fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#ffffff
+    classDef l3 fill:#e11d48,stroke:#be123c,stroke-width:2px,color:#ffffff
+
     subgraph Level1["Level 1: Universal OS Hardening (All 44 Flavors)"]
-        CIS["CIS L2 Server & BSI IT-Grundschutz"]
-        NTS["Multi-Peer Anycast NTS Chrony (0640)"]
-        Kernel["BBR + fq + sysrq=0 + protected_hardlinks"]
-        NVMe["mq-deadline I/O & ZRAM Compressed Swap"]
+        CIS["CIS L2 Server & BSI IT-Grundschutz"]:::l1
+        NTS["Multi-Peer Anycast NTS Chrony (0640)"]:::l1
+        Kernel["BBR + fq + sysrq=0 + protected_hardlinks"]:::l1
+        NVMe["mq-deadline I/O & ZRAM Compressed Swap"]:::l1
     end
 
     subgraph Level2["Level 2: Workload & Runtime Isolation"]
-        T2["Tier 2: Containers<br/><small>Docker CE 29 · Podman 5 · no-new-privileges · CDI</small>"]
-        T3["Tier 3: Kubernetes<br/><small>containerd 2.3.5 · Cgroup v2 · Cilium/Calico · kube-vip</small>"]
-        T4["Tier 4: K3s Edge Fleet<br/><small>Low-Memory Footprint &lt;300MB RAM · SQLite</small>"]
+        T2["Tier 2: Containers<br/><small>Docker CE 29 · Podman 5 · no-new-privileges · CDI</small>"]:::l2
+        T3["Tier 3: Kubernetes<br/><small>containerd 2.3.5 · Cgroup v2 · Cilium/Calico · kube-vip</small>"]:::l2
+        T4["Tier 4: K3s Edge Fleet<br/><small>Low-Memory Footprint &lt;300MB RAM · SQLite</small>"]:::l2
     end
 
     subgraph Level3["Level 3: Specialized Workload Tuning"]
-        T5["Tier 5: CloudNative & Storage<br/><small>Immutable Read-Only Root · tmpfs · NVMe-oF · OpenZFS</small>"]
-        T6["Tier 6: AI & LLM Inference<br/><small>Transparent Hugepages · NUMA Pinning · /dev/kfd</small>"]
-        T7["Tier 7: Homelab Appliances<br/><small>Stub Resolver Disabled · Coral Edge TPU · 4096KB Readahead</small>"]
+        T5["Tier 5: CloudNative & Storage<br/><small>Immutable Read-Only Root · tmpfs · NVMe-oF · OpenZFS</small>"]:::l3
+        T6["Tier 6: AI & LLM Inference<br/><small>Transparent Hugepages · NUMA Pinning · /dev/kfd</small>"]:::l3
+        T7["Tier 7: Homelab Appliances<br/><small>Stub Resolver Disabled · Coral Edge TPU · 4096KB Readahead</small>"]:::l3
     end
 
     Level1 --> Level2
     Level2 --> Level3
+
+    style Level1 fill:none,stroke:#d97706,stroke-width:2px,stroke-dasharray: 4 4
+    style Level2 fill:none,stroke:#7c3aed,stroke-width:2px,stroke-dasharray: 4 4
+    style Level3 fill:none,stroke:#e11d48,stroke-width:2px,stroke-dasharray: 4 4
 ```
 
 ---
@@ -183,3 +192,38 @@ flowchart TD
    - 32-bit `i386` multi-architecture enabled with 32-bit glibc packages.
    - Network UDP buffer tuning: `net.core.rmem_max = 16777216`, `net.core.wmem_max = 16777216`.
    - SteamCMD execution wrapper pre-installed.
+
+---
+
+## 9. NIST SP 800-53 (Rev. 5) & NIST SP 800-190 Compliance Crosswalk
+
+Following [ADR-0011](../adr/0011-enterprise-golden-image-compliance-and-lifecycle.md), all `lusoris-cloud-images` flavors implement a formal crosswalk to federal cybersecurity standards:
+
+| Regulatory Standard | Control ID | Concrete Implementation in `lusoris-cloud-images` | Automated Verification |
+| :--- | :--- | :--- | :--- |
+| **NIST SP 800-53** | **AC-6 (Least Privilege)** | Non-essential setuid/setgid bits stripped; execution permissions restricted on low-level toolchains (`chmod 0700 /usr/bin/as /usr/bin/byacc`); unprivileged runtime UIDs (UID >= 10001). | `test_provisioners_no_banned_constructs` |
+| **NIST SP 800-53** | **CM-6 (Configuration Settings)** | 100% declarative SSOT in [`versions.json`](https://github.com/lusoris/lusoris-cloud-images/blob/main/versions.json); zero hardcoded distribution URLs or versions; sysctl hardening in `/etc/sysctl.d/99-lusoris.conf`. | `test_schema_conformance`, `goss.yaml` |
+| **NIST SP 800-53** | **SI-2 (Flaw Remediation)** | Zero in-place patching policy. Base images are regenerated on weekly cadences with upstream security errata, producing immutable release artifacts. | CI matrix rebuilds, 30-day deprecation flags |
+| **NIST SP 800-53** | **SI-4 (Information Monitoring)** | Audit subsystem configured with safe buffer scaling (`-b 8192 -f 1`); BPF JIT hardened (`bpf_jit_harden = 2`); eBPF execution restricted to administrative contexts. | `tests/compliance/goss.yaml` |
+| **NIST SP 800-190** | **Application Container Security** | Default compilers (`gcc`, `make`, `clang`) purged from runtime layers; read-only rootfilesystems (`cloudnative-*`); seccomp default profiles; rootless Podman execution (`41-podman-runtime.sh`). | `test_all_flavors_in_catalog_and_matrix` |
+
+---
+
+## 10. OpenSSH Hardening Baseline & Certificate Authority (CA) Integration
+
+All production images ship with a hardened OpenSSH configuration drop-in at `/etc/ssh/sshd_config.d/00-hardened-sshd.conf` (permissions `0600`):
+
+### 10.1 Cryptographic Suites
+- **Key Exchange**: `curve25519-sha256`, `curve25519-sha256@libssh.org`, `diffie-hellman-group16-sha512`, `diffie-hellman-group18-sha512`.
+- **Ciphers**: `chacha20-poly1305@openssh.com`, `aes256-gcm@openssh.com`, `aes128-gcm@openssh.com`.
+- **MACs**: `hmac-sha2-512-etm@openssh.com`, `hmac-sha2-256-etm@openssh.com`.
+
+### 10.2 Operational Boundaries & Session Controls
+- `PermitRootLogin no`: Direct root SSH access is completely blocked.
+- `PasswordAuthentication no`: Enforced upon final snapshot sealing in `99-cleanup.sh`. Access strictly requires SSH keys or CA certificates.
+- `MaxAuthTries 3` and `MaxSessions 2`: Mitigates brute-force authentication attempts.
+- `ClientAliveInterval 300` and `ClientAliveCountMax 0`: Terminates unresponsive or orphaned sessions.
+- `X11Forwarding no`, `AllowTcpForwarding no`, `AllowAgentForwarding no`: Prevents lateral proxy hopping and agent hijacking.
+
+### 10.3 Enterprise OpenSSH Certificate Authority
+Images pre-configure `TrustedUserCAKeys /etc/ssh/trusted-user-ca-keys.pub`. Organizations can deploy enterprise CA public keys via cloud-init or configuration management, enabling engineers to authenticate using short-lived (1–8h), MFA-backed user certificates issued by identity providers (IdPs) without managing static `authorized_keys`.

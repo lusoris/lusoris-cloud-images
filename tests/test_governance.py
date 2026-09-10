@@ -7,7 +7,9 @@ Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked asser
 """
 
 from pathlib import Path
+import os
 import re
+import subprocess
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 PACKER_DIR = REPO_ROOT / "packer"
@@ -120,4 +122,14 @@ class TestGovernanceIntegrity:
         """Verify audit-repository-health.sh is present and executable."""
         audit_script = REPO_ROOT / "scripts" / "audit-repository-health.sh"
         assert audit_script.exists(), "scripts/audit-repository-health.sh missing"
-        assert audit_script.stat().st_mode & 0o111, "scripts/audit-repository-health.sh not executable"
+        if os.name == "nt":
+            res = subprocess.run(
+                ["git", "ls-files", "-s", "scripts/audit-repository-health.sh"],
+                capture_output=True,
+                text=True,
+                cwd=str(REPO_ROOT),
+                check=False,
+            )
+            assert res.stdout.startswith("100755"), "scripts/audit-repository-health.sh not executable in git"
+        else:
+            assert audit_script.stat().st_mode & 0o111, "scripts/audit-repository-health.sh not executable"

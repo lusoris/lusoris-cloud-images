@@ -18,4 +18,7 @@ Once an ADR reaches status **Accepted**, its text is immutable. If architectural
 | [0006](0006-k3s-edge-fleet-flavors.md) | K3s Lightweight Fleet Edge Flavors | Accepted | 2026-09-10 |
 | [0007](0007-cloudnative-and-cncf-storage-appliances.md) | Cloud-Native Immutable and CNCF Storage Appliances | Accepted | 2026-09-10 |
 | [0008](0008-specialized-homelab-appliances.md) | Specialized Homelab Appliance Flavors | Accepted | 2026-09-10 |
+| [0009](0009-multi-distribution-base-roadmap.md) | Multi-Distribution Base OS Architecture and Roadmap | Accepted | 2026-09-10 |
+| [0010](0010-container-ecosystem-runtimes-and-tooling.md) | Modern Container Runtimes, Lazy-Pulling Snapshotters, and Zero-Footprint Diagnostic Tooling | Accepted | 2026-09-10 |
+| [0011](0011-enterprise-golden-image-compliance-and-lifecycle.md) | Enterprise Golden Image Hardening, Compliance Crosswalk, and Lifecycle Governance | Accepted | 2026-09-10 |
 

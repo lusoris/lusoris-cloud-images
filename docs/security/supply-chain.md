@@ -32,30 +32,36 @@ Every pull request is subjected to deterministic automated validation before rea
 
 ```mermaid
 flowchart TD
+    %% Semantic class definitions with vibrant, high-contrast jewel palettes
+    classDef pr fill:#0284c7,stroke:#0369a1,stroke-width:2px,color:#ffffff
+    classDef scan fill:#d97706,stroke:#b45309,stroke-width:2px,color:#ffffff
+    classDef merge fill:#059669,stroke:#047857,stroke-width:2px,color:#ffffff
+    classDef release fill:#7c3aed,stroke:#6d28d9,stroke-width:2px,color:#ffffff
+
     subgraph PRGate["1. PR Submission & Project Gate"]
-        PR["Pull Request Created"]
-        ProjectGate["pr-project-gate<br/><small>Epics & Milestones Verification</small>"]
+        PR["Pull Request Created"]:::pr
+        ProjectGate["pr-project-gate<br/><small>Epics & Milestones Verification</small>"]:::pr
         PR --> ProjectGate
     end
 
     subgraph SecurityScans["2. Parallel Quality & Security Scanners"]
         direction TB
-        Gitleaks["Gitleaks<br/><small>Secret & RFC 1918 Leak Detection</small>"]
-        Semgrep["Semgrep SAST<br/><small>Static Application Security Analysis</small>"]
-        Trivy["Trivy Vulnerability Scan<br/><small>Filesystem & Dependency CVEs</small>"]
-        Linter["Linters Matrix<br/><small>ShellCheck · Shfmt · Actionlint · Yamllint</small>"]
-        Tests["Test Matrix<br/><small>Go 1.27 Unit Tests · Pytest (49 Tests)</small>"]
+        Gitleaks["Gitleaks<br/><small>Secret & RFC 1918 Leak Detection</small>"]:::scan
+        Semgrep["Semgrep SAST<br/><small>Static Application Security Analysis</small>"]:::scan
+        Trivy["Trivy Vulnerability Scan<br/><small>Filesystem & Dependency CVEs</small>"]:::scan
+        Linter["Linters Matrix<br/><small>ShellCheck · Shfmt · Actionlint · Yamllint</small>"]:::scan
+        Tests["Test Matrix<br/><small>Go 1.27 Unit Tests · Pytest (50 Tests)</small>"]:::scan
     end
 
     subgraph MergeGate["3. Trunk-Based Hard Gate"]
-        Aggregator{"required-checks<br/><small>All Checks Green</small>"}
-        MainBranch(["Merged to main Branch"])
+        Aggregator{"required-checks<br/><small>All Checks Green</small>"}:::merge
+        MainBranch(["Merged to main Branch"]):::merge
     end
 
     subgraph ReleaseChain["4. Cryptographic Release Attestation"]
-        Cosign["Sigstore Cosign<br/><small>Keyless OIDC Artifact Signing</small>"]
-        Syft["Syft SBOM Generator<br/><small>CycloneDX & SPDX JSON</small>"]
-        Artifacts[("Signed Production Artifacts<br/><small>.qcow2.zst · .raw.zst · .vmdk.zst</small>")]
+        Cosign["Sigstore Cosign<br/><small>Keyless OIDC Artifact Signing</small>"]:::release
+        Syft["Syft SBOM Generator<br/><small>CycloneDX & SPDX JSON</small>"]:::release
+        Artifacts[("Signed Production Artifacts<br/><small>.qcow2.zst · .raw.zst · .vmdk.zst</small>")]:::release
         Cosign & Syft --> Artifacts
     end
 
@@ -63,5 +69,10 @@ flowchart TD
     SecurityScans --> Aggregator
     Aggregator -->|Pass| MainBranch
     MainBranch --> ReleaseChain
+
+    style PRGate fill:none,stroke:#0284c7,stroke-width:2px,stroke-dasharray: 4 4
+    style SecurityScans fill:none,stroke:#d97706,stroke-width:2px,stroke-dasharray: 4 4
+    style MergeGate fill:none,stroke:#059669,stroke-width:2px,stroke-dasharray: 4 4
+    style ReleaseChain fill:none,stroke:#7c3aed,stroke-width:2px,stroke-dasharray: 4 4
 ```
 

@@ -5,6 +5,8 @@
 # Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.
 set -euo pipefail
 
+CDEBUG_VERSION="${CDEBUG_VERSION:-0.5.1}"
+
 install_podman_packages() {
   echo "==> Installing Podman, Buildah, Skopeo, Netavark, and crun on Ubuntu 26.04..."
   sudo apt-get update
@@ -34,9 +36,25 @@ configure_quadlet_and_rootless() {
   sudo chown -R ubuntu:ubuntu /home/ubuntu/.config 2>/dev/null || true
 }
 
+install_cdebug() {
+  local version="${CDEBUG_VERSION:-0.5.1}"
+  local arch
+  arch=$(uname -m)
+  case "${arch}" in
+    x86_64) arch="amd64" ;;
+    aarch64 | arm64) arch="arm64" ;;
+    *) return 0 ;;
+  esac
+  echo "==> Installing cdebug v${version} for zero-footprint diagnostics..."
+  local url="https://github.com/iximiuz/cdebug/releases/download/v${version}/cdebug_${version}_linux_${arch}.tar.gz"
+  curl -fsSL --max-time 30 "${url}" | sudo tar -xz -C /usr/local/bin cdebug 2>/dev/null || true
+  sudo chmod 755 /usr/local/bin/cdebug 2>/dev/null || true
+}
+
 main() {
   install_podman_packages
   configure_quadlet_and_rootless
+  install_cdebug
   echo "==> 41-podman-runtime: Complete."
 }
 

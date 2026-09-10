@@ -100,12 +100,48 @@ configure_zram_swap() {
   fi
 }
 
+configure_openssh_hardening() {
+  echo "==> Configuring CIS Level 2 / DISA STIG OpenSSH daemon hardening..."
+  sudo mkdir -p /etc/ssh/sshd_config.d
+  cat <<'EOF' | sudo tee /etc/ssh/sshd_config.d/00-hardened-sshd.conf
+# CIS Benchmark Level 2 & DISA STIG OpenSSH Hardening Baseline
+Port 22
+Protocol 2
+AddressFamily inet
+
+# Cryptographic Suite Selection
+KexAlgorithms curve25519-sha256,curve25519-sha256@libssh.org,diffie-hellman-group16-sha512,diffie-hellman-group18-sha512
+Ciphers chacha20-poly1305@openssh.com,aes256-gcm@openssh.com,aes128-gcm@openssh.com
+MACs hmac-sha2-512-etm@openssh.com,hmac-sha2-256-etm@openssh.com
+
+# Authentication & Session Boundaries
+PermitRootLogin no
+MaxAuthTries 3
+MaxSessions 2
+PubkeyAuthentication yes
+ClientAliveInterval 300
+ClientAliveCountMax 0
+LoginGraceTime 30
+X11Forwarding no
+AllowTcpForwarding no
+AllowAgentForwarding no
+
+# OpenSSH Certificate Authority Integration
+TrustedUserCAKeys /etc/ssh/trusted-user-ca-keys.pub
+EOF
+
+  sudo touch /etc/ssh/trusted-user-ca-keys.pub
+  sudo chmod 0600 /etc/ssh/sshd_config.d/00-hardened-sshd.conf
+  sudo chmod 0644 /etc/ssh/trusted-user-ca-keys.pub
+}
+
 main() {
   strip_documentation_paths
   purge_distro_bloat
   configure_fast_boot_and_systemd
   install_base_essentials
   configure_zram_swap
+  configure_openssh_hardening
   echo "==> 00-base-strip: Complete."
 }
 
