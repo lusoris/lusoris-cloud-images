@@ -48,7 +48,7 @@ Across the reference repositories, the stable architectural pattern is:
 | **Supply-Chain & SAST Scans** | **Adopted** | OpenSSF Scorecard v2.4.4, Semgrep SAST, Trivy CVE filesystem scan, Gitleaks |
 | **Worktree Discipline** | **Adopted** | Isolated branch/worktree execution under `.workingdir2/worktrees/`; never run parallel agents in main |
 | **Working Sequence & Prose Bar** | **Adopted** | Standardized 7-step working sequence and technical information density in `AGENTS.md` |
-| **Schema-Validated SSOT** | **Adopted** | Declarative [`versions.schema.json`](../versions.schema.json) dynamically enforcing `versions.json` integrity |
+| **Schema-Validated SSOT** | **Adopted** | Declarative `versions.schema.json` dynamically enforcing `versions.json` integrity |
 | **Local Audit Ledger** | **Adopted** | `.workingdir2/AUDIT_RESULTS_2026-09-10.md` tracking merge train and audit evidence |
 | **Interactive Question Style** | **Adopted** | Prefer structured popup questions on real forks; act on unambiguous work |
 | **Go 1.27 Engineering Contract** | **Adopted** from `golusoris/*` | Functions $\le 60$ statements, small interfaces, `stdoutRedirect` JSON-RPC framing, `slog` to stderr |
