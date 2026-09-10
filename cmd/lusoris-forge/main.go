@@ -192,7 +192,21 @@ func newCloudInitCmd() *cobra.Command {
 	genCmd.Flags().StringVar(&user, "user", "ubuntu", "Default non-root operator user")
 	genCmd.Flags().StringVarP(&platform, "platform", "p", "proxmox", "Platform target (proxmox, unraid, macos, windows)")
 
-	cmd.AddCommand(genCmd)
+	metaCmd := &cobra.Command{
+		Use:   "metadata",
+		Short: "Generate meta-data YAML",
+		RunE: func(cmd *cobra.Command, args []string) error {
+			md, err := cloudinit.GenerateMetaData(cloudinit.Config{Hostname: hostname})
+			if err != nil {
+				return err
+			}
+			fmt.Fprint(cmd.OutOrStdout(), md)
+			return nil
+		},
+	}
+	metaCmd.Flags().StringVar(&hostname, "hostname", "lusoris-node", "Virtual machine hostname")
+
+	cmd.AddCommand(genCmd, metaCmd)
 	return cmd
 }
 

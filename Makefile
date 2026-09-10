@@ -51,11 +51,17 @@ build-cli: ## Build Go 1.27 lusoris-forge CLI and MCP server
 test-go: ## Run Go unit test suite
 	@go test ./... -v
 
-audit: ## Run comprehensive repository health and quality audit
-	@bash scripts/audit-repository-health.sh
+test-bench: ## Run Go benchmarks with memory allocation metrics
+	@go test -bench ".*" -benchmem ./...
 
-test: test-go ## Run automated configuration, SSOT, and privacy tests
+test-coverage: ## Run Go test coverage analysis
+	@go test -cover -coverprofile=coverage.out ./...
+	@go tool cover -func=coverage.out
+
+test: test-go ## Run automated configuration, SSOT, privacy, execution, and container tests
 	@pytest tests/ -v
+
+test-all: lint test test-bench ## Run full enterprise verification suite (lints, unit tests, mock execution, live docker, benchmarks)
 
 compress: ## Compress generated output images with zstd (sparse)
 	@echo "==> Compressing output images with zstd (sparse, -19)..."

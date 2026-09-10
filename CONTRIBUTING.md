@@ -26,7 +26,7 @@ This project follows **Trunk-Based Development** with protected `main` branch. D
    ```bash
    make fmt-check
    make lint
-   make test
+   make test         # or make test-all for benchmarks and full coverage
    pre-commit run --all-files
    ```
 4. **Commit with Conventional Commits**:

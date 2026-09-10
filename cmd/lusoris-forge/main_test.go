@@ -95,3 +95,41 @@ func TestMilestonesList(t *testing.T) {
 	assert.Contains(t, out, "TITLE")
 	assert.Contains(t, out, "v2026")
 }
+
+func TestStandardsGet(t *testing.T) {
+	out, err := executeCommand("standards", "get", "base-generic")
+	require.NoError(t, err)
+	assert.Contains(t, out, `"flavor_id": "base-generic"`)
+}
+
+func TestCloudInitGenerate(t *testing.T) {
+	out, err := executeCommand("cloud-init", "generate", "--flavor=base-generic", "--platform=proxmox")
+	require.NoError(t, err)
+	assert.Contains(t, out, "#cloud-config")
+}
+
+func TestCloudInitMetadata(t *testing.T) {
+	out, err := executeCommand("cloud-init", "metadata", "--hostname=test-node")
+	require.NoError(t, err)
+	assert.Contains(t, out, "instance-id: test-node-01")
+}
+
+func TestApplyCommand(t *testing.T) {
+	out, err := executeCommand("apply", "--flavor=base-generic", "--dry-run")
+	require.NoError(t, err)
+	assert.Contains(t, out, "#!/usr/bin/env bash")
+	assert.Contains(t, out, "DRY-RUN:")
+}
+
+func TestBootCommand(t *testing.T) {
+	out, err := executeCommand("boot", "--flavor=base-generic")
+	require.NoError(t, err)
+	assert.Contains(t, out, "qemu-system-x86_64")
+	assert.Contains(t, out, "-kernel")
+}
+
+func TestBuildCommand(t *testing.T) {
+	out, err := executeCommand("build", "--flavor=base-generic", "--backend=local", "--dry-run")
+	require.NoError(t, err)
+	assert.Contains(t, out, "dry-run:")
+}

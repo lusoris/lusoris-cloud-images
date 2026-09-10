@@ -134,6 +134,9 @@ func registerCloudInitTools(s *sdkmcp.Server) {
 			if err := json.Unmarshal(req.Params.Arguments, &args); err != nil {
 				return nil, err
 			}
+			if _, err := flavors.Get(args.Flavor); err != nil {
+				return &sdkmcp.CallToolResult{IsError: true, Content: []sdkmcp.Content{&sdkmcp.TextContent{Text: err.Error()}}}, nil
+			}
 			cfg := cloudinit.DefaultConfig(args.Flavor)
 			if args.Hostname != "" {
 				cfg.Hostname = args.Hostname

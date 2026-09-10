@@ -10,9 +10,15 @@ Execute the test suite to ensure all image definitions and provisioner scripts s
 ## Usage
 
 ```bash
-# Run pytest verification
+# Run automated Go and Python test suite
 make test
 
-# Or directly
-pytest tests/ -v
+# Run Go benchmarks with memory allocation metrics
+make test-bench
+
+# Run Go coverage analysis
+make test-coverage
+
+# Run full enterprise verification suite (lints, tests, live docker, benchmarks)
+make test-all
 ```
