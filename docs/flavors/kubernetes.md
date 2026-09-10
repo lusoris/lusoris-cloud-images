@@ -14,6 +14,50 @@ To balance zero first-boot latency with disk footprint, `lusoris-cloud-images` p
 - **Kernel Acceleration**: OverlayFS metacopy and redirect directory acceleration (`metacopy=on`, `redirect_dir=on`), BPF JIT compiler hardening (`bpf_jit_harden=2`), and conntrack table scaled to 1,048,576 entries.
 - **Networking**: `br_netfilter` loaded, bridge sysctls active (`net.bridge.bridge-nf-call-iptables = 1`), IP forwarding enabled, and swap permanently disabled.
 
+```mermaid
+flowchart TD
+    subgraph ControlPlaneVIP["High Availability Virtual IP"]
+        KV["kube-vip:v1.2.3<br/><small>Control Plane API HA</small>"]
+    end
+
+    subgraph NodeStack["Kubernetes Worker Node Architecture"]
+        direction TB
+        subgraph K8sCore["Node Core Binaries (Pinned v1.37.0)"]
+            Kubelet["kubelet (Cgroup v2)"]
+            Kubeadm["kubeadm & kubectl"]
+        end
+
+        subgraph RuntimeLayer["Container Runtime (containerd 2.3.5)"]
+            Containerd["containerd.service<br/><small>SystemdCgroup = true · discard_unpacked_layers</small>"]
+            Pause["registry.k8s.io/pause:3.10"]
+        end
+
+        subgraph CNIProfiles["Modular CNI Profiles"]
+            Cilium["Cilium 1.20.1<br/><small>eBPF Routing & Policies</small>"]
+            Calico["Calico 3.32.2<br/><small>BGP & VXLAN Overlay</small>"]
+            Flannel["Flannel 0.28.9<br/><small>Lightweight VXLAN</small>"]
+        end
+
+        subgraph HardwareCDI["Hardware Acceleration & CDI"]
+            IntelDP["Intel GPU Device Plugin<br/><small>Level Zero / iHD</small>"]
+            AMDDP["AMD ROCm Device Plugin<br/><small>/dev/kfd & /dev/dri</small>"]
+            NvidiaDP["NVIDIA Device Plugin<br/><small>CDI / NVLink Fabric</small>"]
+        end
+
+        subgraph OSFoundation["Linux Kernel 6.14+ (Ubuntu Resolute)"]
+            BBR["BBR + TCP ECN"]
+            BPF["bpf_jit_harden = 2"]
+            Netfilter["br_netfilter & OverlayFS Metacopy"]
+        end
+    end
+
+    OSFoundation --> RuntimeLayer
+    RuntimeLayer --> K8sCore
+    RuntimeLayer --> CNIProfiles
+    RuntimeLayer --> HardwareCDI
+    K8sCore -.-> KV
+```
+
 ---
 
 ## Modular Preheat Profiles

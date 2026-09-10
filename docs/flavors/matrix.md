@@ -1,8 +1,35 @@
-# The 4D Flavor Matrix (39 Flavors)
+# The 4D Flavor Matrix (44 Flavors)
 
 `lusoris-cloud-images` structures operating system images across four orthogonal dimensions: **Platform**, **Workload Tier**, **Hardware Acceleration**, and **Security Hardening**.
 
-All 39 flavors originate from a single base configuration and are customized via declarative Packer pipelines.
+All 44 flavors originate from a single base configuration and are customized via declarative Packer pipelines.
+
+```mermaid
+flowchart LR
+    subgraph Dimensions["The 4 Orthogonal Dimensions"]
+        D1["Dimension 1: Platform<br/><small>Proxmox · Unraid · ESXi · BareMetal</small>"]
+        D2["Dimension 2: Workload Tier<br/><small>Base · Containers · K8s · K3s · CloudNative · AI · Homelab</small>"]
+        D3["Dimension 3: Hardware Acceleration<br/><small>VirtIO · Intel Xe · AMD ROCm · NVIDIA 535–615 · Coral</small>"]
+        D4["Dimension 4: Hardening Profile<br/><small>CIS L2 · NTS Chrony · BBR · Immutable Root</small>"]
+    end
+
+    subgraph Tiers["7 Workload Tiers (44 Production Flavors)"]
+        T1["Tier 1: Base Cloud (8)"]
+        T2["Tier 2: Container Hosts (7)"]
+        T3["Tier 3: Enterprise K8s (9)"]
+        T4["Tier 4: K3s Edge Fleet (5)"]
+        T5["Tier 5: CloudNative & Storage (4)"]
+        T6["Tier 6: AI & LLM Inference (6)"]
+        T7["Tier 7: Homelab Appliances (5)"]
+    end
+
+    subgraph Deliverables["Output Artifacts"]
+        Out["44 Production Cloud Images<br/><small>.qcow2.zst · .raw.zst · .vmdk.zst</small>"]
+    end
+
+    Dimensions --> Tiers
+    Tiers --> Deliverables
+```
 
 ---
 
@@ -41,7 +68,7 @@ All 39 flavors originate from a single base configuration and are customized via
     | **`docker-nvidia-bleeding`** | NVIDIA Bleeding | `generic` | Docker CE + NVIDIA 615 + Container Toolkit CDI | `make build-docker-nvidia-bleeding` |
     | **`podman-generic`** | VirtIO / CPU | `generic` | Podman 5.x, Buildah, Skopeo, Quadlet, Netavark CNI | `make build-podman-generic` |
 
-=== "Tier 3: Enterprise Kubernetes (10)"
+=== "Tier 3: Enterprise Kubernetes (9)"
 
     Production Kubernetes worker nodes pre-baked with `containerd 2.3.5`, `kubelet 1.37.0`, `kubeadm`, and optional preheated CNI/VIP images for instant cluster join.
 

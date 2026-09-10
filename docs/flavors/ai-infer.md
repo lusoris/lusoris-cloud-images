@@ -17,6 +17,44 @@ All appliances come pre-configured with **Docker CE 29.8**, vendor Container Dev
 | **`ai-infer-nvidia-modern`** | NVIDIA Modern | CUDA 13.3, Ada / Hopper TE | RTX 4080/4090, L40, L40S, H100 PCIe | CDI (`/etc/cdi/nvidia.yaml`) |
 | **`ai-infer-nvidia-bleeding`**| NVIDIA Bleeding | CUDA 13.4, Blackwell 2nd-gen TE| GeForce RTX 5090, B100, B200, GB200 NVL | CDI (`/etc/cdi/nvidia.yaml`) |
 
+```mermaid
+flowchart TD
+    subgraph Hardware["1. Multi-Vendor Compute Hardware"]
+        CPU["High-Throughput CPU<br/><small>EPYC / Xeon (AMX, AVX-512)</small>"]
+        Intel["Intel Arc & Xe2<br/><small>Battlemage / Flex / Max</small>"]
+        AMD["AMD RDNA & Instinct<br/><small>RX 7900 / MI300</small>"]
+        Nvidia["NVIDIA Generational<br/><small>535 / 565 / 610 / 615 Blackwell</small>"]
+    end
+
+    subgraph KernelTuning["2. Appliance Kernel & Memory Optimizations"]
+        THP["transparent_hugepage=always<br/><small>Zero-Overhead Tensor Allocs</small>"]
+        NUMA["numactl & OMP_PROC_BIND=spread<br/><small>Multi-Socket Memory Affinity</small>"]
+        Limits["vm.max_map_count = 1048576<br/><small>High KV-Cache Capacity</small>"]
+    end
+
+    subgraph RuntimeCDI["3. Container Runtime & CDI Routing"]
+        Docker["Docker CE 29.8 (CDI Enabled)"]
+        CDI_Intel["/etc/cdi/intel.yaml"]
+        CDI_AMD["/etc/cdi/amd.yaml"]
+        CDI_Nvidia["/etc/cdi/nvidia.yaml"]
+    end
+
+    subgraph Engines["4. Turnkey Inference Engines"]
+        VLLM["vLLM OpenAI Server<br/><small>Continuous Batching & PagedAttention</small>"]
+        Ollama["Ollama Runtime<br/><small>GGUF / Multi-Model Serving</small>"]
+        OpenVINO["OpenVINO Model Server<br/><small>Intel Xe / Battlemage Optimized</small>"]
+    end
+
+    subgraph Clients["5. Standardized Application APIs"]
+        API["OpenAI-Compatible HTTP API<br/><small>Port 8000 / 11434 (:v1/chat/completions)</small>"]
+    end
+
+    Hardware --> KernelTuning
+    KernelTuning --> RuntimeCDI
+    RuntimeCDI --> Engines
+    Engines --> Clients
+```
+
 ---
 
 ## Common System Optimizations

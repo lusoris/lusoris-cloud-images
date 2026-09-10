@@ -97,3 +97,54 @@ class TestDocsIntegrity:
         assert any(sec in content for sec in ["### Added", "### Changed", "### Fixed"]), (
             "CHANGELOG.md missing standard category sections"
         )
+
+    def test_mermaid_diagrams_syntax_and_style(self) -> None:
+        """Verify all Mermaid code blocks in documentation have valid diagram types and balanced syntax."""
+        mermaid_pattern = re.compile(r"```mermaid\s*\n(.*?)\n```", re.DOTALL)
+        valid_prefixes = (
+            "flowchart",
+            "graph",
+            "sequenceDiagram",
+            "stateDiagram",
+            "stateDiagram-v2",
+            "classDiagram",
+            "erDiagram",
+            "mindmap",
+            "timeline",
+            "xychart-beta",
+        )
+
+        md_files = [
+            f
+            for f in REPO_ROOT.rglob("*.md")
+            if ".workingdir2" not in f.parts and ".pytest_cache" not in f.parts
+        ]
+        total_diagrams = 0
+
+        for md_file in md_files:
+            content = md_file.read_text(encoding="utf-8", errors="ignore")
+            for match in mermaid_pattern.finditer(content):
+                total_diagrams += 1
+                block = match.group(1).strip()
+                lines = [
+                    line.strip()
+                    for line in block.splitlines()
+                    if line.strip() and not line.strip().startswith("%%")
+                ]
+                assert len(lines) > 0, f"Empty mermaid block in {md_file.relative_to(REPO_ROOT)}"
+
+                first_line = lines[0]
+                assert any(first_line.startswith(prefix) for prefix in valid_prefixes), (
+                    f"Invalid diagram type '{first_line}' in {md_file.relative_to(REPO_ROOT)}"
+                )
+
+                assert block.count("{") == block.count("}"), (
+                    f"Unbalanced curly braces in {md_file.relative_to(REPO_ROOT)}"
+                )
+                assert block.count("[") == block.count("]"), (
+                    f"Unbalanced square brackets in {md_file.relative_to(REPO_ROOT)}"
+                )
+
+        assert total_diagrams >= 5, (
+            f"Expected at least 5 mermaid diagrams in repository, found {total_diagrams}"
+        )

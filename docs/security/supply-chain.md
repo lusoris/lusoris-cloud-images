@@ -24,3 +24,44 @@ Every release provides a complete catalog of installed deb packages, container l
 
 Images and repository code are continuously scanned via **Trivy** and **Semgrep** in CI, halting releases if unpatched `CRITICAL` CVEs are detected.
 
+---
+
+## 4. Continuous Assurance & PR Project Hard Gates
+
+Every pull request is subjected to deterministic automated validation before reaching `main`:
+
+```mermaid
+flowchart TD
+    subgraph PRGate["1. PR Submission & Project Gate"]
+        PR["Pull Request Created"]
+        ProjectGate["pr-project-gate<br/><small>Epics & Milestones Verification</small>"]
+        PR --> ProjectGate
+    end
+
+    subgraph SecurityScans["2. Parallel Quality & Security Scanners"]
+        direction TB
+        Gitleaks["Gitleaks<br/><small>Secret & RFC 1918 Leak Detection</small>"]
+        Semgrep["Semgrep SAST<br/><small>Static Application Security Analysis</small>"]
+        Trivy["Trivy Vulnerability Scan<br/><small>Filesystem & Dependency CVEs</small>"]
+        Linter["Linters Matrix<br/><small>ShellCheck · Shfmt · Actionlint · Yamllint</small>"]
+        Tests["Test Matrix<br/><small>Go 1.27 Unit Tests · Pytest (49 Tests)</small>"]
+    end
+
+    subgraph MergeGate["3. Trunk-Based Hard Gate"]
+        Aggregator{"required-checks<br/><small>All Checks Green</small>"}
+        MainBranch(["Merged to main Branch"])
+    end
+
+    subgraph ReleaseChain["4. Cryptographic Release Attestation"]
+        Cosign["Sigstore Cosign<br/><small>Keyless OIDC Artifact Signing</small>"]
+        Syft["Syft SBOM Generator<br/><small>CycloneDX & SPDX JSON</small>"]
+        Artifacts[("Signed Production Artifacts<br/><small>.qcow2.zst · .raw.zst · .vmdk.zst</small>")]
+        Cosign & Syft --> Artifacts
+    end
+
+    ProjectGate --> SecurityScans
+    SecurityScans --> Aggregator
+    Aggregator -->|Pass| MainBranch
+    MainBranch --> ReleaseChain
+```
+

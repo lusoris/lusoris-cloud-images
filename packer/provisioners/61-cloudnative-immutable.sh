@@ -47,7 +47,7 @@ main() {
   configure_tmpfs_mounts
   configure_immutable_security
   configure_container_runtime_cdi
-  echo "==> 60-cloudnative-immutable: Complete."
+  echo "==> 61-cloudnative-immutable: Complete."
 }
 
 main "$@"

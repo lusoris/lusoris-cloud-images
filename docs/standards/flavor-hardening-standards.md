@@ -6,20 +6,29 @@
 
 ## 1. Matrix Overview Across the 7 Workload Tiers
 
-```
-+-----------------------------------------------------------------------------------------+
-|                                7 WORKLOAD TIERS & STANDARDS                             |
-+-------------------+-----------------------------+---------------------------------------+
-| Tier              | Flavor Count                | Primary Hardening Standard            |
-+-------------------+-----------------------------+---------------------------------------+
-| 1. Base Cloud OS  | 8 Flavors                   | CIS L2 Server / BSI IT-Grundschutz    |
-| 2. Containers     | 7 Flavors                   | Docker CE 29 / Podman 5 / CDI Spec    |
-| 3. Kubernetes     | 9 Flavors                   | CIS Benchmark for Kubernetes 1.37     |
-| 4. K3s Edge Fleet | 5 Flavors                   | Minimal Edge Footprint (<300MB RAM)   |
-| 5. CloudNative    | 4 Flavors                   | Immutable Read-Only Root / OpenZFS 2.3|
-| 6. AI Inference   | 6 Flavors                   | Hugepages / NUMA / Accelerators       |
-| 7. Homelab        | 5 Flavors                   | Specialized Peripheral & Appliance    |
-+-------------------+-----------------------------+---------------------------------------+
+```mermaid
+flowchart TD
+    subgraph Level1["Level 1: Universal OS Hardening (All 44 Flavors)"]
+        CIS["CIS L2 Server & BSI IT-Grundschutz"]
+        NTS["Multi-Peer Anycast NTS Chrony (0640)"]
+        Kernel["BBR + fq + sysrq=0 + protected_hardlinks"]
+        NVMe["mq-deadline I/O & ZRAM Compressed Swap"]
+    end
+
+    subgraph Level2["Level 2: Workload & Runtime Isolation"]
+        T2["Tier 2: Containers<br/><small>Docker CE 29 · Podman 5 · no-new-privileges · CDI</small>"]
+        T3["Tier 3: Kubernetes<br/><small>containerd 2.3.5 · Cgroup v2 · Cilium/Calico · kube-vip</small>"]
+        T4["Tier 4: K3s Edge Fleet<br/><small>Low-Memory Footprint &lt;300MB RAM · SQLite</small>"]
+    end
+
+    subgraph Level3["Level 3: Specialized Workload Tuning"]
+        T5["Tier 5: CloudNative & Storage<br/><small>Immutable Read-Only Root · tmpfs · NVMe-oF · OpenZFS</small>"]
+        T6["Tier 6: AI & LLM Inference<br/><small>Transparent Hugepages · NUMA Pinning · /dev/kfd</small>"]
+        T7["Tier 7: Homelab Appliances<br/><small>Stub Resolver Disabled · Coral Edge TPU · 4096KB Readahead</small>"]
+    end
+
+    Level1 --> Level2
+    Level2 --> Level3
 ```
 
 ---

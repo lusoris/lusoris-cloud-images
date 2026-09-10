@@ -17,6 +17,36 @@ Or using the built-in helper utility:
 lusoris-install-to-disk https://releases.lusoris.org/lusoris-base-generic.raw.zst /dev/nvme0n1
 ```
 
+```mermaid
+flowchart LR
+    subgraph RescueEnv["Live Rescue Environment (RAM / Netboot)"]
+        Curl["curl -fsSL (HTTP Stream)"]
+        Zstd["zstdcat (Decompress Stream)"]
+        DD["dd of=/dev/nvme0n1 bs=4M conv=fsync"]
+        Curl -->|Unix Pipe| Zstd -->|Raw Blocks| DD
+    end
+
+    subgraph RemoteStorage["Release Server / Object Storage"]
+        RemoteImg[("lusoris-*.raw.zst<br/><small>Compressed Image Stream</small>")]
+    end
+
+    subgraph TargetDrive["Target Physical NVMe / SATA Disk"]
+        GPT["GPT Partition Table<br/><small>Root Partition (20GB)</small>"]
+    end
+
+    subgraph FirstBoot["First Boot Sequence"]
+        Growpart["growpart & resize2fs<br/><small>Expands to fill 100% of Drive</small>"]
+        FullRoot[("Expanded Root Filesystem<br/><small>Full Capacity Online</small>")]
+        Growpart --> FullRoot
+    end
+
+    RemoteImg -->|Network Stream| Curl
+    DD -->|Direct Write| GPT
+    GPT -.-> FirstBoot
+```
+
+---
+
 ## 2. Automatic Root Disk Expansion
 
 When flashing a 20GB `.raw.zst` image onto a 1TB, 2TB, or larger physical drive, `cloud-guest-utils` and `growpart` automatically resize the root GPT partition and filesystem to fill 100% of the drive on first boot.
