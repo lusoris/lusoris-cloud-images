@@ -112,6 +112,7 @@ class TestGovernanceIntegrity:
             "security-scans.yml",
             "supply-chain.yml",
             "pr-project-gate.yml",
+            "codeql.yml",
         ]
         for wf_name in required_workflows:
             wf_file = WORKFLOWS_DIR / wf_name

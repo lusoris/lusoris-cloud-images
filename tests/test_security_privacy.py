@@ -101,3 +101,25 @@ class TestSecurityPrivacyIntegrity:
         required_patterns = ["output-images", "packer_cache", "*.qcow2", "*.iso", ".env"]
         for pattern in required_patterns:
             assert pattern in gitignore_content, f"Missing '{pattern}' pattern in .gitignore"
+
+    def test_workflows_least_privilege_permissions(self) -> None:
+        """Verify no workflow declares write permissions at the top level (OpenSSF Scorecard)."""
+        assert WORKFLOWS_DIR.exists(), ".github/workflows directory is missing"
+        workflow_files = sorted(WORKFLOWS_DIR.glob("*.yml")) + sorted(WORKFLOWS_DIR.glob("*.yaml"))
+
+        for wf in workflow_files:
+            content = wf.read_text(encoding="utf-8")
+            parts = re.split(r"^jobs:\s*$", content, flags=re.MULTILINE)
+            top_level = parts[0] if parts else content
+
+            perm_match = re.search(r"^permissions:\s*(.*?)(?=\n[a-zA-Z]|\Z)", top_level, flags=re.MULTILINE | re.DOTALL)
+            if perm_match:
+                perm_body = perm_match.group(1).strip()
+                assert "write-all" not in perm_body, (
+                    f"Top-level 'write-all' permission forbidden in {wf.name} (OpenSSF Scorecard rule)."
+                )
+                for line in perm_body.splitlines():
+                    assert ": write" not in line and not line.strip().endswith("write"), (
+                        f"Top-level write permission '{line.strip()}' forbidden in {wf.name}. "
+                        f"Permissions must be scoped to specific jobs."
+                    )

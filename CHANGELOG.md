@@ -59,6 +59,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Deep 4-platform x 7-tier cloud-init matrix tests (`tests/test_cloudinit_deep.py`).
   - Repository automation test suite (`tests/test_scripts_automation.py`) testing fleet manager, fanout worktrees, and zero-leak pre-tool hooks.
   - Quality gate orchestration targets: `make test-all`, `make test-bench`, `make test-coverage`.
+  - ADR-0014: Automated Dependency & Security Governance via Zero-Noise Renovate and Native CodeQL (`docs/adr/0014-automated-dependency-management-renovate.md`).
+  - Native GitHub CodeQL static analysis workflow (`.github/workflows/codeql.yml`) analyzing Go and Python codebases with `+security-and-quality` rules.
+  - Zero-noise Renovate configuration (`renovate.json`) with automated GitHub Action commit SHA pinning (`helpers:pinGitHubActionDigests`), weekly Monday batch scheduling, 3-day release stability quarantine, and SSOT regex managers for `versions.json`.
+  - OpenSSF Scorecard least-privilege token permissions across all GitHub Actions workflows (`contents: read` top-level default, job-scoped write permissions only).
+  - Automated least-privilege workflow permission enforcement test (`test_workflows_least_privilege_permissions`) in `tests/test_security_privacy.py` and `codeql.yml` verification in `tests/test_governance.py`.
 
 ### Fixed
 - Universal multi-architecture portability: replaced hardcoded `[arch=amd64]` APT repository configurations with dynamic `$(dpkg --print-architecture)` in AMD ROCm (`32-gpu-amd-rocm.sh`) and Docker CE (`40-docker-runtime.sh`) provisioners.
