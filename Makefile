@@ -6,7 +6,8 @@
         build-k8s-generic build-k8s-cilium build-k8s-calico build-k8s-flannel \
         build-k8s-intel build-k8s-amd build-k8s-nvidia build-k8s-nvidia-modern build-k8s-nvidia-bleeding \
         build-ai-infer-generic build-ai-infer-intel build-ai-infer-amd \
-        build-ai-infer-nvidia build-ai-infer-nvidia-modern build-ai-infer-nvidia-bleeding \
+        build-k3s-agent-generic build-k3s-agent-intel build-k3s-agent-amd build-k3s-agent-nvidia build-k3s-server-generic \
+        build-cloudnative-generic build-cloudnative-k8s build-cloudnative-storage build-cloudnative-pg \
         build-generic build-intel build-amd build-nvidia
 
 
@@ -167,6 +168,19 @@ build-k3s-agent-nvidia: init ## Build k3s-agent-nvidia image (K3s worker + NVIDI
 
 build-k3s-server-generic: init ## Build k3s-server-generic image (K3s control plane + SQLite)
 	@cd packer && $(PACKER) build -only="k3s-server-generic.qemu.image" .
+
+# CloudNative & Storage Appliances
+build-cloudnative-generic: init ## Build cloudnative-generic immutable container host
+	@cd packer && $(PACKER) build -only="cloudnative-generic.qemu.image" .
+
+build-cloudnative-k8s: init ## Build cloudnative-k8s immutable Kubernetes worker node
+	@cd packer && $(PACKER) build -only="cloudnative-k8s.qemu.image" .
+
+build-cloudnative-storage: init ## Build cloudnative-storage CNCF storage appliance (NVMe-oF / ZFS)
+	@cd packer && $(PACKER) build -only="cloudnative-storage.qemu.image" .
+
+build-cloudnative-pg: init ## Build cloudnative-pg PostgreSQL / CloudNativePG host
+	@cd packer && $(PACKER) build -only="cloudnative-pg.qemu.image" .
 
 
 

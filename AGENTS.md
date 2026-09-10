@@ -50,7 +50,7 @@ Autonomous agents should utilize specialized project skills under `.agents/skill
 
 ---
 
-## 3. The 4-Dimensional Flavor Matrix (35 Flavors)
+## 3. The 4-Dimensional Flavor Matrix (39 Flavors)
 
 | Workload Tier | Hardware Stack | Flavor Target | Key Components |
 | :--- | :--- | :--- | :--- |
@@ -83,6 +83,10 @@ Autonomous agents should utilize specialized project skills under `.agents/skill
 | **K3s Edge** | AMD GPU | `k3s-agent-amd` | K3s agent + AMD ROCm 10 compute runtime + RADV Vulkan |
 | **K3s Edge** | NVIDIA Mainstream | `k3s-agent-nvidia` | K3s agent + NVIDIA 565 + Container Toolkit CDI |
 | **K3s Edge** | Control Plane | `k3s-server-generic` | K3s standalone master, embedded SQLite, local-path storage |
+| **CloudNative**| Generic (VirtIO) | `cloudnative-generic` | Immutable container host, read-only root, ephemeral tmpfs, containerd CDI |
+| **CloudNative**| Generic (VirtIO) | `cloudnative-k8s` | Immutable Kubernetes node, read-only root, containerd 2.3.5, kubelet 1.37.0 |
+| **CloudNative**| Storage (CNCF) | `cloudnative-storage` | NVMe-oF (TCP), OpenZFS 2.3, iSCSI, multipath, NFS |
+| **CloudNative**| Database (CNPG) | `cloudnative-pg` | PostgreSQL / CloudNativePG kernel tuning, hugepages, strict overcommit |
 | **AI Infer** | Generic (CPU) | `ai-infer-generic` | AMX, AVX-512, NUMA, vLLM/Ollama CPU, Docker CE |
 | **AI Infer** | Intel GPU | `ai-infer-intel` | Intel Level Zero, OpenVINO, IPEX-LLM, CDI, Docker CE |
 | **AI Infer** | AMD GPU | `ai-infer-amd` | AMD ROCm 10, /dev/kfd, RDNA 3/4 & Instinct, CDI, Docker CE |

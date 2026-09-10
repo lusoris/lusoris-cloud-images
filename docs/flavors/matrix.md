@@ -4,7 +4,7 @@
 
 ---
 
-## Comprehensive 35-Flavor Matrix
+## Comprehensive 39-Flavor Matrix
 
 | Flavor Name | Workload Tier | Hardware Stack | Kernel Profile | Preheat Profile | Key Components & Target Platforms |
 | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -28,7 +28,7 @@
 | **`k8s-node-calico`** | K8s Worker | VirtIO / CPU | `k8s` | `calico` | containerd 2.3.5, preheated Calico 3.32.2 & kube-vip 1.2.3 |
 | **`k8s-node-flannel`** | K8s Worker | VirtIO / CPU | `k8s` | `flannel` | containerd 2.3.5, preheated Flannel 0.28.9 & kube-vip 1.2.3 |
 | **`k8s-node-intel`** | K8s Worker | Intel Arc/Xe2 | `k8s` | `cilium` | containerd 2.3.5 + Intel drivers + Intel K8s Plugin v0.36.0 |
-| **`k8s-node-amd`** | K8s Worker | AMD ROCm 10 | `k8s` | `cilium` | containerd 2.3.5 + AMD ROCm 10 + AMD K8s Plugin v1.37.0 |
+| **`k8s-node-amd`** | K8s Worker | AMD GPU | `k8s` | `cilium` | containerd 2.3.5 + AMD ROCm 10 + AMD K8s Plugin v1.37.0 |
 | **`k8s-node-nvidia`** | K8s Worker | NVIDIA Mainstream | `k8s` | `cilium` | containerd 2.3.5 + NVIDIA 565 + NVIDIA K8s Plugin v0.20.0 |
 | **`k8s-node-nvidia-modern`** | K8s Worker | NVIDIA Modern | `k8s` | `cilium` | containerd 2.3.5 + NVIDIA 610 + NVIDIA K8s Plugin v0.20.0 |
 | **`k8s-node-nvidia-bleeding`** | K8s Worker | NVIDIA Bleeding | `k8s` | `cilium` | containerd 2.3.5 + NVIDIA 615 + NVIDIA K8s Plugin v0.20.0 |
@@ -37,6 +37,10 @@
 | **`k3s-agent-amd`** | K3s Worker | AMD ROCm 10 | `k8s` | None | K3s agent + AMD ROCm 10 compute runtime + RADV Vulkan |
 | **`k3s-agent-nvidia`** | K3s Worker | NVIDIA Mainstream | `k8s` | None | K3s agent + NVIDIA 565 + Container Toolkit CDI |
 | **`k3s-server-generic`** | K3s Server | VirtIO / CPU | `k8s` | None | K3s standalone control plane + embedded SQLite + local-path |
+| **`cloudnative-generic`** | Immutable Host | VirtIO / CPU | `generic` | None | Read-only root hardening, ephemeral tmpfs, containerd CDI |
+| **`cloudnative-k8s`** | Immutable Worker | VirtIO / CPU | `k8s` | `lean` | Read-only root hardening, containerd 2.3.5, kubelet 1.37.0 |
+| **`cloudnative-storage`** | CNCF Storage | VirtIO / Baremetal | `baremetal` | None | NVMe-oF (TCP), OpenZFS 2.3, iSCSI, multipath, NFS |
+| **`cloudnative-pg`** | Database Host | VirtIO / Baremetal | `ai-infer` | None | CloudNativePG tuning, hugepages, strict memory overcommit |
 | **`ai-infer-generic`** | AI Inference | CPU High-Throughput | `ai-infer` | None | AMX, AVX-512, NUMA, vLLM / Ollama CPU, Docker CE |
 | **`ai-infer-intel`** | AI Inference | Intel Xe/Arc/Xe2 | `ai-infer` | None | Intel Level Zero, OpenVINO, IPEX-LLM, CDI, Docker CE |
 | **`ai-infer-amd`** | AI Inference | AMD ROCm 10 | `ai-infer` | None | AMD ROCm 10, /dev/kfd, RDNA 3/4 & Instinct, CDI, Docker CE |
@@ -87,6 +91,12 @@ make build-k3s-agent-intel     # Intel QuickSync / Xe transcoding worker
 make build-k3s-agent-amd       # AMD ROCm 10 compute worker
 make build-k3s-agent-nvidia    # NVIDIA 565 / CDI GPU worker
 make build-k3s-server-generic  # Standalone master with local-path storage
+
+# CloudNative & Storage Appliances
+make build-cloudnative-generic # Immutable container host
+make build-cloudnative-k8s     # Immutable Kubernetes node
+make build-cloudnative-storage # CNCF storage appliance (NVMe-oF / ZFS)
+make build-cloudnative-pg      # Production PostgreSQL / CNPG host
 
 # AI Inference Appliances (All Vendors)
 make build-ai-infer-generic   # CPU High-Throughput / AMX / AVX-512
