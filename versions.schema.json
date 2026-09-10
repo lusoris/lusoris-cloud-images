@@ -93,6 +93,13 @@
         }
       }
     },
+    "k3s": {
+      "type": "object",
+      "required": ["version"],
+      "properties": {
+        "version": { "type": "string" }
+      }
+    },
     "runtimes": {
       "type": "object",
       "required": ["containerd", "docker_ce"],

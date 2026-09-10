@@ -152,6 +152,23 @@ build-ai-infer-nvidia-modern: init ## Build ai-infer-nvidia-modern host (NVIDIA 
 build-ai-infer-nvidia-bleeding: init ## Build ai-infer-nvidia-bleeding host (NVIDIA 615 / Blackwell / vLLM)
 	@cd packer && $(PACKER) build -only="ai-infer-nvidia-bleeding.qemu.image" .
 
+# K3s Edge Fleet Flavors
+build-k3s-agent-generic: init ## Build k3s-agent-generic image (Lightweight < 300MB RAM worker)
+	@cd packer && $(PACKER) build -only="k3s-agent-generic.qemu.image" .
+
+build-k3s-agent-intel: init ## Build k3s-agent-intel image (K3s worker + QuickSync / Xe)
+	@cd packer && $(PACKER) build -only="k3s-agent-intel.qemu.image" .
+
+build-k3s-agent-amd: init ## Build k3s-agent-amd image (K3s worker + AMD ROCm 10)
+	@cd packer && $(PACKER) build -only="k3s-agent-amd.qemu.image" .
+
+build-k3s-agent-nvidia: init ## Build k3s-agent-nvidia image (K3s worker + NVIDIA 565 / CDI)
+	@cd packer && $(PACKER) build -only="k3s-agent-nvidia.qemu.image" .
+
+build-k3s-server-generic: init ## Build k3s-server-generic image (K3s control plane + SQLite)
+	@cd packer && $(PACKER) build -only="k3s-server-generic.qemu.image" .
+
+
 
 # Backwards compatibility aliases
 build-generic: build-base-generic

@@ -32,11 +32,13 @@ locals {
   cuda_bleeding            = local.manifest.drivers.nvidia.cuda_bleeding
   rocm_legacy_version      = local.manifest.drivers.amd.rocm_legacy_version
   rocm_bleeding_version    = local.manifest.drivers.amd.rocm_bleeding_version
+  k3s_version              = try(local.manifest.k3s.version, "v1.36.4+k3s1")
 
   common_env = [
     "DISTRO_RELEASE=${local.distro_release}",
     "K8S_MAJOR_MINOR=${local.k8s_major_minor}",
     "K8S_VERSION=${local.k8s_version}",
+    "K3S_VERSION=${local.k3s_version}",
     "IMG_PAUSE=${local.img_pause}",
     "IMG_COREDNS=${local.img_coredns}",
     "IMG_CILIUM=${local.img_cilium}",
@@ -663,4 +665,103 @@ build {
     ]
   }
 }
+
+# 28. K3s Agent Generic: Lightweight edge & homelab worker (< 300MB RAM)
+build {
+  name    = "k3s-agent-generic"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=k3s-agent-generic", "BM_GEN=generic", "K3S_ROLE=agent", "KERNEL_PROFILE=k8s"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/52-k3s-runtime.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 29. K3s Agent Intel: K3s worker + Intel QuickSync/Xe & Level Zero
+build {
+  name    = "k3s-agent-intel"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=k3s-agent-intel", "BM_GEN=intel", "K3S_ROLE=agent", "KERNEL_PROFILE=k8s"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/30-gpu-intel.sh",
+      "${path.root}/provisioners/52-k3s-runtime.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 30. K3s Agent AMD: K3s worker + AMD ROCm 10 compute runtime
+build {
+  name    = "k3s-agent-amd"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=k3s-agent-amd", "BM_GEN=amd", "K3S_ROLE=agent", "KERNEL_PROFILE=k8s"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/32-gpu-amd-rocm.sh",
+      "${path.root}/provisioners/52-k3s-runtime.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 31. K3s Agent NVIDIA: K3s worker + NVIDIA 565 / CUDA 12.8 & CDI
+build {
+  name    = "k3s-agent-nvidia"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=k3s-agent-nvidia", "BM_GEN=nvidia", "K3S_ROLE=agent", "KERNEL_PROFILE=k8s"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/34-gpu-nvidia-mainstream.sh",
+      "${path.root}/provisioners/52-k3s-runtime.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 32. K3s Server Generic: Standalone control plane with embedded SQLite & local-path storage
+build {
+  name    = "k3s-server-generic"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=k3s-server-generic", "BM_GEN=generic", "K3S_ROLE=server", "KERNEL_PROFILE=k8s"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/52-k3s-runtime.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
 

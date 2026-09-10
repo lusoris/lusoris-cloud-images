@@ -47,6 +47,9 @@
       "k8s_plugin": "nvcr.io/nvidia/k8s-device-plugin:v0.20.0"
     }
   },
+  "k3s": {
+    "version": "v1.36.4+k3s1"
+  },
   "runtimes": {
     "containerd": "2.3.5",
     "docker_ce": "29.8"

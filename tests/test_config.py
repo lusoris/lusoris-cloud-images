@@ -47,6 +47,11 @@ EXPECTED_FLAVORS = [
     "ai-infer-nvidia",
     "ai-infer-nvidia-modern",
     "ai-infer-nvidia-bleeding",
+    "k3s-agent-generic",
+    "k3s-agent-intel",
+    "k3s-agent-amd",
+    "k3s-agent-nvidia",
+    "k3s-server-generic",
 ]
 
 
