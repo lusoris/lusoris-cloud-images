@@ -80,19 +80,21 @@ The repository runs the OpenSSF Scorecard supply-chain security analysis via Git
 - **Result**: **0 Secret Leaks**. Verified zero exposed private keys, bearer tokens, or sensitive API secrets.
 
 ### E. Zero-Leak Privacy Invariant Gate
-- **Scope**: Automated pre-commit and CI verification (`tests/test_config.py::test_no_private_ips_or_user_paths`).
+- **Scope**: Automated pre-commit and CI verification (`tests/test_security_privacy.py`).
 - **Enforcement**:
   - Rejects any RFC 1918 private IPv4 addresses (`10.0.0.0/8`, `172.16.0.0/12`, `192.168.0.0/16`) in configuration and code files.
   - Rejects developer workstation paths (`/home/<user>/...`), enforcing generic `/home/ubuntu` or `/tmp` paths.
+  - Enforces that 100% of external GitHub Actions in `.github/workflows/*.yml` are pinned to immutable 40-character commit SHAs.
 - **Result**: **100% Compliant**.
 
 ### F. NASA/JPL Power of 10 Shell Provisioner Quality Audit
-- **Scope**: 16 shell provisioner scripts under `packer/provisioners/`.
+- **Scope**: 28 shell provisioner scripts under `packer/provisioners/` verified across 8 dedicated test suites.
 - **Standard**: Gerard J. Holzmann's Power of 10 rules adapted for cloud image engineering ([`docs/principles.md`](../principles.md)).
 - **Metrics**:
-  - Maximum function length $\le$ 60 lines.
-  - Strict error handling: `set -euo pipefail` on all scripts.
-  - Command return checks and bounded loops.
+  - Maximum function length $\le$ 60 lines (Rule 4).
+  - Strict error handling: `set -euo pipefail` across all 28 scripts.
+  - Standard `main "$@"` entrypoint structure and return code checking (Rule 7).
+  - License header: `Copyright 2026 Lusoris` present in 100% of provisioners.
   - ShellCheck verification: **Zero warnings, zero errors**.
 
 ---

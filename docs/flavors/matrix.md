@@ -101,9 +101,23 @@ All 39 flavors originate from a single base configuration and are customized via
     | **`ai-infer-nvidia-modern`** | NVIDIA Modern | `ai-infer` | NVIDIA 610, Transparent Hugepages, NUMA, vLLM, Docker CE | `make build-ai-infer-nvidia-modern` |
     | **`ai-infer-nvidia-bleeding`**| NVIDIA Bleeding | `ai-infer` | NVIDIA 615, Blackwell RTX 5090 / B200, vLLM, Docker CE | `make build-ai-infer-nvidia-bleeding` |
 
-=== "Complete 39-Flavor Index"
+=== "Tier 7: Homelab Appliances (5)"
 
-    Complete flat index across all 39 flavors:
+    Turn-key, hardened homelab appliances resolving top r/homelab community friction points (Google Coral TPU, port 53 DNS collisions, dual-vendor VA-API media transcoding, multi-arch CI runners, and 32-bit SteamCMD game servers).
+
+    📖 [View Homelab Appliances Documentation](homelab-appliances.md)
+
+    | Flavor Name | Primary Workload | Hardware Stack | Key Components | Build Target |
+    | :--- | :--- | :--- | :--- | :--- |
+    | **`appliance-vision-nvr`** | Frigate NVR, Scrypted | Intel GPU + Coral TPU | Coral TPU (`gasket-dkms`, udev), Intel QuickSync (`iHD`), CDI spec | `make build-appliance-vision-nvr` |
+    | **`appliance-gateway-dns`** | AdGuard Home, Pi-hole | VirtIO / Low-Power CPU | Port 53 stub disabled, WireGuard, line-rate forwarding (< 150MB RAM) | `make build-appliance-gateway-dns` |
+    | **`appliance-media-server`**| Jellyfin, Plex, Tdarr | Intel + AMD GPU + NAS | Intel QuickSync + AMD Mesa VA-API, `nfs-common`, `cifs-utils`, 4096KB readahead | `make build-appliance-media-server` |
+    | **`appliance-ci-runner`** | Self-Hosted CI Runner | Multi-Core CPU / DinD | QEMU ARM64/ARMv7 binfmt, Docker Buildx, `git-lfs`, 4GB tmpfs `/tmp` | `make build-appliance-ci-runner` |
+    | **`appliance-game-server`**| SteamCMD, Pterodactyl | High Clock CPU | 32-bit `i386` glibc, `steamcmd`, 16MB UDP socket buffer tuning, 1M file limits | `make build-appliance-game-server` |
+
+=== "Complete 44-Flavor Index"
+
+    Complete flat index across all 44 flavors:
 
     | Flavor Name | Workload Tier | Hardware Stack | Kernel Profile | Preheat Profile | Key Components |
     | :--- | :--- | :--- | :--- | :--- | :--- |
@@ -146,3 +160,8 @@ All 39 flavors originate from a single base configuration and are customized via
     | **`ai-infer-nvidia`** | AI Inference | NVIDIA Mainstream | `ai-infer` | None | NVIDIA 565, Transparent Hugepages, NUMA, vLLM, Docker CE |
     | **`ai-infer-nvidia-modern`** | AI Inference | NVIDIA Modern | `ai-infer` | None | NVIDIA 610, Transparent Hugepages, NUMA, vLLM, Docker CE |
     | **`ai-infer-nvidia-bleeding`**| AI Inference | NVIDIA Bleeding | `ai-infer` | None | NVIDIA 615, Blackwell RTX 5090 / B200, vLLM, Docker CE |
+    | **`appliance-vision-nvr`** | Vision / NVR | Intel GPU + Coral TPU | `generic` | None | Coral Edge TPU (`gasket-dkms`, udev), Intel QuickSync (`iHD`), CDI, Docker CE |
+    | **`appliance-gateway-dns`** | Gateway / DNS | VirtIO / CPU | `generic` | None | Port 53 stub disabled, WireGuard, line-rate forwarding (< 150MB RAM) |
+    | **`appliance-media-server`**| Media Server | Intel + AMD GPU + NAS | `baremetal` | None | Intel QuickSync + AMD Mesa VA-API, `nfs-common`, `cifs-utils`, 4096KB readahead |
+    | **`appliance-ci-runner`** | CI/CD Runner | Multi-Core CPU / DinD | `generic` | None | QEMU ARM64/ARMv7 binfmt, Docker Buildx, `git-lfs`, 4GB tmpfs `/tmp` |
+    | **`appliance-game-server`**| Game Server | High Clock CPU | `generic` | None | 32-bit `i386` glibc, `steamcmd`, 16MB UDP socket buffer tuning, 1M file limits |

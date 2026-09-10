@@ -7,7 +7,7 @@
 [![Supply Chain](https://img.shields.io/github/actions/workflow/status/lusoris/lusoris-cloud-images/supply-chain.yml?branch=main&label=Scorecard&logo=securityscorecards&logoColor=white&style=flat-square)](https://github.com/lusoris/lusoris-cloud-images/actions/workflows/supply-chain.yml)
 [![Release Matrix](https://img.shields.io/github/actions/workflow/status/lusoris/lusoris-cloud-images/release-matrix.yml?branch=main&label=Release%20Engine&logo=packer&logoColor=white&style=flat-square)](https://github.com/lusoris/lusoris-cloud-images/actions/workflows/release-matrix.yml)
 
-[![Flavors](https://img.shields.io/badge/Flavors-39%20Production%20Targets-blue?logo=linux&logoColor=white&style=flat-square)](FLAVORS.md)
+[![Flavors](https://img.shields.io/badge/Flavors-44%20Production%20Targets-blue?logo=linux&logoColor=white&style=flat-square)](FLAVORS.md)
 [![Base OS](https://img.shields.io/badge/Base%20OS-Ubuntu%2026.04%20Noble-E95420?logo=ubuntu&logoColor=white&style=flat-square)](versions.json)
 [![Packer](https://img.shields.io/badge/Packer-1.11%2B-02A8EF?logo=packer&logoColor=white&style=flat-square)](https://www.packer.io/)
 [![SSOT Schema](https://img.shields.io/badge/SSOT-Draft%202020--12-success?logo=json&style=flat-square)](versions.schema.json)
@@ -24,7 +24,7 @@
 **Enterprise-grade, hardened, hardware-accelerated cloud and bare-metal OS image forge with pre-baked runtimes.**
 
 [📖 Documentation Portal](https://lusoris.github.io/lusoris-cloud-images) &nbsp;•&nbsp;
-[📋 Complete Flavor Catalog (39 Flavors)](FLAVORS.md) &nbsp;•&nbsp;
+[📋 Complete Flavor Catalog (44 Flavors)](FLAVORS.md) &nbsp;•&nbsp;
 [📐 Architecture & Principles](docs/principles.md) &nbsp;•&nbsp;
 [🔒 Security Advisories](https://github.com/lusoris/lusoris-cloud-images/security/advisories)
 
@@ -68,15 +68,16 @@ graph TD
     S4 --> T4["Tier 4: K3s Edge Fleet (5)"]:::target
     S4 --> T5["Tier 5: CloudNative & Storage (4)"]:::target
     S4 --> T6["Tier 6: AI & LLM Inference (6)"]:::target
+    S4 --> T7["Tier 7: Homelab Appliances (5)"]:::target
 
-    T1 & T2 & T3 & T4 & T5 & T6 --> OUT[".qcow2.zst · .raw.zst · .vmdk.zst · Proxmox / Unraid Templates"]:::out
+    T1 & T2 & T3 & T4 & T5 & T6 & T7 --> OUT[".qcow2.zst · .raw.zst · .vmdk.zst · Proxmox / Unraid Templates"]:::out
 ```
 
 ---
 
-## Workload Tier Summary (39 Flavors)
+## Workload Tier Summary (44 Flavors)
 
-To keep maintenance low and usability high, flavors are partitioned into 6 distinct tiers. 
+To keep maintenance low and usability high, flavors are partitioned into 7 distinct tiers. 
 
 | Tier | Flavors | Hardware Acceleration | Key Runtime Components | Documentation |
 | :--- | :---: | :--- | :--- | :--- |
@@ -86,8 +87,9 @@ To keep maintenance low and usability high, flavors are partitioned into 6 disti
 | **4. K3s Edge Fleet** | 5 | Generic, Intel QuickSync, AMD ROCm 10, NVIDIA CDI | Lightweight K3s (< 300MB RAM), Flannel, SQLite | [📖 K3s Guide](docs/flavors/k3s.md) |
 | **5. CloudNative & Storage** | 4 | Generic, Baremetal, NVMe-oF, OpenZFS 2.3 | Read-only root immutability, OpenZFS, CloudNativePG | [📖 CloudNative Guide](docs/flavors/cloudnative.md) |
 | **6. AI & LLM Inference** | 6 | AMX/AVX-512, Intel Xe2, AMD ROCm 10, NVIDIA (565/610/615) | Transparent Hugepages, NUMA, vLLM / Ollama | [📖 AI Inference Guide](docs/flavors/ai-infer.md) |
+| **7. Homelab Appliances** | 5 | Coral TPU, QuickSync, Dual VA-API, ARM64 binfmt, i386 | Frigate NVR, AdGuard/Pi-hole, Jellyfin, CI runner, SteamCMD | [📖 Homelab Guide](docs/flavors/homelab-appliances.md) |
 
-> 📋 **Detailed Specifications**: Browse the complete list of all 39 target configurations in [**`FLAVORS.md`**](FLAVORS.md) or explore them interactively in the [**Documentation Portal Matrix**](https://lusoris.github.io/lusoris-cloud-images/flavors/matrix/).
+> 📋 **Detailed Specifications**: Browse the complete list of all 44 target configurations in [**`FLAVORS.md`**](FLAVORS.md) or explore them interactively in the [**Documentation Portal Matrix**](https://lusoris.github.io/lusoris-cloud-images/flavors/matrix/).
 
 ---
 

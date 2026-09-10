@@ -844,5 +844,108 @@ build {
   }
 }
 
+# =============================================================================
+# TIER 7: SPECIALIZED HOMELAB APPLIANCES (5 Flavors)
+# =============================================================================
+
+# 37. Appliance Vision NVR: Frigate NVR, Scrypted, Coral Edge TPU (gasket-dkms, udev), Intel QuickSync, Docker CE
+build {
+  name    = "appliance-vision-nvr"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=appliance-vision-nvr", "BM_GEN=intel", "KERNEL_PROFILE=generic"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/40-docker-runtime.sh",
+      "${path.root}/provisioners/75-appliance-vision.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 38. Appliance Gateway DNS: AdGuard Home, Pi-hole, WireGuard, port 53 stub disabled (< 150MB RAM)
+build {
+  name    = "appliance-gateway-dns"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=appliance-gateway-dns", "BM_GEN=generic", "KERNEL_PROFILE=generic"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/76-appliance-gateway.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 39. Appliance Media Server: Jellyfin, Plex, Tdarr (Intel + AMD VA-API, NFS/CIFS, 4096KB readahead)
+build {
+  name    = "appliance-media-server"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=appliance-media-server", "BM_GEN=generic", "KERNEL_PROFILE=baremetal"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/40-docker-runtime.sh",
+      "${path.root}/provisioners/77-appliance-media.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 40. Appliance CI Runner: Self-hosted GitHub/GitLab runner, QEMU ARM64 binfmt emulation, Buildx, tmpfs /tmp
+build {
+  name    = "appliance-ci-runner"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=appliance-ci-runner", "BM_GEN=generic", "KERNEL_PROFILE=generic"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/40-docker-runtime.sh",
+      "${path.root}/provisioners/78-appliance-runner.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
+# 41. Appliance Game Server: SteamCMD, Pterodactyl Wings, i386 multiarch glibc, UDP buffer tuning, 1M file limits
+build {
+  name    = "appliance-game-server"
+  sources = ["source.qemu.image", "source.proxmox-clone.template"]
+
+  provisioner "shell" {
+    environment_vars = concat(["FLAVOR=appliance-game-server", "BM_GEN=generic", "KERNEL_PROFILE=generic"], local.common_env)
+    scripts = [
+      "${path.root}/provisioners/00-base-strip.sh",
+      "${path.root}/provisioners/05-hypervisor-agents.sh",
+      "${path.root}/provisioners/10-network-time.sh",
+      "${path.root}/provisioners/20-kernel-sysctl.sh",
+      "${path.root}/provisioners/25-baremetal-tuning.sh",
+      "${path.root}/provisioners/40-docker-runtime.sh",
+      "${path.root}/provisioners/79-appliance-game.sh",
+      "${path.root}/provisioners/99-cleanup.sh"
+    ]
+  }
+}
+
 
 

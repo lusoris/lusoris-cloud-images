@@ -61,17 +61,23 @@ EXPECTED_FLAVORS = [
     "ai-infer-nvidia",
     "ai-infer-nvidia-modern",
     "ai-infer-nvidia-bleeding",
+    # Tier 7: Specialized Homelab Appliances (5)
+    "appliance-vision-nvr",
+    "appliance-gateway-dns",
+    "appliance-media-server",
+    "appliance-ci-runner",
+    "appliance-game-server",
 ]
 
 
 class TestFlavorsIntegrity:
     def test_expected_flavors_count(self) -> None:
         """Verify the exact count of active production flavors."""
-        assert len(EXPECTED_FLAVORS) == 39, f"Expected 39 flavors, got {len(EXPECTED_FLAVORS)}"
+        assert len(EXPECTED_FLAVORS) == 44, f"Expected 44 flavors, got {len(EXPECTED_FLAVORS)}"
 
     def test_naming_convention(self) -> None:
         """Verify all flavor targets conform to the canonical naming regex."""
-        pattern = re.compile(r"^(base|docker|podman|k8s-node|k3s-agent|k3s-server|cloudnative|ai-infer)-[a-z0-9-]+$")
+        pattern = re.compile(r"^(base|docker|podman|k8s-node|k3s-agent|k3s-server|cloudnative|ai-infer|appliance)-[a-z0-9-]+$")
         for flavor in EXPECTED_FLAVORS:
             assert pattern.match(flavor), f"Flavor '{flavor}' violates naming convention"
 
@@ -105,7 +111,7 @@ class TestFlavorsIntegrity:
         """Verify all build blocks start with 00-base-strip and terminate with 99-cleanup."""
         content = BUILDS_PKR.read_text(encoding="utf-8")
         build_blocks = re.findall(r'build\s*\{[^}]*name\s*=\s*"([^"]+)"[^}]*scripts\s*=\s*\[(.*?)\]', content, re.DOTALL)
-        assert len(build_blocks) >= 39, "Failed to parse build blocks from builds.pkr.hcl"
+        assert len(build_blocks) >= 44, "Failed to parse build blocks from builds.pkr.hcl"
 
         for name, scripts_raw in build_blocks:
             scripts = [s.strip().strip('"').strip("'") for s in scripts_raw.split(",") if s.strip()]

@@ -50,7 +50,7 @@ Autonomous agents should utilize specialized project skills under `.agents/skill
 
 ---
 
-## 3. The 4-Dimensional Flavor Matrix (39 Flavors)
+## 3. The 4-Dimensional Flavor Matrix (44 Flavors)
 
 | Workload Tier | Hardware Stack | Flavor Target | Key Components |
 | :--- | :--- | :--- | :--- |
@@ -93,6 +93,11 @@ Autonomous agents should utilize specialized project skills under `.agents/skill
 | **AI Infer** | NVIDIA Mainstream | `ai-infer-nvidia` | Transparent hugepages, numactl, vLLM/Ollama (NVIDIA 565) |
 | **AI Infer** | NVIDIA Modern | `ai-infer-nvidia-modern` | Transparent hugepages, numactl, vLLM/Ollama (NVIDIA 610) |
 | **AI Infer** | NVIDIA Bleeding | `ai-infer-nvidia-bleeding`| Transparent hugepages, Blackwell RTX 5090 / B200 (NVIDIA 615) |
+| **Homelab** | Intel GPU + Coral | `appliance-vision-nvr` | Coral Edge TPU (`gasket-dkms`, udev), Intel QuickSync (`iHD`), CDI, Docker CE |
+| **Homelab** | VirtIO / Low-Power | `appliance-gateway-dns` | Port 53 stub disabled, WireGuard, line-rate forwarding (< 150MB RAM) |
+| **Homelab** | Intel + AMD GPU + NAS | `appliance-media-server`| Intel QuickSync + AMD Mesa VA-API, `nfs-common`, `cifs-utils`, 4096KB readahead |
+| **Homelab** | Multi-Core CPU / DinD | `appliance-ci-runner` | QEMU ARM64/ARMv7 binfmt, Docker Buildx, `git-lfs`, 4GB tmpfs `/tmp` |
+| **Homelab** | High Clock CPU | `appliance-game-server` | 32-bit `i386` glibc, `steamcmd`, 16MB UDP socket buffer tuning, 1M file limits |
 
 ---
 

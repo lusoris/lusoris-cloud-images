@@ -8,6 +8,7 @@
         build-ai-infer-generic build-ai-infer-intel build-ai-infer-amd \
         build-k3s-agent-generic build-k3s-agent-intel build-k3s-agent-amd build-k3s-agent-nvidia build-k3s-server-generic \
         build-cloudnative-generic build-cloudnative-k8s build-cloudnative-storage build-cloudnative-pg \
+        build-appliance-vision-nvr build-appliance-gateway-dns build-appliance-media-server build-appliance-ci-runner build-appliance-game-server \
         build-generic build-intel build-amd build-nvidia
 
 
@@ -181,6 +182,22 @@ build-cloudnative-storage: init ## Build cloudnative-storage CNCF storage applia
 
 build-cloudnative-pg: init ## Build cloudnative-pg PostgreSQL / CloudNativePG host
 	@cd packer && $(PACKER) build -only="cloudnative-pg.qemu.image" .
+
+# Specialized Homelab Appliances
+build-appliance-vision-nvr: init ## Build appliance-vision-nvr (Coral TPU + QuickSync + Frigate)
+	@cd packer && $(PACKER) build -only="appliance-vision-nvr.qemu.image" .
+
+build-appliance-gateway-dns: init ## Build appliance-gateway-dns (Port 53 freed, WireGuard, AdGuard/Pi-hole)
+	@cd packer && $(PACKER) build -only="appliance-gateway-dns.qemu.image" .
+
+build-appliance-media-server: init ## Build appliance-media-server (Intel/AMD VA-API, NFS/CIFS, Jellyfin/Plex)
+	@cd packer && $(PACKER) build -only="appliance-media-server.qemu.image" .
+
+build-appliance-ci-runner: init ## Build appliance-ci-runner (QEMU ARM64 binfmt, Buildx, GitHub/GitLab runner)
+	@cd packer && $(PACKER) build -only="appliance-ci-runner.qemu.image" .
+
+build-appliance-game-server: init ## Build appliance-game-server (SteamCMD, 32-bit glibc, low-latency UDP)
+	@cd packer && $(PACKER) build -only="appliance-game-server.qemu.image" .
 
 
 
