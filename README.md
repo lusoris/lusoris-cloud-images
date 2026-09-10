@@ -1,114 +1,93 @@
 # lusoris-cloud-images
 
-[![CI Quality Gates](https://github.com/lusoris/lusoris-cloud-images/actions/workflows/ci.yml/badge.svg)](https://github.com/lusoris/lusoris-cloud-images/actions/workflows/ci.yml)
-[![Security Scans](https://github.com/lusoris/lusoris-cloud-images/actions/workflows/security-scans.yml/badge.svg)](https://github.com/lusoris/lusoris-cloud-images/actions/workflows/security-scans.yml)
-[![Packer](https://img.shields.io/badge/Packer-1.11%2B-blue.svg)](https://www.packer.io/)
-[![Documentation](https://img.shields.io/badge/Docs-MkDocs%20Material-teal.svg)](https://lusoris.github.io/lusoris-cloud-images)
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](LICENSE)
+<div align="center">
 
-> Enterprise-grade, hardened, hardware-accelerated cloud and bare-metal OS image forge with pre-baked runtimes.
+[![CI Quality Gates](https://img.shields.io/github/actions/workflow/status/lusoris/lusoris-cloud-images/ci.yml?branch=main&label=CI%20Gates&logo=githubactions&logoColor=white&style=flat-square)](https://github.com/lusoris/lusoris-cloud-images/actions/workflows/ci.yml)
+[![Security Scans](https://img.shields.io/github/actions/workflow/status/lusoris/lusoris-cloud-images/security-scans.yml?branch=main&label=Security%20Scans&logo=github&logoColor=white&style=flat-square)](https://github.com/lusoris/lusoris-cloud-images/actions/workflows/security-scans.yml)
+[![Supply Chain](https://img.shields.io/github/actions/workflow/status/lusoris/lusoris-cloud-images/supply-chain.yml?branch=main&label=Scorecard&logo=securityscorecards&logoColor=white&style=flat-square)](https://github.com/lusoris/lusoris-cloud-images/actions/workflows/supply-chain.yml)
+[![Release Matrix](https://img.shields.io/github/actions/workflow/status/lusoris/lusoris-cloud-images/release-matrix.yml?branch=main&label=Release%20Engine&logo=packer&logoColor=white&style=flat-square)](https://github.com/lusoris/lusoris-cloud-images/actions/workflows/release-matrix.yml)
 
-📖 **Full Documentation Portal**: [https://lusoris.github.io/lusoris-cloud-images](https://lusoris.github.io/lusoris-cloud-images)
+[![Flavors](https://img.shields.io/badge/Flavors-39%20Production%20Targets-blue?logo=linux&logoColor=white&style=flat-square)](FLAVORS.md)
+[![Base OS](https://img.shields.io/badge/Base%20OS-Ubuntu%2026.04%20Noble-E95420?logo=ubuntu&logoColor=white&style=flat-square)](versions.json)
+[![Packer](https://img.shields.io/badge/Packer-1.11%2B-02A8EF?logo=packer&logoColor=white&style=flat-square)](https://www.packer.io/)
+[![SSOT Schema](https://img.shields.io/badge/SSOT-Draft%202020--12-success?logo=json&style=flat-square)](versions.schema.json)
+[![Time Security](https://img.shields.io/badge/Time%20Security-NTS%20RFC%208915-informational?style=flat-square)](docs/security/time-nts.md)
+
+[![Accelerators](https://img.shields.io/badge/Accelerators-NVIDIA%20CUDA%20%7C%20Intel%20Xe%20%7C%20AMD%20ROCm-76B900?logo=nvidia&logoColor=white&style=flat-square)](docs/hardware/nvidia.md)
+[![Hypervisors](https://img.shields.io/badge/Hypervisors-Proxmox%20%7C%20Unraid%20%7C%20ESXi%20%7C%20KVM-orange?style=flat-square)](docs/platforms/proxmox.md)
+[![Open Standards](https://img.shields.io/badge/Open%20Standards-CDI%20%7C%20OCI%20%7C%20CNI%20%7C%20CSI-purple?style=flat-square)](docs/principles.md)
+[![Documentation](https://img.shields.io/badge/Docs-MkDocs%20Material-teal?logo=materialformkdocs&logoColor=white&style=flat-square)](https://lusoris.github.io/lusoris-cloud-images)
+[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg?style=flat-square)](LICENSE)
+
+<br/>
+
+**Enterprise-grade, hardened, hardware-accelerated cloud and bare-metal OS image forge with pre-baked runtimes.**
+
+[📖 Documentation Portal](https://lusoris.github.io/lusoris-cloud-images) &nbsp;•&nbsp;
+[📋 Complete Flavor Catalog (39 Flavors)](FLAVORS.md) &nbsp;•&nbsp;
+[📐 Architecture & Principles](docs/principles.md) &nbsp;•&nbsp;
+[🔒 Security Advisories](https://github.com/lusoris/lusoris-cloud-images/security/advisories)
+
+</div>
 
 ---
 
-## Overview
+## Why lusoris-cloud-images?
 
-`lusoris-cloud-images` is an automated, open-source OS image forge producing minimal, hardened, and vendor-specialized OS images (`.qcow2`, `.raw`, `.vmdk`, and Proxmox/Unraid/VMware templates).
-
-Instead of deploying generic stock distributions that spend minutes pulling gigabytes of packages and container layers on first boot, `lusoris-cloud-images` provides:
+Stock cloud distributions waste minutes downloading gigabytes of kernel modules, GPU drivers, and container runtimes on first boot. `lusoris-cloud-images` bakes these dependencies into production-ready, verified images (`.qcow2`, `.raw`, `.vmdk`, and Proxmox/Unraid/VMware templates).
 
 - **Zero Base Bloat**: Complete elimination of Canonical snaps, telemetry services (`ubuntu-pro-client`, `landscape-common`, `popularity-contest`), motd news, and unneeded documentation.
-- **Single Source of Truth (`versions.json`)**: Upstream distribution URLs, Kubernetes versions, DaemonSets, and driver branches are centrally managed in one file.
-- **Hardware Acceleration Tiers**: Tailored GPU driver stacks for Intel Arc/Flex/Xe, AMD Mesa & ROCm, and NVIDIA generational CUDA (Pascal 535, Ampere/Ada 565, Hopper/Blackwell Open Modules + Fabric Manager).
-- **Multi-Hypervisor Portability**: Coexisting `qemu-guest-agent` and `open-vm-tools`, Unraid `virtiofs`/`9p` host sharing, and ACPI clean power shutdown.
-- **Bare-Metal & Hypervisor Performance Engine**: NVMe/VirtIO `mq-deadline` I/O scheduling, automated weekly `fstrim.timer`, ZRAM in-memory swap guard, fast-boot `NoCloud` cloud-init discovery, BBR congestion control, and direct disk streaming (`lusoris-install-to-disk`).
-- **Resilient Global Time**: Cryptographically authenticated Network Time Security (NTS) using Cloudflare Anycast and European national metrology institutes (PTB, Netnod, SIDN, 3eck).
+- **Single Source of Truth (`versions.json`)**: Every upstream URL, driver branch, and container tag originates from a single declarative manifest validated against `versions.schema.json`.
+- **Multi-Generational Hardware**: Tailored driver stacks for Intel Arc/Flex/Xe2, AMD Mesa/ROCm 10, and NVIDIA generational CUDA (Pascal 535, Ampere/Ada 565, Hopper/Blackwell 610/615).
+- **Hypervisor & Bare-Metal Speed Engine**: Coexisting `qemu-guest-agent` + `open-vm-tools`, Unraid `virtiofs`/`9p` host sharing, fast-boot `NoCloud` discovery (< 2s), ZRAM compressed swap guard, weekly `fstrim.timer`, and VirtIO `mq-deadline` I/O scheduling.
+- **Resilient Global Time**: Cryptographically authenticated Network Time Security (NTS RFC 8915) combining Cloudflare Anycast and European national metrology laboratories (PTB, Netnod, SIDN, 3eck).
 
 ---
 
-## Architecture
+## Build Architecture
 
 ```mermaid
 graph TD
-    A[Upstream Ubuntu 26.04 Cloud Base] --> B[Packer QEMU / Proxmox Engine]
-    SSOT[Single Source of Truth: versions.json] --> B
+    classDef base fill:#1e293b,stroke:#3b82f6,stroke-width:2px,color:#fff;
+    classDef stage fill:#0f172a,stroke:#10b981,stroke-width:2px,color:#fff;
+    classDef target fill:#1e1b4b,stroke:#8b5cf6,stroke-width:2px,color:#fff;
+    classDef out fill:#052e16,stroke:#22c55e,stroke-width:2px,color:#fff;
 
-    B --> C[00-base-strip: Remove snapd, telemetry, docs]
-    C --> AG[05-hypervisor-agents: QEMU + VMware + Unraid VirtFS]
-    AG --> D[10-network-time: Authoritative Anycast NTS chrony]
-    D --> E[20-kernel-sysctl: CIS Baseline & BBR]
-    E --> BM[25-baremetal-tuning: NVMe sched & growroot]
+    A["Ubuntu 26.04 Cloud Base"]:::base --> SSOT["versions.json (SSOT)"]:::base
+    SSOT --> P["Packer Engine (QEMU / Proxmox)"]:::base
 
-    BM --> F1[base-generic: Minimal cloud VM]
-    BM --> F2[30-gpu-intel: Intel Media & Level Zero]
-    BM --> F3[31/32-gpu-amd: Mesa RADV or ROCm Compute]
-    BM --> F4[33/34/35-gpu-nvidia: Legacy / Mainstream / Datacenter]
+    P --> S0["00-base-strip: Purge snaps & telemetry"]:::stage
+    S0 --> S1["05-hypervisor: QEMU + VMware + VirtFS"]:::stage
+    S1 --> S2["10-time: Multi-peer Anycast NTS"]:::stage
+    S2 --> S3["20-sysctl: CIS & BBR Tuning"]:::stage
+    S3 --> S4["25-baremetal: NVMe sched & ZRAM"]:::stage
 
-    F1 --> W1[base-generic]
-    F2 --> W2[docker-intel: Docker CE + QuickSync]
-    F3 --> W3[docker-amd: Docker CE + ROCm]
-    F4 --> W4[docker-nvidia: Docker CE + NVIDIA CDI]
-    F1 --> K1[50/55-k8s: k8s-node-generic]
-    F2 --> K2[50/55-k8s: k8s-node-intel]
-    F4 --> K4[50/55-k8s: k8s-node-nvidia]
-    F4 --> AI[60-ai-infer: ai-infer-nvidia]
+    S4 --> T1["Tier 1: Minimal Base OS (8)"]:::target
+    S4 --> T2["Tier 2: Container Hosts (7)"]:::target
+    S4 --> T3["Tier 3: Enterprise K8s Nodes (10)"]:::target
+    S4 --> T4["Tier 4: K3s Edge Fleet (5)"]:::target
+    S4 --> T5["Tier 5: CloudNative & Storage (4)"]:::target
+    S4 --> T6["Tier 6: AI & LLM Inference (6)"]:::target
 
-    W1 --> OUT[.qcow2.zst / .raw.zst / .vmdk.zst]
-    W2 --> OUT
-    W3 --> OUT
-    W4 --> OUT
-    K1 --> OUT
-    K2 --> OUT
-    K4 --> OUT
-    AI --> OUT
+    T1 & T2 & T3 & T4 & T5 & T6 --> OUT[".qcow2.zst · .raw.zst · .vmdk.zst · Proxmox / Unraid Templates"]:::out
 ```
 
 ---
 
-## The 4D Flavor Matrix (39 Flavors)
+## Workload Tier Summary (39 Flavors)
 
-| Flavor | Workload | Hardware Stack | Kernel Profile | Key Components |
-| :--- | :--- | :--- | :--- | :--- |
-| **`base-generic`** | Minimal OS | VirtIO / CPU | `generic` | Zero bloat, Anycast NTS, QEMU+VMware agents |
-| **`base-intel`** | Minimal OS | Intel Xe/Arc/Xe2 | `generic` | Intel Media Driver (`iHD`), Level Zero, vainfo, Battlemage Xe2 |
-| **`base-amd`** | Minimal OS | AMD GPU | `generic` | Mesa Gallium `radeonsi`, RADV Vulkan, AMDGPU DRM |
-| **`base-nvidia-legacy`** | Minimal OS | NVIDIA Pascal/Volta | `generic` | NVIDIA 535 driver, CUDA 12.2, GTX 1080, P4, P40, P100, V100 |
-| **`base-nvidia-mainstream`**| Minimal OS | NVIDIA Turing/Ampere | `generic` | NVIDIA 565 driver, CUDA 12.8, RTX 20/30/40, A100, L4 |
-| **`base-nvidia-modern`**    | Minimal OS | NVIDIA Ada/Hopper | `generic` | NVIDIA 610 driver, CUDA 13.3, RTX 4080/4090, L40S, H100 |
-| **`base-nvidia-bleeding`** | Minimal OS | NVIDIA Blackwell | `generic` | NVIDIA 615 driver, CUDA 13.4, RTX 5090, B200 |
-| **`base-nvidia-datacenter`**| Minimal OS | NVIDIA Hopper/Blackwell | `baremetal` | NVIDIA 615 Open Modules, Fabric Manager, NVLink mesh |
-| **`docker-generic`** | Docker Host | VirtIO / CPU | `generic` | Docker CE 29.8, Docker Compose v2, log rotation |
-| **`docker-intel`** | Docker Host | Intel GPU | `generic` | Docker CE + Intel QuickSync passthrough + CDI spec |
-| **`docker-amd`** | Docker Host | AMD GPU | `generic` | Docker CE + AMD ROCm 10 compute runtime + CDI spec |
-| **`docker-nvidia`** | Docker Host | NVIDIA Mainstream | `generic` | Docker CE + NVIDIA 565 + NVIDIA Container Toolkit CDI |
-| **`docker-nvidia-modern`** | Docker Host | NVIDIA Modern | `generic` | Docker CE + NVIDIA 610 + NVIDIA Container Toolkit CDI |
-| **`docker-nvidia-bleeding`** | Docker Host | NVIDIA Bleeding | `generic` | Docker CE + NVIDIA 615 + NVIDIA Container Toolkit CDI |
-| **`podman-generic`** | Rootless OCI | VirtIO / CPU | `generic` | Podman 5.x, Buildah, Skopeo, Quadlet, Netavark CNI |
-| **`k8s-node-generic`** | K8s Worker | VirtIO / CPU | `k8s` | containerd 2.3.5, kubelet 1.37.0, lean zero-preheat |
-| **`k8s-node-cilium`** | K8s Worker | VirtIO / CPU | `k8s` | containerd 2.3.5, preheated Cilium 1.20.1 & kube-vip 1.2.3 |
-| **`k8s-node-calico`** | K8s Worker | VirtIO / CPU | `k8s` | containerd 2.3.5, preheated Calico 3.32.2 & kube-vip 1.2.3 |
-| **`k8s-node-flannel`** | K8s Worker | VirtIO / CPU | `k8s` | containerd 2.3.5, preheated Flannel 0.28.9 & kube-vip 1.2.3 |
-| **`k8s-node-intel`** | K8s Worker | Intel Arc/Xe2 | `k8s` | containerd 2.3.5 + Intel drivers + Intel K8s Plugin v0.36.0 |
-| **`k8s-node-amd`** | K8s Worker | AMD GPU | `k8s` | containerd 2.3.5 + AMD ROCm 10 + AMD K8s Plugin v1.37.0 |
-| **`k8s-node-nvidia`** | K8s Worker | NVIDIA Mainstream | `k8s` | containerd 2.3.5 + NVIDIA 565 + NVIDIA K8s Plugin v0.20.0 |
-| **`k8s-node-nvidia-modern`** | K8s Worker | NVIDIA Modern | `k8s` | containerd 2.3.5 + NVIDIA 610 + NVIDIA K8s Plugin v0.20.0 |
-| **`k8s-node-nvidia-bleeding`** | K8s Worker | NVIDIA Bleeding | `k8s` | containerd 2.3.5 + NVIDIA 615 + NVIDIA K8s Plugin v0.20.0 |
-| **`k3s-agent-generic`** | K3s Worker | VirtIO / CPU | `k8s` | Lightweight K3s agent, containerd, Flannel (< 300MB RAM) |
-| **`k3s-agent-intel`** | K3s Worker | Intel GPU | `k8s` | K3s agent + Intel QuickSync passthrough (`iHD`) + Level Zero |
-| **`k3s-agent-amd`** | K3s Worker | AMD GPU | `k8s` | K3s agent + AMD ROCm 10 compute runtime + RADV Vulkan |
-| **`k3s-agent-nvidia`** | K3s Worker | NVIDIA Mainstream | `k8s` | K3s agent + NVIDIA 565 + Container Toolkit CDI |
-| **`k3s-server-generic`** | K3s Server | VirtIO / CPU | `k8s` | K3s standalone master, embedded SQLite, local-path storage |
-| **`cloudnative-generic`** | Immutable Host | VirtIO / CPU | `generic` | Read-only root protection, ephemeral tmpfs, containerd CDI |
-| **`cloudnative-k8s`** | Immutable Worker | VirtIO / CPU | `k8s` | Read-only root protection, containerd 2.3.5, kubelet 1.37.0 |
-| **`cloudnative-storage`** | CNCF Storage | VirtIO / Baremetal | `baremetal` | NVMe-oF (TCP), OpenZFS 2.3, iSCSI, multipath, NFS |
-| **`cloudnative-pg`** | Database Host | VirtIO / Baremetal | `ai-infer` | CloudNativePG tuning, hugepages, strict memory overcommit |
-| **`ai-infer-generic`** | AI Inference | CPU High-Throughput | `ai-infer` | AMX, AVX-512, NUMA, vLLM / Ollama CPU, Docker CE |
-| **`ai-infer-intel`** | AI Inference | Intel Xe/Arc/Xe2 | `ai-infer` | Intel Level Zero, OpenVINO, IPEX-LLM, CDI, Docker CE |
-| **`ai-infer-amd`** | AI Inference | AMD ROCm 10 | `ai-infer` | AMD ROCm 10, /dev/kfd, RDNA 3/4 & Instinct, CDI, Docker CE |
-| **`ai-infer-nvidia`** | AI Inference | NVIDIA Mainstream | `ai-infer` | NVIDIA 565, Transparent Hugepages, NUMA, vLLM, Docker CE |
-| **`ai-infer-nvidia-modern`** | AI Inference | NVIDIA Modern | `ai-infer` | NVIDIA 610, Transparent Hugepages, NUMA, vLLM, Docker CE |
-| **`ai-infer-nvidia-bleeding`**| AI Inference | NVIDIA Bleeding | `ai-infer` | NVIDIA 615, Blackwell RTX 5090 / B200, vLLM, Docker CE |
+To keep maintenance low and usability high, flavors are partitioned into 6 distinct tiers. 
+
+| Tier | Flavors | Hardware Acceleration | Key Runtime Components | Documentation |
+| :--- | :---: | :--- | :--- | :--- |
+| **1. Base Cloud** | 8 | Generic, Intel Xe, AMD Mesa, NVIDIA (535 to 615) | Hardened OS, Anycast NTS, QEMU/VMware agents | [📖 Base Guide](docs/flavors/base.md) |
+| **2. Container Hosts** | 7 | Generic, Intel QuickSync, AMD ROCm, NVIDIA CDI | Docker CE 29.8, Docker Compose v2, Podman 5.x | [📖 Containers Guide](docs/flavors/containers.md) |
+| **3. Enterprise K8s** | 10 | Generic, Intel Arc, AMD ROCm 10, NVIDIA Mainstream/Bleeding | containerd 2.3.5, kubelet 1.37.0, Cilium/Calico preheat | [📖 Kubernetes Guide](docs/flavors/kubernetes.md) |
+| **4. K3s Edge Fleet** | 5 | Generic, Intel QuickSync, AMD ROCm 10, NVIDIA CDI | Lightweight K3s (< 300MB RAM), Flannel, SQLite | [📖 K3s Guide](docs/flavors/k3s.md) |
+| **5. CloudNative & Storage** | 4 | Generic, Baremetal, NVMe-oF, OpenZFS 2.3 | Read-only root immutability, OpenZFS, CloudNativePG | [📖 CloudNative Guide](docs/flavors/cloudnative.md) |
+| **6. AI & LLM Inference** | 6 | AMX/AVX-512, Intel Xe2, AMD ROCm 10, NVIDIA (565/610/615) | Transparent Hugepages, NUMA, vLLM / Ollama | [📖 AI Inference Guide](docs/flavors/ai-infer.md) |
+
+> 📋 **Detailed Specifications**: Browse the complete list of all 39 target configurations in [**`FLAVORS.md`**](FLAVORS.md) or explore them interactively in the [**Documentation Portal Matrix**](https://lusoris.github.io/lusoris-cloud-images/flavors/matrix/).
 
 ---
 
@@ -116,7 +95,7 @@ graph TD
 
 ### Prerequisites
 
-- [Packer](https://developer.hashicorp.com/packer/install) >= 1.9.0
+- [Packer](https://developer.hashicorp.com/packer/install) $\ge$ 1.9.0
 - [QEMU](https://www.qemu.org/) with KVM support (`qemu-system-x86_64`)
 - ShellCheck, Shfmt, and Yamllint
 
@@ -132,49 +111,42 @@ make init
 make lint
 make test
 
-# Build images across the matrix
-make build-base-generic
-make build-docker-generic
-make build-docker-nvidia
-make build-k8s-generic        # Lean zero-preheat
-make build-k8s-cilium         # Preheated Cilium
-make build-k3s-agent-generic   # Lightweight Edge K3s worker
-make build-k3s-server-generic  # Standalone K3s control plane
-make build-cloudnative-generic # Immutable container host
-make build-cloudnative-storage # CNCF storage appliance
-make build-ai-infer-generic   # CPU High-Throughput
-make build-ai-infer-intel     # Intel Arc / Battlemage Xe2
-make build-ai-infer-amd       # AMD ROCm 10
-make build-ai-infer-nvidia    # NVIDIA Mainstream
-make build-ai-infer-nvidia-bleeding # NVIDIA Bleeding Blackwell
+# Build images (or specify any flavor from FLAVORS.md)
+make build-base-generic        # Minimal hardened OS
+make build-docker-nvidia       # Docker CE + NVIDIA 565 Container Toolkit
+make build-k8s-cilium          # Enterprise K8s + preheated Cilium
+make build-k3s-agent-generic   # Lightweight Edge K3s worker (< 300MB RAM)
+make build-cloudnative-generic # Immutable container host (read-only root)
+make build-cloudnative-storage # CNCF storage appliance (NVMe-oF / ZFS)
+make build-ai-infer-nvidia     # AI inference appliance (vLLM / NUMA tuning)
 ```
 
 ---
 
-## Repository Structure
+## Repository & Documentation Map
 
 ```text
 .
-├── versions.json              # Single Source of Truth for all component versions
-├── mkdocs.yml                 # Material for MkDocs configuration
-├── docs/                      # Full documentation portal (guides, matrix, ADRs)
-├── .github/
-│   ├── CODEOWNERS             # Repository code owners
-│   ├── PULL_REQUEST_TEMPLATE.md
-│   ├── ISSUE_TEMPLATE/        # Structured issue forms
-│   └── workflows/             # Enterprise CI/CD suite (ci, security, supply-chain, pages)
-├── packer/
-│   ├── versions.pkr.hcl       # Required Packer plugins
-│   ├── variables.pkr.hcl      # Universal build variables
-│   ├── sources.pkr.hcl        # QEMU and Proxmox builder sources
-│   ├── builds.pkr.hcl         # Modular 26-flavor pipeline definitions
-│   ├── http/                  # Headless cloud-init seed data
-│   └── provisioners/          # Modular shell scripts (NASA/JPL Power of 10 compliant)
+├── versions.json              # Single Source of Truth (SSOT) for all versions
+├── versions.schema.json       # JSON Schema (Draft 2020-12) validating SSOT
+├── FLAVORS.md                 # Segmented catalog of all 39 flavors & make targets
+├── mkdocs.yml                 # Documentation portal configuration
+├── docs/                      # Comprehensive engineering documentation
+│   ├── flavors/               # Detailed guides for each workload tier
+│   ├── platforms/             # Hypervisors: Proxmox, Unraid, VMware, Bare-Metal
+│   ├── hardware/              # Acceleration: NVIDIA CUDA, Intel Arc, AMD ROCm
+│   ├── security/              # CIS Benchmarks, Anycast NTS, Supply Chain
+│   ├── adr/                   # Architecture Decision Records (0001–0007)
+│   └── community/             # Contributing, Security, Audits, Governance
+├── packer/                    # Modular Packer HCL2 templates & shell provisioners
 ├── tests/                     # Automated pytest verification suite
-├── AGENTS.md                  # Operating charter and architectural invariants
-├── CLAUDE.md                  # Developer and agent guide
-├── CONTRIBUTING.md            # Contribution workflow and PR guidelines
-├── SECURITY.md                # Vulnerability disclosure policy
-├── Makefile                   # Unified developer targets
-└── README.md                  # Project overview
+└── Makefile                   # Unified local targets (lint, test, build-*)
 ```
+
+---
+
+## Governance & Security
+
+- **Security Advisories**: To report security vulnerabilities, open a [GitHub Private Security Advisory](https://github.com/lusoris/lusoris-cloud-images/security/advisories/new).
+- **Engineering Principles**: All changes must satisfy [Engineering Principles](docs/principles.md) and [Rule Crosswalk](docs/repository-rule-crosswalk.md).
+- **License**: [Apache 2.0](LICENSE) — Copyright &copy; 2026 The Lusoris Authors.
