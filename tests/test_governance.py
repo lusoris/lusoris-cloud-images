@@ -43,6 +43,7 @@ class TestGovernanceIntegrity:
             REPO_ROOT / "release-please-config.json",
             REPO_ROOT / ".release-please-manifest.json",
             REPO_ROOT / "renovate.json",
+            REPO_ROOT / "requirements-test.txt",
         ]
         for file_path in required_files:
             assert file_path.exists(), f"Missing required file: {file_path}"
