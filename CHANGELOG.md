@@ -40,6 +40,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pre-execution privacy and zero-leak lifecycle guard (`.agents/hooks.json` and `.agents/hooks-scripts/guard_privacy.py`) intercepting tool calls to guarantee zero private RFC 1918 IPs or workstation home paths before any file modification.
 - Comprehensive Managed Agents operations guide with saturated jewel-tone architecture flowcharts in `docs/operations/managed-agents.md`.
 - Automated agent fleet integrity test suite in `tests/test_agents_fleet.py` validating schema adherence, hooks wiring, and privacy guard interception.
+- ADR-0012: Persistent Cross-Session Memory via Hindsight Semantic Backend & MCP Architecture (`docs/adr/0012-hindsight-semantic-memory-mcp.md`).
+- Hindsight Model Context Protocol (MCP) semantic memory stdio bridge (`scripts/hindsight_mcp_server.py`) exposing `hindsight_recall`, `hindsight_retain`, `hindsight_reflect`, `hindsight_status`, and `hindsight_list_banks` with automatic offline buffer fallback and pre-ingest privacy sanitization.
+- Dual-layer MCP configuration standard: `.mcp.json` at repository root and `.agents/mcp_config.json` in workspace customization root.
+- Cluster port-forward supervisor (`scripts/tunnel_hindsight.py`) maintaining local access to `service/hindsight:8888`.
+- Officially integrated `google-genai>=2.22.0` SDK in `pyproject.toml` and verified clean OpenAPI v1beta agent schema generation.
+- Automated Hindsight MCP test suite in `tests/test_mcp_hindsight.py` verifying protocol compliance, tool schema discovery, and privacy sanitization.
 
 ### Fixed
 - Corrected base OS badge and metadata to Ubuntu 26.04 LTS Resolute in `README.md`.

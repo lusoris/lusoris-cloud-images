@@ -21,4 +21,5 @@ Once an ADR reaches status **Accepted**, its text is immutable. If architectural
 | [0009](0009-multi-distribution-base-roadmap.md) | Multi-Distribution Base OS Architecture and Roadmap | Accepted | 2026-09-10 |
 | [0010](0010-container-ecosystem-runtimes-and-tooling.md) | Modern Container Runtimes, Lazy-Pulling Snapshotters, and Zero-Footprint Diagnostic Tooling | Accepted | 2026-09-10 |
 | [0011](0011-enterprise-golden-image-compliance-and-lifecycle.md) | Enterprise Golden Image Hardening, Compliance Crosswalk, and Lifecycle Governance | Accepted | 2026-09-10 |
+| [0012](0012-hindsight-semantic-memory-mcp.md) | Persistent Cross-Session Memory via Hindsight Semantic Backend & MCP Architecture | Accepted | 2026-09-10 |
 
