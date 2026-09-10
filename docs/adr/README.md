@@ -24,4 +24,9 @@ Once an ADR reaches status **Accepted**, its text is immutable. If architectural
 | [0012](0012-universal-arch-containerd2-and-dualstack-hardening.md) | Universal Architecture Portability, Containerd 2.x CRI Modernization, and Dual-Stack Hardening | Accepted | 2026-09-10 |
 | [0013](0013-hindsight-semantic-memory-mcp.md) | Persistent Cross-Session Memory via Hindsight Semantic Backend & MCP Architecture | Accepted | 2026-09-10 |
 | [0014](0014-automated-dependency-management-renovate.md) | Automated Dependency & Security Governance via Zero-Noise Renovate and Native CodeQL | Accepted | 2026-09-10 |
+| [0015](0015-progressive-agent-skills-and-staged-mcp-operations.md) | Progressive Disclosure Agent Skills & Two-Phase Staged MCP Mutation Guardrails | Accepted | 2026-09-10 |
+| [0016](0016-hypervisor-and-image-runtime-optimizations.md) | Hypervisor, Storage, and Runtime Image Optimization Architecture | Accepted | 2026-09-10 |
+| [0017](0017-developer-workstations-single-node-k8s-and-orchestration-expansion.md) | Developer Workstation Environments, Single-Node Kubernetes, and Clustered Orchestration Expansion | Accepted | 2026-09-10 |
+| [0018](0018-nas-and-storage-appliance-ecosystem.md) | Open-Source and Virtual Network Attached Storage (NAS) Ecosystem Architecture | Accepted | 2026-09-10 |
+
 

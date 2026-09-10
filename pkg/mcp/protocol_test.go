@@ -69,6 +69,9 @@ func TestMCPProtocolHandshakeAndToolListing(t *testing.T) {
 		"inspect_compliance",
 		"trigger_build",
 		"apply_flavor",
+		"list_staged_actions",
+		"confirm_action",
+		"discard_staged_action",
 	}
 
 	assert.Equal(t, len(expectedTools), len(res.Tools))
@@ -300,5 +303,51 @@ func TestMCPProtocolToolExecution(t *testing.T) {
 		})
 		require.NoError(t, err)
 		assert.True(t, res.IsError)
+	})
+
+	t.Run("staging_lifecycle_via_protocol", func(t *testing.T) {
+		// 1. Calling trigger_build without confirmed or dry_run should stage
+		res, err := session.CallTool(ctx, &sdkmcp.CallToolParams{
+			Name: "trigger_build",
+			Arguments: map[string]any{
+				"flavor":  "base-generic",
+				"backend": "local",
+			},
+		})
+		require.NoError(t, err)
+		assert.False(t, res.IsError)
+		text := res.Content[0].(*sdkmcp.TextContent).Text
+		assert.Contains(t, text, "ACTION STAGED")
+		assert.Contains(t, text, "Action ID: act-")
+
+		// 2. List staged actions
+		resList, err := session.CallTool(ctx, &sdkmcp.CallToolParams{
+			Name:      "list_staged_actions",
+			Arguments: map[string]any{},
+		})
+		require.NoError(t, err)
+		assert.False(t, resList.IsError)
+		listText := resList.Content[0].(*sdkmcp.TextContent).Text
+		assert.Contains(t, listText, "trigger_build")
+
+		// 3. Confirm with invalid action_id
+		resConfirmErr, err := session.CallTool(ctx, &sdkmcp.CallToolParams{
+			Name: "confirm_action",
+			Arguments: map[string]any{
+				"action_id": "nonexistent-action-id",
+			},
+		})
+		require.NoError(t, err)
+		assert.True(t, resConfirmErr.IsError)
+
+		// 4. Discard with invalid action_id
+		resDiscardErr, err := session.CallTool(ctx, &sdkmcp.CallToolParams{
+			Name: "discard_staged_action",
+			Arguments: map[string]any{
+				"action_id": "nonexistent-action-id",
+			},
+		})
+		require.NoError(t, err)
+		assert.True(t, resDiscardErr.IsError)
 	})
 }

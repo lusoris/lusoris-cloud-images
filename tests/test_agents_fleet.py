@@ -100,3 +100,34 @@ class TestAgentsFleetIntegrity:
         )
         assert res_leak.returncode == 1
         assert "SECURITY VIOLATION" in res_leak.stderr
+
+    def test_skills_progressive_disclosure_structure(self) -> None:
+        """Verify .agents/skills/ adhere to 3-layer progressive disclosure standard."""
+        skills_dir = REPO_ROOT / ".agents" / "skills"
+        assert skills_dir.is_dir(), f"Missing {skills_dir}"
+
+        discovered_skills = [d for d in skills_dir.iterdir() if d.is_dir() and not d.name.startswith(".")]
+        assert len(discovered_skills) >= 8, f"Expected at least 8 skills, found {len(discovered_skills)}"
+
+        for skill_dir in discovered_skills:
+            skill_md = skill_dir / "SKILL.md"
+            assert skill_md.is_file(), f"Missing SKILL.md in {skill_dir.name}"
+
+            content = skill_md.read_text(encoding="utf-8")
+            assert content.startswith("---"), f"SKILL.md in {skill_dir.name} missing YAML frontmatter opening"
+            parts = content.split("---", 2)
+            assert len(parts) >= 3, f"SKILL.md in {skill_dir.name} malformed frontmatter"
+
+            frontmatter = parts[1]
+            assert "name:" in frontmatter, f"SKILL.md in {skill_dir.name} missing 'name'"
+            assert "description:" in frontmatter, f"SKILL.md in {skill_dir.name} missing 'description'"
+
+            # If references are defined, assert each referenced file exists
+            if "references:" in frontmatter:
+                for line in frontmatter.splitlines():
+                    stripped = line.strip()
+                    if stripped.startswith("- ") and stripped.endswith(".md"):
+                        ref_rel = stripped[2:].strip().strip("'\"")
+                        ref_file = skill_dir / ref_rel
+                        assert ref_file.is_file(), f"Referenced file {ref_rel} not found in {skill_dir}"
+
