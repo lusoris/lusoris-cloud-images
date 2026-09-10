@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 40-docker-runtime.sh — Install Docker CE, Docker Compose v2, and containerd.io
 # Configures log rotation, systemd cgroup driver, userland-proxy=false, and CDI support.
 # Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.

@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 31-gpu-amd-mesa.sh — AMD Radeon and Ryzen APU Mesa VA-API and Vulkan stack
 # Installs Mesa Gallium radeonsi VA-API, RADV Vulkan drivers, DRM runtime, and CDI specs.
 # Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.

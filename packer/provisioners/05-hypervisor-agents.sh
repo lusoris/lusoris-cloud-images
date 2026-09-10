@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 05-hypervisor-agents.sh — Multi-hypervisor guest agents and Unraid VirtFS integration
 # Coexistence of QEMU guest agent, VMware open-vm-tools, and Unraid host sharing.
 set -euo pipefail

@@ -17,6 +17,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Dedicated segmented flavor catalog in `FLAVORS.md` partitioning 39 flavors across 6 workload tiers.
 - Streamlined `README.md` with multi-tier badge rows, architecture diagram, and workload summary table.
 - Interactive tabbed flavor explorer in `docs/flavors/matrix.md`.
+- Comprehensive modular test coverage suite (48 tests across 8 modules: manifest SSOT, provisioner static analysis, flavor matrix, cloud-init seed data, documentation/ADR integrity, security/privacy invariants, Packer templates, and repository governance).
 
 ## [0.1.0] - 2026-09-09
 

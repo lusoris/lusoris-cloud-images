@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 25-baremetal-tuning.sh — Bare-metal hardware, CPU generation, and firmware tuning
 # Configures Intel/AMD microcode, physical NIC drivers, IOMMU, and NVMe optimization.
 set -euo pipefail

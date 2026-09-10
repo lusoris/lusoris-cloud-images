@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 60-ai-infer-runtime.sh — Turnkey AI/LLM inference host configuration (vLLM & Ollama)
 # Configures transparent hugepages, NUMA interleaving, and high-performance execution.
 set -euo pipefail

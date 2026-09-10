@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 32-gpu-amd-rocm.sh — AMD ROCm compute runtime for AI/ML and GPU acceleration
 # Configures ROCm repository (ROCm 7.0 / 10.0), HIP runtime, and /dev/kfd CDI specs.
 # Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.

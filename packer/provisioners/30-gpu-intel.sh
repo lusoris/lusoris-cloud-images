@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 30-gpu-intel.sh — Intel Arc, Battlemage Xe2, and UHD/Iris Xe GPU acceleration stack
 # Installs Level Zero, oneVPL, Intel Media VA-API driver, OpenCL, and generates CDI specs.
 # Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.

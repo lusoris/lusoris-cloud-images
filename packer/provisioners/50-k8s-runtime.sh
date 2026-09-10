@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Copyright 2026 Lusoris
 # 50-k8s-runtime.sh — Install containerd CRI runtime and Kubernetes node components
 # Consumes K8S_MAJOR_MINOR injected dynamically from versions.json (Ubuntu 26.04).
 # Complies with NASA/JPL Power of 10: short functions (<= 60 lines), checked returns.
